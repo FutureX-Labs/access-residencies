@@ -1,24 +1,13 @@
 "use client";
 import { useState } from "react";
 import axios from "axios";
+import Navbar from "../components/navbar/Navbar";
 
 const url = "http://localhost:4000/api/appartmentForRent/add";
 
 function Add() {
   const [postImage, setPostImage] = useState(null);
-  //   const [postMultipleImages, setPostMultipleImages] = useState(null);
   const [formData, setFormData] = useState(new FormData());
-
-  // propertyId: String,
-  // title: String,
-  // price: Number,
-  // thumbnailImage: String,
-  // images: [String],
-  // description: String,
-  // size: Number,
-  // bedrooms: Number,
-  // bathrooms: Number,
-  // town: String,
 
   const createPost = async () => {
     try {
@@ -76,40 +65,58 @@ function Add() {
   };
 
   return (
-    <div className="App">
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="file-upload" className="custom-file-upload">
-          {postImage && <img src={URL.createObjectURL(postImage)} alt="" />}
-        </label>
+    <>
+      <Navbar type={"user"} />
+      <div className="App" style={{ marginTop: "95px" }}>
+        <form onSubmit={handleSubmit}>
+          <label htmlFor="file-upload" className="custom-file-upload">
+            {postImage && <img src={URL.createObjectURL(postImage)} alt="" />}
+          </label>
 
-        <input
-          type="file"
-          label="Image"
-          name="myFile"
-          id="file-upload"
-          accept=".jpeg, .png, .jpg"
-          onChange={(e) => handleFileUpload(e)}
-        />
+          <input
+            type="file"
+            label="Image"
+            name="myFile"
+            id="file-upload"
+            accept=".jpeg, .png, .jpg"
+            onChange={(e) => handleFileUpload(e)}
+          />
 
-        <hr />
-        <hr />
-        <hr />
-        <hr />
-        <hr />
+          <hr />
+          <hr />
+          <hr />
+          <hr />
+          <hr />
 
-        <input
-          type="file"
-          label="Image"
-          name="myFiles"
-          id="file-uploads"
-          accept=".jpeg, .png, .jpg"
-          onChange={(e) => handleMultipleFileUpload(e)}
-          multiple
-        />
+          <input
+            type="file"
+            label="Image"
+            name="myFiles"
+            id="file-uploads"
+            accept=".jpeg, .png, .jpg"
+            onChange={(e) => handleMultipleFileUpload(e)}
+            multiple
+          />
 
-        <button type="submit">Submit</button>
-      </form>
-    </div>
+          <button type="submit">Submit</button>
+        </form>
+        <div>fdsfsdf</div>
+        <div>fdsfsdf</div>
+        <div>fdsfsdf</div>
+        <div>fdsfsdf</div>
+        <div>fdsfsdf</div>
+        <div>fdsfsdf</div>
+        <div>fdsfsdf</div>
+        <div>fdsfsdf</div>
+        <div>fdsfsdf</div>
+        <div>fdsfsdf</div>
+        <div>fdsfsdf</div>
+        <div>fdsfsdf</div>
+        <div>fdsfsdf</div>
+        <div>fdsfsdf</div>
+        <div>fdsfsdf</div>
+      </div>
+    </>
   );
 }
 

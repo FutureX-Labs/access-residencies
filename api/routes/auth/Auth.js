@@ -8,13 +8,18 @@ const upload = multer({ storage: storage });
 router.post("/login", async (req, res) => {
   try {
     const { username, password } = req.body;
-    const result = await auth.find({ username, password });
-    res.status(200).json(result);
+    const user = await auth.findOne({ username, password });
+    if (user) {
+      res.status(200).json(user);
+    } else {
+      res.status(401).json({ message: "Invalid username or password" });
+    }
   } catch (error) {
     console.error(error);
-    res.status(400).json(error);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
+
 router.post("/signup", async (req, res) => {
   try {
     const { username, password, isAdmin } = req.body;
@@ -25,7 +30,7 @@ router.post("/signup", async (req, res) => {
       isAdmin,
     });
     const result = await authDetails.save();
-    res.status(200).json(result);
+    res.status(200).send(result.data);
   } catch (error) {
     console.error(error);
     res.status(400).json(error);

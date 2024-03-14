@@ -1,0 +1,25 @@
+.root {
+  min-height: 100vh;
+  min-width: 100vw;
+  background-color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.loginBox {
+  height: 600px;
+  width: 650px;
+  background-color: white;
+  border-radius: 10px;
+}
+
+.inputField {
+  display: flex;
+  flex-direction: column;
+  padding: 30px 40px;
+}
+
+.textField {
+  margin: 20px 0px;
+}
