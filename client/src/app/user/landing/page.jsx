@@ -1,27 +1,39 @@
 "use client";
 import { useState } from "react";
 import axios from "axios";
-import Navbar from "./components/navbar/Navbar";
+import Navbar from "../../components/navbar/Navbar";
 import Image from "next/image";
 import { Box, Item, Grid, Typography, Select, MenuItem } from "@mui/material";
 import Container from "@mui/material/Container";
 
-const url = "http://localhost:4000/test";
+const url = "http://localhost:4000/api/appartmentForRent/add";
 
-function Home() {
-  const [postImages, setPostImages] = useState([]);
+function Add() {
+  const [postImage, setPostImage] = useState(null);
+  const [formData, setFormData] = useState(new FormData());
+  const [propertyType, setPropertyType] = useState("");
   const [property, setProperty] = useState("");
 
-  const createPost = async (newImages) => {
+  console.log(propertyType, property);
+  const createPost = async () => {
     try {
-      const chunkSize = 500000;
-      const chunks = [];
-      for (let i = 0; i < newImages.length; i += chunkSize) {
-        chunks.push(newImages.slice(i, i + chunkSize));
-      }
-      for (const chunk of chunks) {
-        await axios.post(url, chunk);
-      }
+      const additionalData = {
+        propertyId: "5wfdfwe",
+        title: "house beautifyll",
+        price: 4324,
+        description: "dsfsdfdsfsdfsd",
+        size: 2,
+        bedrooms: 4,
+        bathrooms: 5,
+        town: "dfgfdgd",
+      };
+      formData.append("additionalData", JSON.stringify(additionalData));
+      const response = await axios.post(url, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      console.log(response);
     } catch (error) {
       console.log(error);
     }
@@ -29,24 +41,38 @@ function Home() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    createPost(postImages);
-    console.log("Uploaded");
+    createPost();
+    if (postImage) {
+      //   formData.append("myFile", postImage);
+    } else {
+      console.log("No image selected");
+    }
   };
 
-  const handleFileUpload = async (e) => {
-    const files = e.target.files;
-    const newImages = [];
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      const base64 = await convertToBase64(file);
-      newImages.push(base64);
-    }
-    setPostImages([...postImages, ...newImages]);
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    setPostImage(file);
   };
-  console.log("postImages", postImages);
+  console.log(postImage);
+  const handleMultipleFileUpload = (e) => {
+    const files = e.target.files;
+    console.log("before Files", files);
+
+    // Convert postImage to an array if it's not already
+    const postImagesArray = postImage ? [postImage] : [];
+    console.log("postImagesArray", postImagesArray);
+    // Concatenate postImage with files
+    const allFiles = [...files, ...postImagesArray];
+
+    for (let i = 0; i < allFiles.length; i++) {
+      formData.append("myFiles", allFiles[i]);
+    }
+    console.log("files", allFiles);
+  };
+
   return (
-    <div className="App">
-      <Navbar type={"user"} />
+    <>
+      <Navbar type={"admin"} />
       <div>
         <Box style={{ width: "100vw", minheight: "550px", overflow: "hidden" }}>
           <Image
@@ -104,7 +130,7 @@ function Home() {
               <MenuItem value="Commercial">Commercial</MenuItem>
             </Select>
 
-            {/* <Select
+            <Select
               value={propertyType}
               onChange={(e) => setPropertyType(e.target.value)}
               sx={{
@@ -119,11 +145,11 @@ function Home() {
               </MenuItem>
               <MenuItem value="ForSale">For Sale</MenuItem>
               <MenuItem value="ForRent">For Rent</MenuItem>
-            </Select> */}
+            </Select>
           </Box>
           <form onSubmit={handleSubmit}>
             <label htmlFor="file-upload" className="custom-file-upload">
-              {/* {postImage && <img src={URL.createObjectURL(postImage)} alt="" />} */}
+              {postImage && <img src={URL.createObjectURL(postImage)} alt="" />}
             </label>
 
             <input
@@ -155,47 +181,8 @@ function Home() {
           </form>
         </Container>
       </div>
-
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="file-upload" className="custom-file-upload">
-          {/* {postImages.map((image, index) => (
-            <img key={index} src={image?.myFile} alt="" />
-          ))} */}
-        </label>
-
-        <input
-          type="file"
-          lable="Image"
-          name="myFile"
-          id="file-upload"
-          accept=".jpeg, .png, .jpg"
-          onChange={(e) => handleFileUpload(e)}
-          multiple
-        />
-
-        <h3>Doris Wilder</h3>
-        <span>Designer</span>
-
-        <button type="submit">Submit</button>
-      </form>
-      {/* {postImages.map((img) => {
-        return <img src={img} alt="img" width="400px" height="499px" />;
-      })} */}
-    </div>
+    </>
   );
 }
 
-export default Home;
-
-function convertToBase64(file) {
-  return new Promise((resolve, reject) => {
-    const fileReader = new FileReader();
-    fileReader.readAsDataURL(file);
-    fileReader.onload = () => {
-      resolve(fileReader.result);
-    };
-    fileReader.onerror = (error) => {
-      reject(error);
-    };
-  });
-}
+export default Add;

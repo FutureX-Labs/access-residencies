@@ -1,14 +1,14 @@
 "use client";
 import { useState } from "react";
 import axios from "axios";
-import Navbar from "../components/navbar/Navbar";
+import Navbar from "../../components/navbar/Navbar";
 import Image from "next/image";
 import { Box, Item, Grid, Typography, Select, MenuItem } from "@mui/material";
 import Container from "@mui/material/Container";
 
 const url = "http://localhost:4000/api/appartmentForRent/add";
 
-function Add() {
+function View() {
   const [postImage, setPostImage] = useState(null);
   const [formData, setFormData] = useState(new FormData());
   const [propertyType, setPropertyType] = useState("");
@@ -185,4 +185,4 @@ function Add() {
   );
 }
 
-export default Add;
+export default View;

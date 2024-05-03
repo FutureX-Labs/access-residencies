@@ -12,6 +12,7 @@ const commercialForSale = new Schema(
     propertyType: String,
     size: String,
     town: String,
+    city: String,
   },
   {
     timestamps: true,

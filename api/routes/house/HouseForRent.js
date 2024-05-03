@@ -5,7 +5,7 @@ const multer = require("multer");
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-router.get("/getdata", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const houses = await houseForRent.find();
     res.status(200).json(houses);
@@ -27,6 +27,7 @@ router.post("/add", upload.array("myFiles"), async (req, res) => {
       bedrooms,
       bathrooms,
       town,
+      city,
     } = JSON.parse(req.body.additionalData);
     const images = files.map((file) => file.buffer.toString("base64"));
     const thumbnailImage = images[images.length - 1];
@@ -41,7 +42,8 @@ router.post("/add", upload.array("myFiles"), async (req, res) => {
       size,
       bedrooms,
       bathrooms,
-      town
+      town,
+      city
     );
     const newHouse = new houseForRent({
       propertyId,
@@ -54,6 +56,7 @@ router.post("/add", upload.array("myFiles"), async (req, res) => {
       bedrooms,
       bathrooms,
       town,
+      city,
     });
 
     const response = await newHouse.save();
@@ -81,6 +84,7 @@ router.put("/edit/:id", upload.array("myFiles"), async (req, res) => {
       bedrooms,
       bathrooms,
       town,
+      city,
     } = req.body;
 
     await houseForRent.findByIdAndUpdate(houseId, {
@@ -94,6 +98,7 @@ router.put("/edit/:id", upload.array("myFiles"), async (req, res) => {
       bedrooms,
       bathrooms,
       town,
+      city,
     });
 
     res.status(200).json("House edited successfully");
@@ -129,6 +134,7 @@ router.post("/filter", async (req, res) => {
       bedrooms,
       bathrooms,
       town,
+      city,
     } = req.body;
 
     const filter = {};

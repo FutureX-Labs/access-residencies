@@ -5,7 +5,7 @@ const multer = require("multer");
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-router.get("/getdata", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const houses = await houseForSale.find();
     res.status(200).json(houses);
@@ -27,6 +27,7 @@ router.post("/add", upload.array("myFiles"), async (req, res) => {
       bedrooms,
       bathrooms,
       town,
+      city,
     } = JSON.parse(req.body.additionalData);
     const images = files.map((file) => file.buffer.toString("base64"));
     const thumbnailImage = images[images.length - 1];
@@ -43,6 +44,7 @@ router.post("/add", upload.array("myFiles"), async (req, res) => {
       bedrooms,
       bathrooms,
       town,
+      city,
     });
 
     const response = await result.save();
@@ -70,6 +72,7 @@ router.put("/edit/:id", upload.array("myFiles"), async (req, res) => {
       bedrooms,
       bathrooms,
       town,
+      city,
     } = req.body;
 
     const result = await houseForSale.findByIdAndUpdate(Id, {
@@ -83,6 +86,7 @@ router.put("/edit/:id", upload.array("myFiles"), async (req, res) => {
       bedrooms,
       bathrooms,
       town,
+      city,
     });
 
     res.status(200).json(result);
@@ -118,6 +122,7 @@ router.post("/filter", async (req, res) => {
       bedrooms,
       bathrooms,
       town,
+      city,
     } = req.body;
 
     const filter = {};

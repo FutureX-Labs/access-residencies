@@ -5,7 +5,7 @@ const multer = require("multer");
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-router.get("/getdata", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const result = await landForSale.find();
     res.status(200).json(result);
@@ -18,8 +18,16 @@ router.get("/getdata", async (req, res) => {
 router.post("/add", upload.array("myFiles"), async (req, res) => {
   try {
     const files = req.files;
-    const { propertyId, title, price, description, perches, acres, town } =
-      JSON.parse(req.body.additionalData);
+    const {
+      propertyId,
+      title,
+      price,
+      description,
+      perches,
+      acres,
+      town,
+      city,
+    } = JSON.parse(req.body.additionalData);
     const images = files.map((file) => file.buffer.toString("base64"));
     const thumbnailImage = images[images.length - 1];
     thumbnailImage ? images.pop() : thumbnailImage;
@@ -38,6 +46,7 @@ router.post("/add", upload.array("myFiles"), async (req, res) => {
         acres,
       },
       town,
+      city,
     });
 
     const response = await newHouse.save();
@@ -56,8 +65,16 @@ router.put("/edit/:id", upload.array("myFiles"), async (req, res) => {
     const thumbnailImage = images[images.length - 1];
     thumbnailImage ? images.pop() : thumbnailImage;
     const houseId = req.params.id;
-    const { propertyId, title, price, description, perches, acres, town } =
-      req.body;
+    const {
+      propertyId,
+      title,
+      price,
+      description,
+      perches,
+      acres,
+      town,
+      city,
+    } = req.body;
 
     const result = await landForSale.findByIdAndUpdate(houseId, {
       propertyId,
@@ -71,6 +88,7 @@ router.put("/edit/:id", upload.array("myFiles"), async (req, res) => {
         acres,
       },
       town,
+      city,
     });
 
     res.status(200).json(result);
@@ -107,6 +125,7 @@ router.post("/filter", async (req, res) => {
       minAcres,
       maxAcres,
       town,
+      city,
     } = req.body;
 
     const filter = {};

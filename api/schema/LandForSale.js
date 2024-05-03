@@ -14,6 +14,7 @@ const landForSale = new Schema(
       acres: Number,
     },
     town: String,
+    city: String,
   },
   {
     timestamps: true,

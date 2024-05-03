@@ -36,23 +36,10 @@ function Navbar(props) {
 
   const userNavItems = [
     { title: "Home", path: "/" },
-    { title: "About us", path: "/about" },
-    { title: "Gallery", path: "/gallery" },
-
-    {
-      title: "Property Management",
-      dropdown: true,
-      subItems: [
-        { title: "House For Sale", path: "/Property Management/project1" },
-        { title: "House For Rent", path: "/Property Management/project2" },
-        { title: "Land For Sale", path: "/Property Management/project3" },
-        { title: "Commercial For Sale", path: "/Property Management/project5" },
-        { title: "Commercial For Rent", path: "/Property Management/project6" },
-        { title: "Appartment For Sale", path: "/Property Management/project6" },
-        { title: "Appartment For Rent", path: "/Property Management/project6" },
-      ],
-    },
-    { title: "Contact Us", path: "/contact" },
+    { title: "About us", path: "#about" },
+    { title: "Gallery", path: "#gallery" },
+    { title: "Contact Us", path: "#contact" },
+    { title: "Login", path: "/auth" },
   ];
 
   const navItems = type === "admin" ? adminNavItems : userNavItems;
@@ -133,7 +120,6 @@ function Navbar(props) {
                 href={userNavItems[3].path}
               >
                 <ListItemText
-                  primary={userNavItems[3].title}
                   sx={{
                     color: "white",
                     fontFamily: "Roboto Condensed",
@@ -143,46 +129,8 @@ function Navbar(props) {
                   }}
                   onClick={() => setShowProperty((prev) => !prev)}
                 />
-
-                {showProperty ? (
-                  <FaAngleUp style={{ marginLeft: 5 }} color="white" />
-                ) : (
-                  <FaAngleDown style={{ marginLeft: 5 }} color="white" />
-                )}
               </ListItemButton>
             </ListItem>
-            <List>
-              {userNavItems
-                .find((item) => item.title === "Property Management")
-                .subItems.map((subItem) =>
-                  showProperty ? (
-                    <ListItem
-                      key={subItem.title}
-                      disablePadding
-                      sx={{ ml: "15px", width: "200px" }}
-                    >
-                      <ListItemButton
-                        sx={{ textAlign: "left" }}
-                        component="a"
-                        href={subItem.path}
-                      >
-                        <ListItemText
-                          primary={subItem.title}
-                          sx={{
-                            color: "white",
-                            fontFamily: "Roboto Condensed",
-                            fontWeight: "800",
-                            fontSize: "24px",
-                            lingHeight: " 28.13px",
-                          }}
-                        />
-                      </ListItemButton>
-                    </ListItem>
-                  ) : (
-                    <></>
-                  )
-                )}
-            </List>
           </React.Fragment>
         )}
       </List>
@@ -223,76 +171,9 @@ function Navbar(props) {
                   key={item.title}
                   sx={{ color: "#fff" }}
                   href={item.path}
-                  onClick={
-                    item.title === "Property Management"
-                      ? () => setShowProperty((prev) => !prev)
-                      : null
-                  }
                 >
-                  {item.title === "Property Management" ? (
-                    <>
-                      <span>{item.title}</span>
-                      {showProperty ? (
-                        <FaAngleUp style={{ marginLeft: 5 }} />
-                      ) : (
-                        <FaAngleDown style={{ marginLeft: 5 }} />
-                      )}
-                    </>
-                  ) : (
-                    <>{item.title}</>
-                  )}
+                  <>{item.title}</>
                 </Button>
-                <Box
-                  sx={{
-                    position: "absolute",
-                    top: "62px",
-                    right: "112px",
-                    borderRadius: "5px",
-                  }}
-                >
-                  {showProperty &&
-                    item?.subItems?.map((subItem, index) => (
-                      <div
-                        key={subItem.title}
-                        style={{
-                          display: "flex",
-                          flexDirection: "column",
-                          background: "grey",
-                          padding: "0px",
-                          margin: "0px",
-                        }}
-                      >
-                        <ListItem
-                          sx={{
-                            width: "100%",
-                          }}
-                        >
-                          <ListItemButton
-                            sx={{
-                              textAlign: "left",
-                              "&:hover": {
-                                backgroundColor: "rgba(255, 255, 255, 0.1)",
-                              },
-                            }}
-                            component="a"
-                            href={subItem.path}
-                          >
-                            <ListItemText
-                              primary={subItem.title}
-                              sx={{
-                                color: "white",
-                                textAlign: "center",
-                                fontFamily: "Roboto Condensed",
-                                fontWeight: "800",
-                                fontSize: "24px",
-                                lingHeight: " 28.13px",
-                              }}
-                            />
-                          </ListItemButton>
-                        </ListItem>
-                      </div>
-                    ))}
-                </Box>
               </>
             ))}
           </Box>

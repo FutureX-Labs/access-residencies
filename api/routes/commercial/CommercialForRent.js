@@ -5,7 +5,7 @@ const multer = require("multer");
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-router.get("/getdata", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const houses = await commercialForRent.find();
     res.status(200).json(houses);
@@ -34,6 +34,7 @@ router.post("/add", upload.array("myFiles"), async (req, res) => {
       size,
       propertyType,
       town,
+      city,
     });
 
     const response = await result.save();
@@ -65,6 +66,7 @@ router.put("/edit/:id", upload.array("myFiles"), async (req, res) => {
       size,
       propertyType,
       town,
+      city,
     });
 
     res.status(200).json(result);
@@ -99,6 +101,7 @@ router.post("/filter", async (req, res) => {
       size,
       propertyType,
       town,
+      city,
     } = req.body;
 
     const filter = {};

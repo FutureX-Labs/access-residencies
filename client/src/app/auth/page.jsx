@@ -3,14 +3,15 @@ import React, { useState } from "react";
 import Style from "./style.module.css";
 import Image from "next/image";
 import { TextField, Button, Box } from "@mui/material";
-import { useRouter } from "next/navigation";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { useRouter } from "next/navigation";
 
 const Auth = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const router = useRouter();
 
   const handleLogin = async () => {
     try {
@@ -18,21 +19,21 @@ const Auth = () => {
         username,
         password,
       });
-      if (!result) {
+      console.log("result", result);
+      if (result) {
         Swal.fire({
-          title: "Error!",
-          text: "Do you want to continue",
-          icon: "error",
-          confirmButtonText: "Cool",
+          title: "Login successfull",
+          icon: "success",
         });
+        console.log(result.data.isAdmin);
+        router.push("/admin/customize");
       }
-      Swal.fire({
-        title: "Good job!",
-        text: "You clicked the button!",
-        icon: "success",
-      });
-      console.log(result.data.isAdmin);
     } catch (error) {
+      Swal.fire({
+        title: "Incorrect username or password",
+        icon: "error",
+        confirmButtonText: "Cancel",
+      });
       console.log(error);
     }
   };

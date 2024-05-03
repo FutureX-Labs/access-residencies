@@ -13,6 +13,7 @@ const appartmentForRent = new Schema(
     bedrooms: Number,
     bathrooms: Number,
     town: String,
+    city: String,
   },
   {
     timestamps: true,
