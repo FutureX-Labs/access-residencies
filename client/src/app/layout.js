@@ -1,12 +1,5 @@
-import { Inter } from "next/font/google";
-import "./globals.css";
-import { Roboto } from "next/font/google";
-
-const roboto = Roboto({
-  weight: ["400", "700", "900"],
-  subsets: ["latin"],
-});
-const inter = Inter({ subsets: ["latin"] });
+import Head from "next/head";
+import "./globals.css"; // Assuming this file contains global styles
 
 export const metadata = {
   title: "Create Next App",
@@ -16,7 +9,20 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={roboto.className}>{children}</body>
+      <Head>
+        <link
+          rel="stylesheet"
+          type="text/css"
+          charset="UTF-8"
+          href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css"
+        />
+        <link
+          rel="stylesheet"
+          type="text/css"
+          href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css"
+        />
+      </Head>
+      <body>{children}</body>
     </html>
   );
 }

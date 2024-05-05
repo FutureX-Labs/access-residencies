@@ -162,9 +162,7 @@ function Navbar(props) {
               variant="h6"
             />
           </Box>
-          <Box
-            sx={{ display: { xs: "none", md: "block" }, position: "relative" }}
-          >
+          <Box sx={{ display: { xs: "none", md: "block" } }}>
             {navItems.map((item) => (
               <>
                 <Button

@@ -3,12 +3,26 @@ import { useState } from "react";
 import axios from "axios";
 import Navbar from "../../components/navbar/Navbar";
 import Image from "next/image";
-import { Box, Item, Grid, Typography, Select, MenuItem } from "@mui/material";
-import Container from "@mui/material/Container";
+import {
+  Box,
+  Item,
+  Grid,
+  Typography,
+  Select,
+  MenuItem,
+  Button,
+} from "@mui/material";
+import { FaShareNodes } from "react-icons/fa6";
+import { MdBed } from "react-icons/md";
+import bathroom from "../../../../public/bathroom.png";
+import squareFeet from "../../../../public/images/squareFeet.png";
+import { SlCallEnd } from "react-icons/sl";
+
+import { Roboto } from "next/font/google";
 
 const url = "http://localhost:4000/api/appartmentForRent/add";
 
-function Add() {
+function View() {
   const [postImage, setPostImage] = useState(null);
   const [formData, setFormData] = useState(new FormData());
   const [propertyType, setPropertyType] = useState("");
@@ -70,119 +84,194 @@ function Add() {
     console.log("files", allFiles);
   };
 
+  const data = {
+    title: "Modern House from sale",
+    city: "Columbo",
+    propertyId: "#HS_S_001",
+    description:
+      "Lorem ipsum dolor, sit amet consectetur adipisicing elit.Aut debitis, soluta consequatur quis dolores maiores Aut debitis, soluta consequatur quis dolores maiores Aut debitis, soluta consequatur quis dolores maiores Aut debitis, soluta consequatur quis dolores maiores possimus aliquam non sapiente minima ipsam veniam dignissimos at laudantium minus quo quod quae? Eos?   dolores maiores possimus aliquam non sapiente minima ipsam veniam dignissimos at laudantium minus quo quod quae? Eos?",
+    bedroom: "35 bed rooms",
+    bathroom: "27 bath rooms",
+    size: "125,000 sq.ft",
+    price: "RS. 50,000,00 ",
+  };
+
   return (
     <>
       <Navbar type={"admin"} />
-      <div>
-        <Box style={{ width: "100vw", minheight: "550px", overflow: "hidden" }}>
-          <Image
-            src="/images/AdminAdd.png"
-            alt="Admin Add"
-            layout="responsive"
-            width={100}
-            height={55}
-            quality={100}
-            style={{ objectFit: "cover" }}
-          />
-        </Box>
-        <Container maxWidth="lg" sx={{ backgroundColor: "red", mt: "50px" }}>
-          <Typography
-            sx={{
-              fontFamily: "Roboto",
-              fontWeight: "900",
-              fontSize: "32px",
-              lineHeight: "37.5px",
-              color: "white",
-            }}
-          >
-            Add New Properties
-          </Typography>
-          <Typography
-            sx={{
-              fontFamily: "Roboto",
-              fontWeight: "400",
-              fontSize: "22px",
-              lineHeight: "33.5px",
-              color: "white",
-              mt: "30px",
-            }}
-          >
-            Type
-          </Typography>
-          <Box sx={{ display: "flex", ml: "20px", my: "10px" }}>
-            <Select
-              value={property}
-              onChange={(e) => setProperty(e.target.value)}
-              sx={{
-                minWidth: 320,
-                mr: "10px",
-                "&:focus": { backgroundColor: "transparent" },
-              }}
-              size="small"
-              displayEmpty
-            >
-              <MenuItem value="" disabled>
-                <em>Select Property</em>
-              </MenuItem>
-              <MenuItem value="House">House</MenuItem>
-              <MenuItem value="Land">Land</MenuItem>
-              <MenuItem value="Apartment">Apartment</MenuItem>
-              <MenuItem value="Commercial">Commercial</MenuItem>
-            </Select>
 
-            <Select
-              value={propertyType}
-              onChange={(e) => setPropertyType(e.target.value)}
+      <Box
+        sx={{
+          height: {md:"630px", xs:"650px"},
+          backgroundColor: "#333",
+          color: "#fff",
+          boxShadow: "0px 0px 10px rgba(0,0,0,0.5)",
+          borderRadius: "8px",
+          width: {md:"50%",xs:"90%"},
+          
+          margin:"auto"
+        }}
+        my={4}
+        display="flex"
+        flexDirection="column"
+        gap={2}
+        p={2}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { md: "row", xs: "column" },
+            justifyContent: "space-between",
+            padding: "10px",
+          }}
+        >
+          <Box>
+            <Typography
               sx={{
-                minWidth: 320,
-                "&:focus": { backgroundColor: "transparent" },
+                textAlign: { md: "start", xs: "center" },
+                fontWeight: "500",
               }}
-              size="small"
-              displayEmpty
+              variant="h5"
             >
-              <MenuItem value="" disabled>
-                <em>Select Property Type</em>
-              </MenuItem>
-              <MenuItem value="ForSale">For Sale</MenuItem>
-              <MenuItem value="ForRent">For Rent</MenuItem>
-            </Select>
+              {data.title}
+            </Typography>
+            <Typography
+              sx={{
+                textAlign: { md: "start", xs: "center" },
+                color: "#FF6DD6",
+                fontWeight: "600",
+                marginTop: "8px",
+              }}
+            >
+              {data.city}
+            </Typography>
           </Box>
-          <form onSubmit={handleSubmit}>
-            <label htmlFor="file-upload" className="custom-file-upload">
-              {postImage && <img src={URL.createObjectURL(postImage)} alt="" />}
-            </label>
+          <Box sx={{display:"flex", flexDirection: "column" , justifyContent:{md:"end", xs:' center'}}}  >
+            <Box sx={{display:"flex", justifyContent:"center", alignItems:"center"}}>
+            <Button
+              sx={{
+                backgroundColor: "#8C1C40",
+                padding: "5px 10px",
+                color: "#fff",
+                gap: "10px",
+                width:"100px",
+           
+              }}
+            >
+              <FaShareNodes size={20} />
+              <Typography sx={{ fontSize: "13px",}}>Share</Typography>
+            </Button>
+            </Box>
+            <Typography
+              sx={{
+                color: "#787878",
+                fontSize: "14px",
+                textAlign: {mdL:"end", xs:"center"},
+                fontWeight: "600",
+                marginTop: "8px",
+              }}
+            >
+              {data.propertyId}
+            </Typography>
+          </Box>
+        </Box>
 
-            <input
-              type="file"
-              label="Image"
-              name="myFile"
-              id="file-upload"
-              accept=".jpeg, .png, .jpg"
-              onChange={(e) => handleFileUpload(e)}
-            />
+        <Box sx={{ width: "85%", margin: " 0px   auto" }}>
+          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+            <Box sx={{ display: "flex", padding: "10px", gap: "20px" }}>
+              <MdBed size={22} />
+              <Typography
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  gap: "10px",
+                  fontSize: "14px",
+                  color: "#bdbdbd",
+                }}
+              >
+                {data.bedroom}{" "}
+              </Typography>
 
-            <hr />
-            <hr />
-            <hr />
-            <hr />
-            <hr />
+              <Box sx={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <Image
+                  style={{ marginTop: "-12px" }}
+                  src={bathroom}
+                  alt="icon"
+                  size={12}
+                />
+                <Typography
+                  sx={{ gap: "10px", fontSize: "14px", color: "#bdbdbd" }}
+                >
+                  {data.bathroom}
+                </Typography>
+              </Box>
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: "10px",
+              }}
+            >
+              <Image src={squareFeet} alt="icon" size={12} />
+              <Typography sx={{ fontSize: "14px", color: "#bdbdbd" }}>
+                {" "}
+                {data.size}{" "}
+              </Typography>
+            </Box>
+          </Box>
 
-            <input
-              type="file"
-              label="Image"
-              name="myFiles"
-              id="file-uploads"
-              accept=".jpeg, .png, .jpg"
-              onChange={(e) => handleMultipleFileUpload(e)}
-              multiple
-            />
+          <Box
+            sx={{
+              padding: "20px 0px 20px",
+              color: "#FF6DD6",
+              fontWeight: "600",
+              fontSize: "30px",
+            }}
+          >
+            <Typography>{data.price}</Typography>
+          </Box>
+          <Typography
+            sx={{
+              color: "#bdbdbd",
+              fontSize: "18px",
+              textAlign: "center",
+              overflowY: " auto",
+              maxHeight: {md: "300px", xs: "230px"},
+            }}
+          >
+            {data.description}
+          </Typography>
 
-            <button type="submit">Submit</button>
-          </form>
-        </Container>
-      </div>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              margin: "50px 0px",
+            }}
+          >
+            <Typography>Contact : 0711234567</Typography>
+            <Box>
+              <Button
+                sx={{
+                  backgroundColor: "#8C1C40",
+                  padding: "5px 10px",
+                  color: "#fff",
+                  gap: "10px",
+                }}
+              >
+                <SlCallEnd size={20} />
+
+                <Typography sx={{ fontSize: "13px" }}>Call</Typography>
+              </Button>
+            </Box>
+          </Box>
+        </Box>
+      </Box>
     </>
   );
 }
 
-export default Add;
+export default View;
