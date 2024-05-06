@@ -15,27 +15,38 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const response = await landForSale.findById(id);
+
+    if (!response) {
+      return res.status(404).json({ message: "not found" });
+    }
+
+    res.status(200).json(response);
+  } catch (error) {
+    console.error(error);
+    res.status(400).json(error);
+  }
+});
+
 router.post("/add", upload.array("myFiles"), async (req, res) => {
   try {
     const files = req.files;
-    const {
-      propertyId,
-      title,
-      price,
-      description,
-      perches,
-      acres,
-      town,
-      city,
-    } = JSON.parse(req.body.additionalData);
+    const { propertyId, title, price, description, perches, acres, city } =
+      JSON.parse(req.body.additionalData);
     const images = files.map((file) => file.buffer.toString("base64"));
     const thumbnailImage = images[images.length - 1];
     thumbnailImage ? images.pop() : thumbnailImage;
 
     console.log(images);
-    console.log(propertyId, title, price, description, perches, acres, town);
+    console.log(propertyId, title, price, description, perches, acres, city);
     const newHouse = new landForSale({
       propertyId,
+      property: "Land",
+      propertyType: "ForSale",
       title,
       price,
       thumbnailImage,
@@ -45,8 +56,9 @@ router.post("/add", upload.array("myFiles"), async (req, res) => {
         perches,
         acres,
       },
-      town,
+
       city,
+      isVisibale: false,
     });
 
     const response = await newHouse.save();
@@ -61,22 +73,31 @@ router.post("/add", upload.array("myFiles"), async (req, res) => {
 router.put("/edit/:id", upload.array("myFiles"), async (req, res) => {
   try {
     const files = req.files;
+    const { propertyId, title, price, description, perches, acres, city } =
+      JSON.parse(req.body.additionalData);
+    if (!files || files.length === 0) {
+      const id = req.params.id;
+
+      const result = await landForSale.findByIdAndUpdate(id, {
+        propertyId,
+        title,
+        price,
+        description,
+        landExtent: {
+          perches,
+          acres,
+        },
+        city,
+      });
+
+      return res.status(200).json(result);
+    }
     const images = files.map((file) => file.buffer.toString("base64"));
     const thumbnailImage = images[images.length - 1];
     thumbnailImage ? images.pop() : thumbnailImage;
-    const houseId = req.params.id;
-    const {
-      propertyId,
-      title,
-      price,
-      description,
-      perches,
-      acres,
-      town,
-      city,
-    } = req.body;
+    const id = req.params.id;
 
-    const result = await landForSale.findByIdAndUpdate(houseId, {
+    const result = await landForSale.findByIdAndUpdate(id, {
       propertyId,
       title,
       price,
@@ -87,7 +108,6 @@ router.put("/edit/:id", upload.array("myFiles"), async (req, res) => {
         perches,
         acres,
       },
-      town,
       city,
     });
 
@@ -124,7 +144,7 @@ router.post("/filter", async (req, res) => {
       maxPerches,
       minAcres,
       maxAcres,
-      town,
+
       city,
     } = req.body;
 
@@ -166,8 +186,8 @@ router.post("/filter", async (req, res) => {
         filter["landExtent.acres"].$lte = maxAcres;
       }
     }
-    if (town) {
-      filter.town = { $regex: new RegExp(town, "i") };
+    if (city) {
+      filter.city = { $regex: new RegExp(city, "i") };
     }
 
     const filteredHouses = await landForSale.find(filter);

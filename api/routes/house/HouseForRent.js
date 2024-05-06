@@ -15,6 +15,23 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const response = await houseForRent.findById(id);
+
+    if (!response) {
+      return res.status(404).json({ message: "not found" });
+    }
+
+    res.status(200).json(response);
+  } catch (error) {
+    console.error(error);
+    res.status(400).json(error);
+  }
+});
+
 router.post("/add", upload.array("myFiles"), async (req, res) => {
   try {
     const files = req.files;
@@ -26,7 +43,7 @@ router.post("/add", upload.array("myFiles"), async (req, res) => {
       size,
       bedrooms,
       bathrooms,
-      town,
+
       city,
     } = JSON.parse(req.body.additionalData);
     const images = files.map((file) => file.buffer.toString("base64"));
@@ -42,11 +59,13 @@ router.post("/add", upload.array("myFiles"), async (req, res) => {
       size,
       bedrooms,
       bathrooms,
-      town,
+
       city
     );
     const newHouse = new houseForRent({
       propertyId,
+      property: "House",
+      propertyType: "ForRent",
       title,
       rent,
       thumbnailImage,
@@ -55,7 +74,7 @@ router.post("/add", upload.array("myFiles"), async (req, res) => {
       size,
       bedrooms,
       bathrooms,
-      town,
+      isVisibale: false,
       city,
     });
 
@@ -71,10 +90,6 @@ router.post("/add", upload.array("myFiles"), async (req, res) => {
 router.put("/edit/:id", upload.array("myFiles"), async (req, res) => {
   try {
     const files = req.files;
-    const images = files.map((file) => file.buffer.toString("base64"));
-    const thumbnailImage = images[images.length - 1];
-    thumbnailImage ? images.pop() : thumbnailImage;
-    const houseId = req.params.id;
     const {
       propertyId,
       title,
@@ -83,9 +98,30 @@ router.put("/edit/:id", upload.array("myFiles"), async (req, res) => {
       size,
       bedrooms,
       bathrooms,
-      town,
+
       city,
-    } = req.body;
+    } = JSON.parse(req.body.additionalData);
+    if (!files || files.length === 0) {
+      const id = req.params.id;
+
+      const result = await houseForSale.findByIdAndUpdate(id, {
+        propertyId,
+        title,
+        rent,
+        description,
+        size,
+        bedrooms,
+        bathrooms,
+
+        city,
+      });
+
+      return res.status(200).json(result);
+    }
+    const images = files.map((file) => file.buffer.toString("base64"));
+    const thumbnailImage = images[images.length - 1];
+    thumbnailImage ? images.pop() : thumbnailImage;
+    const houseId = req.params.id;
 
     await houseForRent.findByIdAndUpdate(houseId, {
       propertyId,
@@ -97,7 +133,7 @@ router.put("/edit/:id", upload.array("myFiles"), async (req, res) => {
       size,
       bedrooms,
       bathrooms,
-      town,
+
       city,
     });
 
@@ -133,7 +169,7 @@ router.post("/filter", async (req, res) => {
       size,
       bedrooms,
       bathrooms,
-      town,
+
       city,
     } = req.body;
 
@@ -166,8 +202,8 @@ router.post("/filter", async (req, res) => {
     if (bathrooms) {
       filter.bathrooms = bathrooms;
     }
-    if (town) {
-      filter.town = { $regex: new RegExp(town, "i") };
+    if (city) {
+      filter.city = { $regex: new RegExp(city, "i") };
     }
 
     const filteredHouses = await houseForRent.find(filter);

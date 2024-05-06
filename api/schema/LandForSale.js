@@ -4,6 +4,8 @@ const { Schema } = mongoose;
 const landForSale = new Schema(
   {
     propertyId: String,
+    property: String,
+    propertyType: String,
     title: String,
     price: Number,
     thumbnailImage: String,
@@ -13,8 +15,9 @@ const landForSale = new Schema(
       perches: Number,
       acres: Number,
     },
-    town: String,
+
     city: String,
+    isVisibale: Boolean,
   },
   {
     timestamps: true,

@@ -4,6 +4,8 @@ const { Schema } = mongoose;
 const appartmentForSale = new Schema(
   {
     propertyId: String,
+    property: String,
+    propertyType: String,
     title: String,
     price: Number,
     thumbnailImage: String,
@@ -12,8 +14,8 @@ const appartmentForSale = new Schema(
     size: Number,
     bedrooms: Number,
     bathrooms: Number,
-    town: String,
     city: String,
+    isVisibale: Boolean,
   },
   {
     timestamps: true,

@@ -15,10 +15,28 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const response = await commercialForSale.findById(id);
+
+    if (!response) {
+      return res.status(404).json({ message: "not found" });
+    }
+
+    res.status(200).json(response);
+  } catch (error) {
+    console.error(error);
+    res.status(400).json(error);
+  }
+});
+
 router.post("/add", upload.array("myFiles"), async (req, res) => {
   try {
     const files = req.files;
-    const { propertyId, title, price, description, size, propertyType, town } =
+
+    const { propertyId, title, price, description, size, propertyTypes, city } =
       JSON.parse(req.body.additionalData);
     const images = files.map((file) => file.buffer.toString("base64"));
     const thumbnailImage = images[images.length - 1];
@@ -26,15 +44,18 @@ router.post("/add", upload.array("myFiles"), async (req, res) => {
 
     const result = new commercialForSale({
       propertyId,
+      property: "Commercial",
+      propertyType: "ForSale",
       title,
       price,
       thumbnailImage,
       images,
       description,
       size,
-      propertyType,
-      town,
+      propertyTypes,
+
       city,
+      isVisibale: false,
     });
 
     const response = await result.save();
@@ -49,12 +70,28 @@ router.post("/add", upload.array("myFiles"), async (req, res) => {
 router.put("/edit/:id", upload.array("myFiles"), async (req, res) => {
   try {
     const files = req.files;
+    const { propertyId, title, price, description, size, propertyTypes, city } =
+      JSON.parse(req.body.additionalData);
+
+    if (!files || files.length === 0) {
+      const id = req.params.id;
+
+      const result = await commercialForSale.findByIdAndUpdate(id, {
+        propertyId,
+        title,
+        price,
+        description,
+        size,
+        propertyTypes,
+        city,
+      });
+
+      return res.status(200).json(result);
+    }
     const images = files.map((file) => file.buffer.toString("base64"));
     const thumbnailImage = images[images.length - 1];
     thumbnailImage ? images.pop() : thumbnailImage;
     const Id = req.params.id;
-    const { propertyId, title, price, description, size, propertyType, town } =
-      req.body;
 
     const result = await commercialForSale.findByIdAndUpdate(Id, {
       propertyId,
@@ -64,8 +101,8 @@ router.put("/edit/:id", upload.array("myFiles"), async (req, res) => {
       images,
       description,
       size,
-      propertyType,
-      town,
+      propertyTypes,
+
       city,
     });
 
@@ -99,8 +136,8 @@ router.post("/filter", async (req, res) => {
       maxPrice,
       description,
       size,
-      propertyType,
-      town,
+      propertyTypes,
+
       city,
     } = req.body;
 
@@ -127,12 +164,12 @@ router.post("/filter", async (req, res) => {
     if (size) {
       filter.size = size;
     }
-    if (propertyType) {
-      filter.propertyType = propertyType;
+    if (propertyTypes) {
+      filter.propertyTypes = propertyTypes;
     }
 
-    if (town) {
-      filter.town = { $regex: new RegExp(town, "i") };
+    if (city) {
+      filter.city = { $regex: new RegExp(city, "i") };
     }
 
     const filtered = await commercialForSale.find(filter);

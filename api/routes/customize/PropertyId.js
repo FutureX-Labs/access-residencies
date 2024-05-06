@@ -14,6 +14,7 @@ router.get("/", async (req, res) => {
 
 router.post("/add", async (req, res) => {
   try {
+    await PropertyIdSchema.deleteMany({});
     const propertyIds = req.body.propertyIds; // Access propertyIds from req.body
     console.log("propertyIds:", propertyIds); // Check if propertyIds is correctly received
 
