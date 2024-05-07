@@ -1,0 +1,6 @@
+export const PropertyTypes = [
+  { label: "House", value: "House" },
+  { label: "Land", value: "Land" },
+  { label: "Apartment", value: "Apartment" },
+  { label: "Commercial", value: "Commercial" },
+];

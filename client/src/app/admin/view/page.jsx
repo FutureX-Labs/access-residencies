@@ -1,9 +1,18 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import axios from "axios";
 import Navbar from "../../components/navbar/Navbar";
 import Image from "next/image";
-import { Box, Item, Grid, Typography, Select, MenuItem } from "@mui/material";
+import {
+  Box,
+  Item,
+  Grid,
+  Typography,
+  Select,
+  MenuItem,
+  Button,
+} from "@mui/material";
 import Container from "@mui/material/Container";
 
 const url = "http://localhost:4000/api/appartmentForRent/add";
@@ -13,6 +22,17 @@ function View() {
   const [formData, setFormData] = useState(new FormData());
   const [propertyType, setPropertyType] = useState("");
   const [property, setProperty] = useState("");
+  const router = useRouter();
+
+  const id = "663a11900707173436b2b72d";
+
+  const handleClick = () => {
+    const propertyValue = "Commercial";
+    const propertyTypeValue = "ForRent";
+    router.push(
+      `/admin/edit?propertyValue=${propertyValue}&propertyType=${propertyTypeValue}&id=${id}`
+    );
+  };
 
   console.log(propertyType, property);
   const createPost = async () => {
@@ -25,7 +45,7 @@ function View() {
         size: 2,
         bedrooms: 4,
         bathrooms: 5,
-        town: "dfgfdgd",
+        city: "dfgfdgd",
       };
       formData.append("additionalData", JSON.stringify(additionalData));
       const response = await axios.post(url, formData, {
@@ -73,6 +93,7 @@ function View() {
   return (
     <>
       <Navbar type={"admin"} />
+      <Button onClick={handleClick}>Redirect to edit</Button>
       <div>
         <Box style={{ width: "100vw", minheight: "550px", overflow: "hidden" }}>
           <Image

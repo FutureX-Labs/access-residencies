@@ -115,6 +115,7 @@ function Customize() {
 
   console.log(bannerImages);
   const handleBannerFileUpload = async (e) => {
+    bannerFormData.delete("myFiles");
     const files = e.target.files;
     setBannerImages([]);
 
@@ -138,14 +139,12 @@ function Customize() {
       base64Images.push(base64);
     }
     setBannerImages((prevImages) => [...base64Images]);
-    if (bannerFormData.length > 0) {
-      setShowSaveBanner(true);
-    } else {
-      setShowSaveBanner(false);
-    }
+
+    setShowSaveBanner(true);
   };
 
   const handleFeatureFileUpload = async (e) => {
+    featureFormData.delete("myFiles");
     const files = e.target.files;
     setFeatureImages([]);
 
@@ -169,11 +168,8 @@ function Customize() {
       base64Images.push(base64);
     }
     setFeatureImages((prevImages) => [...base64Images]);
-    if (bannerFormData.length > 0) {
-      setShowSaveFeature(true);
-    } else {
-      setShowSaveFeature(false);
-    }
+
+    setShowSaveFeature(true);
   };
 
   const handleTextFieldChange = (index, value) => {

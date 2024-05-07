@@ -25,7 +25,7 @@ function Add() {
         size: 2,
         bedrooms: 4,
         bathrooms: 5,
-        town: "dfgfdgd",
+        city: "dfgfdgd",
       };
       formData.append("additionalData", JSON.stringify(additionalData));
       const response = await axios.post(url, formData, {

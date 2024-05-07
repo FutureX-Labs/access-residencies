@@ -3,6 +3,6 @@ html {
   padding: 0px;
   margin: 0px;
   box-sizing: border-box;
-  /* overflow-y: hidden; */
+  overflow-x: hidden;
   background-color: #000000;
 }

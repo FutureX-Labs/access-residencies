@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import Navbar from "../../components/navbar/Navbar";
 import Image from "next/image";
@@ -11,105 +11,97 @@ import {
   Select,
   MenuItem,
   Button,
+  Breadcrumbs,
 } from "@mui/material";
+import Link from "next/link";
 import { FaShareNodes } from "react-icons/fa6";
 import { MdBed } from "react-icons/md";
 import bathroom from "../../../../public/bathroom.png";
 import squareFeet from "../../../../public/images/squareFeet.png";
 import { SlCallEnd } from "react-icons/sl";
-
 import { Roboto } from "next/font/google";
-
-const url = "http://localhost:4000/api/appartmentForRent/add";
+import { useRouter } from "next/navigation";
+import { GetOneUrl } from "@/app/utility/getOneUrl";
+import BannerSlider from "@/app/components/bannerslider/BannerSlider";
 
 function View() {
-  const [postImage, setPostImage] = useState(null);
-  const [formData, setFormData] = useState(new FormData());
+  const [selectedData, setSelectedData] = useState("");
   const [propertyType, setPropertyType] = useState("");
   const [property, setProperty] = useState("");
 
-  console.log(propertyType, property);
-  const createPost = async () => {
-    try {
-      const additionalData = {
-        propertyId: "5wfdfwe",
-        title: "house beautifyll",
-        price: 4324,
-        description: "dsfsdfdsfsdfsd",
-        size: 2,
-        bedrooms: 4,
-        bathrooms: 5,
-        town: "dfgfdgd",
-      };
-      formData.append("additionalData", JSON.stringify(additionalData));
-      const response = await axios.post(url, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      console.log(response);
-    } catch (error) {
-      console.log(error);
+  const fetchData = async () => {
+    const currentUrl = window.location.href;
+
+    const urlParts = currentUrl.split("?");
+    const queryString = urlParts[1];
+
+    const urlParams = new URLSearchParams(queryString);
+
+    const propertyValue = urlParams.get("propertyValue");
+    const propertyTypeValue = urlParams.get("propertyType");
+
+    const id = urlParams.get("id");
+
+    console.log("propertyValue", propertyValue);
+    console.log("propertyTypeValue", propertyTypeValue);
+    console.log("id", id);
+
+    if ((propertyValue, propertyTypeValue, id)) {
+      try {
+        const url = await GetOneUrl(propertyValue, propertyTypeValue, id);
+        const response = await axios.get(url, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        setSelectedData(response.data);
+        setPropertyType(response?.data?.propertyType);
+        setProperty(response?.data?.property);
+        console.log("url:", url);
+        console.log("response:", response);
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    createPost();
-    if (postImage) {
-      //   formData.append("myFile", postImage);
-    } else {
-      console.log("No image selected");
-    }
-  };
-
-  const handleFileUpload = (e) => {
-    const file = e.target.files[0];
-    setPostImage(file);
-  };
-  console.log(postImage);
-  const handleMultipleFileUpload = (e) => {
-    const files = e.target.files;
-    console.log("before Files", files);
-
-    // Convert postImage to an array if it's not already
-    const postImagesArray = postImage ? [postImage] : [];
-    console.log("postImagesArray", postImagesArray);
-    // Concatenate postImage with files
-    const allFiles = [...files, ...postImagesArray];
-
-    for (let i = 0; i < allFiles.length; i++) {
-      formData.append("myFiles", allFiles[i]);
-    }
-    console.log("files", allFiles);
-  };
-
-  const data = {
-    title: "Modern House from sale",
-    city: "Columbo",
-    propertyId: "#HS_S_001",
-    description:
-      "Lorem ipsum dolor, sit amet consectetur adipisicing elit.Aut debitis, soluta consequatur quis dolores maiores Aut debitis, soluta consequatur quis dolores maiores Aut debitis, soluta consequatur quis dolores maiores Aut debitis, soluta consequatur quis dolores maiores possimus aliquam non sapiente minima ipsam veniam dignissimos at laudantium minus quo quod quae? Eos?   dolores maiores possimus aliquam non sapiente minima ipsam veniam dignissimos at laudantium minus quo quod quae? Eos?",
-    bedroom: "35 bed rooms",
-    bathroom: "27 bath rooms",
-    size: "125,000 sq.ft",
-    price: "RS. 50,000,00 ",
-  };
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   return (
     <>
-      <Navbar type={"admin"} />
-
+      <Navbar type={"user"} />
+      <BannerSlider imageData={selectedData?.images} />
+      <Breadcrumbs
+        aria-label="breadcrumb"
+        sx={{
+          width: { md: "50%", xs: "90%" },
+          margin: "auto",
+        }}
+      >
+        <Link
+          style={{ fontSize: "18px", color: "#FF6DD6", textDecoration: "none" }}
+          href="/"
+        >
+          Properties
+        </Link>
+        <Typography sx={{ fontSize: "18x" }} color="white">
+          {property}
+        </Typography>
+        <Typography sx={{ fontSize: "18x" }} color="white">
+          {propertyType}
+        </Typography>
+      </Breadcrumbs>
       <Box
         sx={{
-          height: {md:"630px", xs:"650px"},
+          height: { md: "630px", xs: "650px" },
           backgroundColor: "#333",
           color: "#fff",
           boxShadow: "0px 0px 10px rgba(0,0,0,0.5)",
           borderRadius: "8px",
-          width: {md:"50%",xs:"90%"},
-          
-          margin:"auto"
+          width: { md: "50%", xs: "90%" },
+
+          margin: "auto",
         }}
         my={4}
         display="flex"
@@ -133,7 +125,7 @@ function View() {
               }}
               variant="h5"
             >
-              {data.title}
+              {selectedData.title}
             </Typography>
             <Typography
               sx={{
@@ -143,35 +135,46 @@ function View() {
                 marginTop: "8px",
               }}
             >
-              {data.city}
+              {selectedData.city}
             </Typography>
           </Box>
-          <Box sx={{display:"flex", flexDirection: "column" , justifyContent:{md:"end", xs:' center'}}}  >
-            <Box sx={{display:"flex", justifyContent:"center", alignItems:"center"}}>
-            <Button
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: { md: "end", xs: " center" },
+            }}
+          >
+            <Box
               sx={{
-                backgroundColor: "#8C1C40",
-                padding: "5px 10px",
-                color: "#fff",
-                gap: "10px",
-                width:"100px",
-           
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
               }}
             >
-              <FaShareNodes size={20} />
-              <Typography sx={{ fontSize: "13px",}}>Share</Typography>
-            </Button>
+              <Button
+                sx={{
+                  backgroundColor: "#8C1C40",
+                  padding: "5px 10px",
+                  color: "#fff",
+                  gap: "10px",
+                  width: "100px",
+                }}
+              >
+                <FaShareNodes size={20} />
+                <Typography sx={{ fontSize: "13px" }}>Share</Typography>
+              </Button>
             </Box>
             <Typography
               sx={{
                 color: "#787878",
                 fontSize: "14px",
-                textAlign: {mdL:"end", xs:"center"},
+                textAlign: { mdL: "end", xs: "center" },
                 fontWeight: "600",
                 marginTop: "8px",
               }}
             >
-              {data.propertyId}
+              {selectedData.propertyId}
             </Typography>
           </Box>
         </Box>
@@ -189,7 +192,7 @@ function View() {
                   color: "#bdbdbd",
                 }}
               >
-                {data.bedroom}{" "}
+                {selectedData.bedrooms} bed rooms .{" "}
               </Typography>
 
               <Box sx={{ display: "flex", alignItems: "center", gap: "10px" }}>
@@ -202,7 +205,7 @@ function View() {
                 <Typography
                   sx={{ gap: "10px", fontSize: "14px", color: "#bdbdbd" }}
                 >
-                  {data.bathroom}
+                  {selectedData.bathrooms} beth rooms
                 </Typography>
               </Box>
             </Box>
@@ -217,7 +220,7 @@ function View() {
               <Image src={squareFeet} alt="icon" size={12} />
               <Typography sx={{ fontSize: "14px", color: "#bdbdbd" }}>
                 {" "}
-                {data.size}{" "}
+                {selectedData.size} sq. ft{" "}
               </Typography>
             </Box>
           </Box>
@@ -230,18 +233,19 @@ function View() {
               fontSize: "30px",
             }}
           >
-            <Typography>{data.price}</Typography>
+            <Typography>RS {selectedData.price}</Typography>
           </Box>
           <Typography
             sx={{
               color: "#bdbdbd",
-              fontSize: "18px",
+              fontSize: "20px",
               textAlign: "center",
+              fontWeight: "700",
               overflowY: " auto",
-              maxHeight: {md: "300px", xs: "230px"},
+              maxHeight: { md: "300px", xs: "230px" },
             }}
           >
-            {data.description}
+            {selectedData.description}
           </Typography>
 
           <Box

@@ -4,8 +4,9 @@ import { Box } from "@mui/material";
 import Image from "next/image";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import Link from "next/link";
 
-export default function BannerSlider({ imageData }) {
+export default function FeatureSlider({ imageData }) {
   console.log("imageData", imageData);
   let settings = {
     dots: false,
@@ -19,12 +20,10 @@ export default function BannerSlider({ imageData }) {
   };
 
   const imgStyle = {
-    width: "100vw",
-    maxHeight: "550px",
+    width: "900px",
+    maxHeight: "400px",
     objectFit: "cover",
     overflow: "none",
-    zIndex: "1",
-    position: "relative",
   };
 
   return (
@@ -33,11 +32,16 @@ export default function BannerSlider({ imageData }) {
       autoplay
       autoplaySpeed={1500}
       className="slick-slider-custom"
-      style={{ zIndex: "10", position: "relative" }}
     >
       {imageData?.map((img) => (
         <div key={img.id}>
-          <img src={`data:image/jpeg;base64,${img}`} alt="" style={imgStyle} />
+          <Link href={img.url}>
+            <img
+              src={`data:image/jpeg;base64,${img?.file}`}
+              alt=""
+              style={imgStyle}
+            />
+          </Link>
         </div>
       ))}
     </Slider>
