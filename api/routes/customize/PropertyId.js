@@ -4,8 +4,8 @@ const PropertyIdSchema = require("../../schema/PropertyId");
 
 router.get("/", async (req, res) => {
   try {
-    const houses = await PropertyIdSchema.find();
-    res.status(200).json(houses);
+    const data = await PropertyIdSchema.find();
+    res.status(200).json(data);
   } catch (error) {
     console.error(error);
     res.status(400).json(error);

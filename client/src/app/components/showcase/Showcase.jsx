@@ -6,6 +6,7 @@ import {
   Typography,
   useMediaQuery,
   useTheme,
+  Button,
 } from "@mui/material";
 import { FaShareNodes } from "react-icons/fa6";
 import { MdBed } from "react-icons/md";
@@ -17,8 +18,13 @@ import { MdSocialDistance } from "react-icons/md";
 import squareFeet from "../../../../public/images/squareFeet.png";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { BorderRight } from "@mui/icons-material";
+import binImage from "../../../../public/BinImage.png";
+import ediImage from "../../../../public/editImage.png";
+import closeImage from "../../../../public/closeImage.png";
+import { IoIosEye } from "react-icons/io";
 
-const Showcase = ({ data }) => {
+const Showcase = ({ data, user }) => {
   // Sample data array
   //   const data = Array.from({ length: 100 }, (_, i) => ({
   //     id: i + 1,
@@ -45,9 +51,10 @@ const Showcase = ({ data }) => {
   };
 
   return (
-    <Box>
-      {/* Box with background image */}
-      {/* <Box
+    <>
+      <Box>
+        {/* Box with background image */}
+        {/* <Box
         sx={{
           height: 200,
           backgroundImage: "url(/background.jpg)", // Your background image URL
@@ -57,206 +64,434 @@ const Showcase = ({ data }) => {
         }}
       ></Box> */}
 
-      {/* Grid to display records */}
-      <Grid container spacing={2}>
-        {data
-          .slice((page - 1) * itemsPerPage, page * itemsPerPage)
-          .map((item) => (
-            <Grid
-              item
-              key={item.id}
-              xs={12}
-              sm={6}
-              md={4}
-              lg={3}
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <Box
-                onClick={() =>
-                  handleRedirect(item.property, item.propertyType, item._id)
-                }
-                sx={{
-                  height: "250px",
-                  width: "270px",
-                  backgroundImage: `url(data:image/jpeg;base64,${item.thumbnailImage})`, // Set background image URL here
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  borderRadius: "10px",
-                  color: "#c2c6cf",
-                  display: "flex",
-                  position: "relative",
-                }}
-              >
-                <Box sx={{ ml: "20px", mt: "16px", textAlign: "start" }}>
-                  <Typography
-                    sx={{
-                      fontWeight: "800",
-                      fontSize: "20px",
-                      lineHeight: "21px",
-                      margin: "10px 0px",
-                    }}
-                  >
-                    {item.title}
-                  </Typography>
-                  <Typography
-                    sx={{
-                      fontWeight: "500",
-                      fontSize: "16px",
-                      lineHeight: "18px",
-                      margin: "5px 0px",
-                    }}
-                  >
-                    {item.city}
-                  </Typography>
+        {/* Grid to display records */}
+        {user === "user" ? (
+          <Grid container spacing={2}>
+            {data
+              ?.slice((page - 1) * itemsPerPage, page * itemsPerPage)
+              .map((item) => (
+                <Grid
+                  item
+                  key={item.id}
+                  xs={12}
+                  sm={6}
+                  md={4}
+                  lg={3}
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
                   <Box
+                    onClick={() =>
+                      handleRedirect(item.property, item.propertyType, item._id)
+                    }
                     sx={{
+                      height: "250px",
+                      width: "270px",
+                      backgroundImage: `url(data:image/jpeg;base64,${item.thumbnailImage})`, // Set background image URL here
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                      borderRadius: "10px",
+                      color: "#c2c6cf",
                       display: "flex",
-                      justifyContent: "start",
-                      alignItems: "center",
-                      gap: "10px",
-                      margin: "13px 0px",
+                      position: "relative",
                     }}
                   >
-                    {item.size && (
-                      <>
-                        <Image src={squareFeet} alt="icon" size={26} />
-                        <Typography
-                          sx={{
-                            fontWeight: "700",
-                            fontSize: "18px",
-                            lineHeight: "21px",
-                          }}
-                        >
-                          {item.size} sq. ft.{" "}
-                        </Typography>
-                      </>
-                    )}
-                  </Box>
-                  <Box sx={{ display: "flex", gap: "10px" }}>
-                    {item.bedrooms && (
+                    <Box sx={{ ml: "20px", mt: "16px", textAlign: "start" }}>
+                      <Typography
+                        sx={{
+                          fontWeight: "800",
+                          fontSize: "20px",
+                          lineHeight: "21px",
+                          margin: "10px 0px",
+                        }}
+                      >
+                        {item.title}
+                      </Typography>
+                      <Typography
+                        sx={{
+                          fontWeight: "500",
+                          fontSize: "16px",
+                          lineHeight: "18px",
+                          margin: "5px 0px",
+                        }}
+                      >
+                        {item.city}
+                      </Typography>
                       <Box
                         sx={{
                           display: "flex",
+                          justifyContent: "start",
                           alignItems: "center",
                           gap: "10px",
+                          margin: "13px 0px",
                         }}
                       >
-                        <IoBedOutline size={26} />
-                        <Typography
-                          sx={{
-                            fontWeight: "700",
-                            fontSize: "18px",
-                            lineHeight: "21px",
-                          }}
-                        >
-                          {item.bedrooms}
-                        </Typography>
+                        {item.size && (
+                          <>
+                            <Image src={squareFeet} alt="icon" size={26} />
+                            <Typography
+                              sx={{
+                                fontWeight: "700",
+                                fontSize: "18px",
+                                lineHeight: "21px",
+                              }}
+                            >
+                              {item.size} sq. ft.{" "}
+                            </Typography>
+                          </>
+                        )}
                       </Box>
-                    )}
-
-                    {item.bathrooms && (
-                      <>
-                        <Typography
-                          sx={{ color: "#bdbdbd", fontWeight: "900" }}
-                        >
-                          .
-                        </Typography>
-                        <Box
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "10px",
-                          }}
-                        >
-                          <MdBathtub size={26} />
-                          <Typography
+                      <Box sx={{ display: "flex", gap: "10px" }}>
+                        {item.bedrooms && (
+                          <Box
                             sx={{
-                              fontWeight: "600",
-                              fontSize: "18px",
-                              lineHeight: "21px",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "10px",
                             }}
                           >
-                            {item.bathrooms}
-                          </Typography>
-                        </Box>
-                      </>
-                    )}
+                            <IoBedOutline size={26} />
+                            <Typography
+                              sx={{
+                                fontWeight: "700",
+                                fontSize: "18px",
+                                lineHeight: "21px",
+                              }}
+                            >
+                              {item.bedrooms}
+                            </Typography>
+                          </Box>
+                        )}
+
+                        {item.bathrooms && (
+                          <>
+                            <Typography
+                              sx={{ color: "#bdbdbd", fontWeight: "900" }}
+                            >
+                              .
+                            </Typography>
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "10px",
+                              }}
+                            >
+                              <MdBathtub size={26} />
+                              <Typography
+                                sx={{
+                                  fontWeight: "600",
+                                  fontSize: "18px",
+                                  lineHeight: "21px",
+                                }}
+                              >
+                                {item.bathrooms}
+                              </Typography>
+                            </Box>
+                          </>
+                        )}
+                      </Box>
+                    </Box>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "end",
+                        alignItems: "end",
+                        position: "absolute",
+                        bottom: "10px",
+                        right: "10px",
+                      }}
+                    >
+                      {item.price && ( // Check if item.price exists
+                        <Typography
+                          sx={{
+                            backdropFilter: "#9B7490",
+                            border: "4px solid #9B7490",
+                            borderRadius: "4px",
+                            textAlign: "center",
+                            padding: "3px 20px",
+                            height: "37px",
+                          }}
+                        >
+                          RS.{item.price}
+                        </Typography>
+                      )}
+                      {item.rent && ( // Check if item.price exists
+                        <Typography
+                          sx={{
+                            backdropFilter: "#9B7490",
+                            border: "4px solid #9B7490",
+                            borderRadius: "4px",
+                            textAlign: "center",
+                            padding: "3px 20px",
+                            height: "37px",
+                          }}
+                        >
+                          RS.{item.rent}
+                        </Typography>
+                      )}
+                    </Box>
                   </Box>
-                </Box>
-                <Box
+                </Grid>
+              ))}
+          </Grid>
+        ) : (
+          <Grid container spacing={2}>
+            {data
+              .slice((page - 1) * itemsPerPage, page * itemsPerPage)
+              .map((item) => (
+                <Grid
+                  item
+                  key={item.id}
+                  xs={12}
+                  sm={6}
+                  md={4}
+                  lg={3}
                   sx={{
                     display: "flex",
-                    justifyContent: "end",
-                    alignItems: "end",
-                    position: "absolute",
-                    bottom: "10px",
-                    right: "10px",
+                    justifyContent: "center",
+                    alignItems: "center",
                   }}
                 >
-                  {item.price && ( // Check if item.price exists
-                    <Typography
-                      sx={{
-                        backdropFilter: "#9B7490",
-                        border: "4px solid #9B7490",
-                        borderRadius: "4px",
-                        textAlign: "center",
-                        padding: "3px 20px",
-                        height: "37px",
-                      }}
-                    >
-                      RS.{item.price}
-                    </Typography>
-                  )}
-                  {item.rent && ( // Check if item.price exists
-                    <Typography
-                      sx={{
-                        backdropFilter: "#9B7490",
-                        border: "4px solid #9B7490",
-                        borderRadius: "4px",
-                        textAlign: "center",
-                        padding: "3px 20px",
-                        height: "37px",
-                      }}
-                    >
-                      RS.{item.rent}
-                    </Typography>
-                  )}
-                </Box>
-              </Box>
-            </Grid>
-          ))}
-      </Grid>
+                  <Box
+                    onClick={() =>
+                      handleRedirect(item.property, item.propertyType, item._id)
+                    }
+                    sx={{
+                      height: "250px",
+                      width: "270px",
+                      backgroundImage: `url(data:image/jpeg;base64,${item.thumbnailImage})`, // Set background image URL here
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                      borderRadius: "10px",
+                      color: "#c2c6cf",
+                      display: "flex",
+                      position: "relative",
+                    }}
+                  >
+                    <Box sx={{ ml: "20px", mt: "16px", textAlign: "start" }}>
+                      <Typography
+                        sx={{
+                          fontWeight: "500",
+                          fontSize: "16px",
+                          lineHeight: "18px",
+                          margin: "5px 0px",
+                        }}
+                      >
+                        {item.city}
+                      </Typography>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "start",
+                          alignItems: "center",
+                          gap: "10px",
+                          margin: "13px 0px",
+                        }}
+                      >
+                        {item.size && (
+                          <>
+                            <Image src={squareFeet} alt="icon" size={26} />
+                            <Typography
+                              sx={{
+                                fontWeight: "700",
+                                fontSize: "18px",
+                                lineHeight: "21px",
+                              }}
+                            >
+                              {item.size} sq. ft.{" "}
+                            </Typography>
+                          </>
+                        )}
+                      </Box>
+                      <Box sx={{ display: "flex", gap: "10px" }}>
+                        {item.bedrooms && (
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "10px",
+                            }}
+                          >
+                            <IoBedOutline size={26} />
+                            <Typography
+                              sx={{
+                                fontWeight: "700",
+                                fontSize: "18px",
+                                lineHeight: "21px",
+                              }}
+                            >
+                              {item.bedrooms}
+                            </Typography>
+                          </Box>
+                        )}
 
-      {/* Pagination */}
-      <Typography sx={{ color: "white", fontSize: "small", mt: "30px" }}>
-        {" "}
-        Showing 20 results
-      </Typography>
-      <Box
-        sx={{
-          margin: "5px 0px",
-          display: "flex",
-          justifyContent: "center",
-        }}
-      >
-        <Pagination
-          count={Math.ceil(data.length / itemsPerPage)}
-          page={page}
-          onChange={handleChangePage}
-          variant="outlined"
-          size="small"
+                        {item.bathrooms && (
+                          <>
+                            <Typography
+                              sx={{ color: "#bdbdbd", fontWeight: "900" }}
+                            >
+                              .
+                            </Typography>
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "10px",
+                              }}
+                            >
+                              <MdBathtub size={26} />
+                              <Typography
+                                sx={{
+                                  fontWeight: "600",
+                                  fontSize: "18px",
+                                  lineHeight: "21px",
+                                }}
+                              >
+                                {item.bathrooms}
+                              </Typography>
+                            </Box>
+                          </>
+                        )}
+                      </Box>
+                      <Typography
+                        sx={{
+                          fontWeight: "800",
+                          fontSize: "20px",
+                          lineHeight: "21px",
+                          margin: "10px 0px",
+                        }}
+                      >
+                        {item.title}
+                      </Typography>
+                    </Box>
+                    <Box>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "end",
+                          alignItems: "end",
+                          position: "absolute",
+                          top: "10px",
+                          right: "10px",
+                        }}
+                      >
+                        {item.price && ( // Check if item.price exists
+                          <Typography
+                            sx={{
+                              backdropFilter: "#9B7490",
+                              border: "4px solid #9B7490",
+                              borderRadius: "4px",
+                              textAlign: "center",
+                              padding: "3px 8px",
+                              height: "37px",
+                            }}
+                          >
+                            RS.{item.price}
+                          </Typography>
+                        )}
+                        {item.rent && ( // Check if item.price exists
+                          <Typography
+                            sx={{
+                              backdropFilter: "#9B7490",
+                              border: "4px solid #9B7490",
+                              borderRadius: "4px",
+                              textAlign: "center",
+                              padding: "3px 20px",
+                              height: "37px",
+                            }}
+                          >
+                            RS.{item.rent}
+                          </Typography>
+                        )}
+                      </Box>
+                    </Box>
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        bottom: "0px",
+                        display: "flex",
+                        justifyContent: "space-around",
+                        gap: "10px",
+                        width: "100%",
+                        margin: "0px",
+                        backgroundColor: "#00000075",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Link
+                        href={`/admin/edit?propertyValue=${item?.property}&propertyType=${item?.propertyType}&id=${item?._id}`}
+                      >
+                        <Button
+                          sx={{
+                            padding: "13px 13px",
+                            borderRight: " 1px solid #6c736b",
+                            margin: "0px",
+                            borderRadius: "0px",
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                          }}
+                        >
+                          <Image src={ediImage} alt="" />
+                        </Button>
+                      </Link>
+
+                      <Button>
+                        {item.isVisibale ? (
+                          <IoIosEye size={"40px"} color="#6c736b" />
+                        ) : (
+                          <Image src={closeImage} alt="" />
+                        )}
+                      </Button>
+                      <Button
+                        sx={{
+                          borderLeft: " 1px solid #6c736b",
+                          padding: "10px 20px",
+                          margin: "0px",
+                          borderRadius: "0px",
+                        }}
+                        onClick={() => handleDelete()}
+                      >
+                        <Image src={binImage} alt="" />
+                      </Button>
+                    </Box>
+                  </Box>
+                </Grid>
+              ))}
+          </Grid>
+        )}
+
+        {/* Pagination */}
+        <Typography sx={{ color: "white", fontSize: "small", mt: "30px" }}>
+          {" "}
+          Showing 20 results
+        </Typography>
+        <Box
           sx={{
-            backgroundColor: " #8C1C40",
-            padding: "5px 30px",
-            borderRadius: "5px",
+            margin: "5px 0px",
+            display: "flex",
+            justifyContent: "center",
           }}
-        />
+        >
+          <Pagination
+            count={Math.ceil(data.length / itemsPerPage)}
+            page={page}
+            onChange={handleChangePage}
+            variant="outlined"
+            size="small"
+            sx={{
+              backgroundColor: " #8C1C40",
+              padding: "5px 30px",
+              borderRadius: "5px",
+            }}
+          />
+        </Box>
       </Box>
-    </Box>
+    </>
   );
 };
 

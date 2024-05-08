@@ -26,6 +26,8 @@ import { Perches } from "@/app/list/perches";
 import { Acres } from "@/app/list/acres";
 import { Cities } from "@/app/list/city";
 import { PropertyTypes } from "@/app/list/propertyTypes";
+import AddImage from '../../../../public/images/add.png';
+
 
 const url = "http://localhost:4000/api/appartmentForRent/add";
 const Input = ({ label, value, onChange }) => {
@@ -196,7 +198,7 @@ function Add() {
       <div>
         <Box style={{ width: "100vw", minheight: "550px", overflow: "hidden" }}>
           <Image
-            src="/images/AdminAdd.png"
+            src={AddImage}
             alt="Admin Add"
             layout="responsive"
             width={100}

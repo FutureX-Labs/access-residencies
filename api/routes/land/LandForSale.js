@@ -131,68 +131,50 @@ router.delete("/delete/:id", async (req, res) => {
     res.status(400).json(error);
   }
 });
-
 router.post("/filter", async (req, res) => {
   try {
-    const {
-      propertyId,
-      title,
-      minPrice,
-      maxPrice,
-      description,
-      minPerches,
-      maxPerches,
-      minAcres,
-      maxAcres,
-
-      city,
-    } = req.body;
+    const { city, price, perches, acres } = req.body;
+    console.log(city);
 
     const filter = {};
 
-    if (propertyId) {
-      filter.propertyId = propertyId;
+    if (price !== undefined) {
+      filter.price = price;
     }
-    if (title) {
-      filter.title = { $regex: new RegExp(title, "i") };
+
+    if (perches !== undefined) {
+      filter["landExtent.perches"] = perches;
     }
-    if (minPrice || maxPrice) {
-      filter.price = {};
-      if (minPrice) {
-        filter.price.$gte = minPrice;
-      }
-      if (maxPrice) {
-        filter.price.$lte = maxPrice;
-      }
+
+    if (acres !== undefined) {
+      filter["landExtent.acres"] = acres;
     }
-    if (description) {
-      filter.description = { $regex: new RegExp(description, "i") };
-    }
-    if (minPerches || maxPerches) {
-      filter["landExtent.perches"] = {};
-      if (minPerches) {
-        filter["landExtent.perches"].$gte = minPerches;
-      }
-      if (maxPerches) {
-        filter["landExtent.perches"].$lte = maxPerches;
-      }
-    }
-    if (minAcres || maxAcres) {
-      filter["landExtent.acres"] = {};
-      if (minAcres) {
-        filter["landExtent.acres"].$gte = minAcres;
-      }
-      if (maxAcres) {
-        filter["landExtent.acres"].$lte = maxAcres;
-      }
-    }
+
     if (city) {
       filter.city = { $regex: new RegExp(city, "i") };
     }
 
-    const filteredHouses = await landForSale.find(filter);
+    let filtered = await landForSale.find(filter).exec();
 
-    res.status(200).json(filteredHouses);
+    res.status(200).json(filtered);
+  } catch (error) {
+    console.error(error);
+    res.status(400).json(error);
+  }
+});
+router.post("/filterId", async (req, res) => {
+  try {
+    const { propertyId } = req.body;
+    console.log(propertyId);
+    const filter = {};
+
+    if (propertyId !== undefined) {
+      filter.propertyId = propertyId;
+    }
+
+    const filtered = await landForSale.find(filter).exec();
+
+    res.status(200).json(filtered);
   } catch (error) {
     console.error(error);
     res.status(400).json(error);

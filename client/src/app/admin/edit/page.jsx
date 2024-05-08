@@ -29,6 +29,7 @@ import { Perches } from "@/app/list/perches";
 import { Acres } from "@/app/list/acres";
 import { Cities } from "@/app/list/city";
 import { PropertyTypes } from "@/app/list/propertyTypes";
+import EditImage from '../../../../public/images/edit.png';
 
 const url = "http://localhost:4000/api/appartmentForRent/add";
 const Input = ({ label, value, onChange }) => {
@@ -264,8 +265,8 @@ function Edit() {
       <div>
         <Box style={{ width: "100vw", minheight: "550px", overflow: "hidden" }}>
           <Image
-            src="/images/AdminAdd.png"
-            alt="Admin Add"
+            src={EditImage}
+            alt="Admin Edit"
             layout="responsive"
             width={100}
             height={55}

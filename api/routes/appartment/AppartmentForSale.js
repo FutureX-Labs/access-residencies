@@ -149,52 +149,50 @@ router.delete("/delete/:id", async (req, res) => {
 
 router.post("/filter", async (req, res) => {
   try {
-    const {
-      propertyId,
-      title,
-      minPrice,
-      maxPrice,
-      description,
-      size,
-      bedrooms,
-      bathrooms,
-      city,
-    } = req.body;
+    const { city, price, size, bedrooms, bathrooms } = req.body;
 
     const filter = {};
 
-    if (propertyId) {
-      filter.propertyId = propertyId;
+    if (price !== undefined) {
+      filter.price = price;
     }
-    if (title) {
-      filter.title = { $regex: new RegExp(title, "i") };
-    }
-    if (minPrice || maxPrice) {
-      filter.price = {};
-      if (minPrice) {
-        filter.price.$gte = minPrice;
-      }
-      if (maxPrice) {
-        filter.price.$lte = maxPrice;
-      }
-    }
-    if (description) {
-      filter.description = { $regex: new RegExp(description, "i") };
-    }
-    if (size) {
-      filter.size = size;
-    }
-    if (bedrooms) {
-      filter.bedrooms = bedrooms;
-    }
-    if (bathrooms) {
-      filter.bathrooms = bathrooms;
-    }
+
     if (city) {
       filter.city = { $regex: new RegExp(city, "i") };
     }
 
-    const filtered = await appartmentForSale.find(filter);
+    if (size !== undefined) {
+      filter.size = size;
+    }
+
+    if (bedrooms !== undefined) {
+      filter.bedrooms = bedrooms;
+    }
+
+    if (bathrooms !== undefined) {
+      filter.bathrooms = bathrooms;
+    }
+
+    let filtered = await appartmentForSale.find(filter).exec();
+
+    res.status(200).json(filtered);
+  } catch (error) {
+    console.error(error);
+    res.status(400).json(error);
+  }
+});
+
+router.post("/filterId", async (req, res) => {
+  try {
+    const { propertyId } = req.body;
+
+    const filter = {};
+
+    if (propertyId !== undefined) {
+      filter.propertyId = propertyId;
+    }
+
+    const filtered = await appartmentForSale.find(filter).exec();
 
     res.status(200).json(filtered);
   } catch (error) {

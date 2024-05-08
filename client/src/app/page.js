@@ -148,11 +148,44 @@ function Home() {
       console.log(error);
     }
   };
-
   useEffect(() => {
     Fetch(property, propertyType);
   }, [property, propertyType]);
 
+  const FetchPropertyIDs = async () => {
+    try {
+      const propertyIDResponse = await axios.get(
+        `http://localhost:4000/api/customize/propertyid/`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("Properties response", propertyIDResponse.data[0].propertyId);
+      const propertyIds = propertyIDResponse.data[0].propertyId;
+
+      const response = await axios.post(
+        `http://localhost:4000/api/properties`,
+        {
+          propertyIds: propertyIds,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("Properties response", response.data.data);
+      setCollectionData(response.data.data);
+    } catch (error) {
+      console.log("error in fetching properties", error);
+    }
+  };
+
+  useEffect(() => {
+    FetchPropertyIDs();
+  }, []);
   return (
     <>
       <Navbar type={"user"} />
@@ -249,7 +282,7 @@ function Home() {
           >
             Showcase Properties
           </Typography>
-          <Showcase data={collectionData} />
+          <Showcase data={collectionData} user={"user"} />
         </Container>
       </Box>
     </>

@@ -160,55 +160,52 @@ router.delete("/delete/:id", async (req, res) => {
 
 router.post("/filter", async (req, res) => {
   try {
-    const {
-      propertyId,
-      title,
-      minRent,
-      maxRent,
-      description,
-      size,
-      bedrooms,
-      bathrooms,
-
-      city,
-    } = req.body;
+    const { city, rent, size, bedrooms, bathrooms } = req.body;
 
     const filter = {};
 
-    if (propertyId) {
-      filter.propertyId = propertyId;
+    if (rent !== undefined) {
+      filter.rent = rent;
     }
-    if (title) {
-      filter.title = { $regex: new RegExp(title, "i") };
-    }
-    if (minRent || maxRent) {
-      filter.rent = {};
-      if (minRent) {
-        filter.rent.$gte = minRent;
-      }
-      if (maxRent) {
-        filter.rent.$lte = maxRent;
-      }
-    }
-    if (description) {
-      filter.description = { $regex: new RegExp(description, "i") };
-    }
-    if (size) {
-      filter.size = size;
-    }
-    if (bedrooms) {
-      filter.bedrooms = bedrooms;
-    }
-    if (bathrooms) {
-      filter.bathrooms = bathrooms;
-    }
+
     if (city) {
       filter.city = { $regex: new RegExp(city, "i") };
     }
 
-    const filteredHouses = await houseForRent.find(filter);
+    if (size !== undefined) {
+      filter.size = size;
+    }
 
-    res.status(200).json(filteredHouses);
+    if (bedrooms !== undefined) {
+      filter.bedrooms = bedrooms;
+    }
+
+    if (bathrooms !== undefined) {
+      filter.bathrooms = bathrooms;
+    }
+
+    let filtered = await houseForRent.find(filter).exec();
+
+    res.status(200).json(filtered);
+  } catch (error) {
+    console.error(error);
+    res.status(400).json(error);
+  }
+});
+
+router.post("/filterId", async (req, res) => {
+  try {
+    const { propertyId } = req.body;
+
+    const filter = {};
+
+    if (propertyId !== undefined) {
+      filter.propertyId = propertyId;
+    }
+
+    const filtered = await houseForRent.find(filter).exec();
+
+    res.status(200).json(filtered);
   } catch (error) {
     console.error(error);
     res.status(400).json(error);

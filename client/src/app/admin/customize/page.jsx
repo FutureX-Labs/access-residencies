@@ -16,8 +16,10 @@ import {
 import Container from "@mui/material/Container";
 import Swal from "sweetalert2";
 import { ConvertToBase64 } from "../../utility/Conversion";
-
 import Items from "@/app/components/items/Items";
+import customizeImage from '../../../../public/images/customize.png';
+
+
 
 const bannerURL = "http://localhost:4000/api/customize/banners/add";
 const featureURL = "http://localhost:4000/api/customize/features/add";
@@ -191,7 +193,7 @@ function Customize() {
 
       <Box style={{ width: "100vw", minheight: "550px", overflow: "hidden" }}>
         <Image
-          src="/images/AdminAdd.png"
+          src={customizeImage}
           alt="Admin Add"
           layout="responsive"
           width={100}
