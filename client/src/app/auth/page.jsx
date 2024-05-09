@@ -26,7 +26,7 @@ const Auth = () => {
           icon: "success",
         });
         console.log(result.data.isAdmin);
-        router.push("/admin/customize");
+        router.push("/admin/view");
       }
     } catch (error) {
       Swal.fire({

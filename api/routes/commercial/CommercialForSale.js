@@ -113,6 +113,21 @@ router.put("/edit/:id", upload.array("myFiles"), async (req, res) => {
   }
 });
 
+router.post("/edit/isVisible/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { isVisibale } = req.body;
+    const result = await commercialForSale.findByIdAndUpdate(id, {
+      isVisibale,
+    });
+
+    res.status(200).json(result);
+  } catch (error) {
+    console.error(error);
+    res.status(400).json(error);
+  }
+});
+
 router.delete("/delete/:id", async (req, res) => {
   try {
     const Id = req.params.id;

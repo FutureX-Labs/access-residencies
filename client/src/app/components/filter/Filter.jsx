@@ -24,8 +24,21 @@ import { Cities } from "@/app/list/city";
 import { PropertyTypes } from "@/app/list/propertyTypes";
 import Showcase from "../showcase/Showcase";
 import axios from "axios";
+import Items from "@/app/components/items/Items";
+import Breadcrumbs from "@mui/material/Breadcrumbs";
+import { IoIosArrowForward } from "react-icons/io";
+import { Padding } from "@mui/icons-material";
+import Link from "next/link";
 
-const Filter = ({ property, propertyType, setCollectionData }) => {
+const Filter = ({
+  property,
+  propertyType,
+  setCollectionData,
+  collectionData,
+  setShowHidden,
+  showHidden,
+  hideProperties,
+}) => {
   const [thumbnail, setThumbnail] = useState(null);
   const [images, setImages] = useState(null);
   const [formData, setFormData] = useState(new FormData());
@@ -43,10 +56,12 @@ const Filter = ({ property, propertyType, setCollectionData }) => {
   const [acres, setAcres] = useState(null);
   const [propertyTypes, setPropertyTypes] = useState(null);
   const [openCityDropDown, setOpenCityDropDown] = useState(false);
+  const [filteredBy, setFilteredBy] = useState([]);
   console.log(" property, propertyType", property, propertyType);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setFilteredBy([filteredBy]);
     try {
       let additionalData = {
         city: city,
@@ -82,18 +97,43 @@ const Filter = ({ property, propertyType, setCollectionData }) => {
       console.log("additionalData", additionalData);
       // formData.append("additionalData", additionalData);
 
-      if (additionalData) {
-        const response = await axios.post(
-          FilterUrl(propertyType, property),
-          additionalData,
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
+      const response = await axios.post(
+        FilterUrl(propertyType, property),
+        additionalData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("filter response", response);
+      setCollectionData(response.data);
+
+      if (response.data && additionalData) {
+        const filteredBy = Object.entries(additionalData).map(
+          ([key, value]) => {
+            if (typeof value === "object") {
+              console.log("Object found:", key, value);
+              return `${key}: ${JSON.stringify(value)}`;
+            }
+            switch (key) {
+              case "bedrooms":
+                return `${value} bedrooms`;
+              case "bathrooms":
+                return `${value} bathrooms`;
+              case "size":
+                return `${value} sq`;
+              case "perches":
+                return `${value} perches`;
+              case "acres":
+                return `${value} acres`;
+              default:
+                return `${key}: ${value}`;
+            }
           }
         );
-        console.log("filter response", response);
-        setCollectionData(response.data);
+        console.log("filteredBy", filteredBy);
+        setFilteredBy(filteredBy);
       }
     } catch (error) {
       console.debug(error);
@@ -107,7 +147,6 @@ const Filter = ({ property, propertyType, setCollectionData }) => {
       };
 
       console.log("additionalData peroperty id ", additionalData);
-      // formData.append("additionalData", additionalData);
 
       if (additionalData) {
         let url = FilterUrl(propertyType, property);
@@ -479,65 +518,130 @@ const Filter = ({ property, propertyType, setCollectionData }) => {
             </Grid>
           </form>
         </Box>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: { md: "row", xs: "column" },
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <Button
-            sx={{
-              borderRadius: "10px",
-              border: "1px solid grey",
-              backgroundColor: "#8C1C40",
-              color: "white",
-              height: "42px",
-              width: "40%",
-            }}
-          >
-            All Hidden Properties
-          </Button>
+        {hideProperties && (
           <Box
             sx={{
               display: "flex",
+              flexDirection: { md: "row", xs: "column" },
               justifyContent: "center",
               alignItems: "center",
             }}
           >
-            <TextField
-              required
-              variant="outlined"
-              placeholder="Property ID"
-              InputProps={{ style: { color: "white" } }}
-              type="text"
-              size="small"
-              sx={{
-                border: "1px solid grey",
-                color: "white",
-                marginLeft: "20px",
-                borderRadius: "10px 0px 0px 10px",
-                width: "300px",
-              }}
-              value={propertyId}
-              onChange={(e) => setPropertyId(e.target.value)}
-              fullWidth
-            />
             <Button
               sx={{
-                borderRadius: "0px 10px 10px 0px",
+                borderRadius: "10px",
                 border: "1px solid grey",
                 backgroundColor: "#8C1C40",
                 color: "white",
                 height: "42px",
-                width: "100px",
+                width: "40%",
               }}
-              onClick={handleSubmitByID}
-              disabled={!propertyId}
+              onClick={() => setShowHidden(!showHidden)}
             >
-              Search
+              All Hidden Properties
             </Button>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <TextField
+                required
+                variant="outlined"
+                placeholder="Property ID"
+                InputProps={{ style: { color: "white" } }}
+                type="text"
+                size="small"
+                sx={{
+                  border: "1px solid grey",
+                  color: "white",
+                  marginLeft: "20px",
+                  borderRadius: "10px 0px 0px 10px",
+                  width: "300px",
+                }}
+                value={propertyId}
+                onChange={(e) => setPropertyId(e.target.value)}
+                fullWidth
+              />
+              <Button
+                sx={{
+                  borderRadius: "0px 10px 10px 0px",
+                  border: "1px solid grey",
+                  backgroundColor: "#8C1C40",
+                  color: "white",
+                  height: "42px",
+                  width: "100px",
+                }}
+                onClick={handleSubmitByID}
+                disabled={!propertyId}
+              >
+                Search
+              </Button>
+            </Box>
+          </Box>
+        )}
+
+        <Box sx={{ margin: "10px 0px " }}>
+          <Breadcrumbs aria-label="breadcrumb" sx={{ margin: "15px 0px" }}>
+            {property && propertyType ? (
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <Link underline="hover" color="#fff" href="#">
+                  <Typography color={"#8C1C40"}>{property}</Typography>
+                </Link>
+                <IoIosArrowForward color={"#8C1C40"} sx={{ padding: "0px" }} />
+                <Link color="#fff" href="#">
+                  <Typography color={"#8C1C40"}>Admin</Typography>
+                </Link>
+              </Box>
+            ) : (
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <Link color="#fff" href="#">
+                  <Typography color={"#8C1C40"}>Admin</Typography>
+                </Link>
+              </Box>
+            )}
+          </Breadcrumbs>
+          {property && propertyType && (
+            <Typography
+              sx={{
+                fontSize: "20px",
+                fontWeight: "500",
+                lineHeight: "18px",
+                color: "white",
+              }}
+            >
+              {property} {propertyType} in Sri Lanka ({collectionData?.length}{" "}
+              properties)
+            </Typography>
+          )}
+
+          <Box sx={{ margin: "20px 0px" }}>
+            <Box sx={{ display: "flex", flexDirection: "column" }}>
+              <Box sx={{ display: "flex", gap: "10px" }}>
+                <Typography
+                  sx={{ color: "white", fontSize: "20px", marginTop: "2px" }}
+                >
+                  Filtered By:
+                </Typography>
+                <Box>
+                  <Items data={filteredBy} disableDelete={true} />
+                </Box>
+              </Box>
+              <Box sx={{ display: "flex", gap: "17px" }}>
+                <Typography
+                  sx={{ color: "white", fontSize: "20px", marginTop: "2px" }}
+                >
+                  Top Cities:
+                </Typography>
+                <Box>
+                  {" "}
+                  <Items data={[city]} disableDelete={true} />{" "}
+                </Box>
+              </Box>
+              {/* <Items data={city}  /> */}
+            </Box>
           </Box>
         </Box>
       </Container>

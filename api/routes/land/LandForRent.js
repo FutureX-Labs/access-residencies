@@ -43,7 +43,7 @@ router.post("/add", upload.array("myFiles"), async (req, res) => {
 
     console.log(images);
     console.log(propertyId, title, rent, description, perches, acres, city);
-    const newHouse = new landForRent({
+    const newLand = new landForRent({
       propertyId,
       property: "Land",
       propertyType: "ForRent",
@@ -58,9 +58,10 @@ router.post("/add", upload.array("myFiles"), async (req, res) => {
       },
 
       city,
+      isVisibale: false,
     });
 
-    const response = await newHouse.save();
+    const response = await newLand.save();
 
     res.status(200).json(response);
   } catch (error) {
@@ -110,7 +111,21 @@ router.put("/edit/:id", upload.array("myFiles"), async (req, res) => {
       },
 
       city,
-      isVisibale: false,
+    });
+
+    res.status(200).json(result);
+  } catch (error) {
+    console.error(error);
+    res.status(400).json(error);
+  }
+});
+
+router.post("/edit/isVisible/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { isVisibale } = req.body;
+    const result = await landForRent.findByIdAndUpdate(id, {
+      isVisibale,
     });
 
     res.status(200).json(result);

@@ -12,6 +12,8 @@ import {
   Select,
   Button,
   MenuItem,
+  InputLabel,
+  TextField,
 } from "@mui/material";
 import Container from "@mui/material/Container";
 import BannerSlider from "@/app/components/bannerslider/BannerSlider";
@@ -21,6 +23,9 @@ import "slick-carousel/slick/slick-theme.css";
 import Showcase from "./components/showcase/Showcase";
 import Subheader from "./components/subheader/subheader";
 import { GetAll } from "./utility/getAll";
+import { PropertyTypes } from "@/app/list/propertyTypes";
+import { Cities } from "@/app/list/city";
+import { Prices } from "@/app/list/price";
 
 const url = "http://localhost:4000/api/appartmentForRent/add";
 
@@ -32,6 +37,12 @@ function Home() {
   const [collectionData, setCollectionData] = useState([]);
   const [property, setProperty] = useState(null);
   const [propertyType, setPropertyType] = useState(null);
+  const [selectedProperty, setSelectedProperty] = useState();
+  const [selectedPropertyType, setSelectedPropertyType] = useState("ForSale");
+  const [price, setPrice] = useState(null);
+  const [rent, setRent] = useState(null);
+  const [city, setCity] = useState("All of Colombo");
+  const [search, setSearch] = useState(null);
 
   console.log(propertyType, property);
   const createPost = async () => {
@@ -198,47 +209,238 @@ function Home() {
           sx={{
             display: "flex",
             justifyContent: "center",
+
             margin: "0px 30px",
             marginTop: "-140px",
             position: "absolute",
             bottom: "-170px",
-            left: "22%",
+            left: "10%",
             zIndex: "10",
           }}
         >
-          <Box
-            sx={{
-              backgroundColor: "rgba(10, 10, 10, 0.76)",
-              width: "1047px",
-              height: "350px",
-              gap: "10px",
-            }}
-          >
-            <Button
+          <form onSubmit={handleSubmit}>
+            <Box
               sx={{
-                color: "white",
-                backgroundColor: "#8C1C40",
-                borderRadius: "5px",
-                margin: "10px 0px",
-                width: "150px",
-                height: "60px",
+                backgroundColor: "rgba(10, 10, 10, 0.76)",
+                width: "1047px",
+                height: "350px",
+                padding: "5px 20px",
+                display: "flex",
+                flexDirection: "column",
               }}
             >
-              Sales
-            </Button>
-            <Button
-              sx={{
-                color: "white",
-                backgroundColor: "#8C1C40",
-                borderRadius: "5px",
-                margin: "10px 0px",
-                width: "150px",
-                height: "60px",
-              }}
-            >
-              Sales
-            </Button>
-          </Box>
+              <Box>
+                <Button
+                  sx={{
+                    color: "white",
+                    backgroundColor:
+                      selectedPropertyType === "ForRent"
+                        ? "transparent"
+                        : "#8C1C40",
+                    borderRadius: "10px",
+                    margin: "10px 0px",
+                    width: "150px",
+                    height: "60px",
+                    border: `5px solid ${
+                      selectedPropertyType === "ForRent" && "#8C1C40"
+                    }`,
+                    marginRight: "10px",
+                  }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setSelectedPropertyType("ForSale");
+                  }}
+                >
+                  Sales
+                </Button>
+                <Button
+                  sx={{
+                    color: "white",
+                    backgroundColor:
+                      selectedPropertyType === "ForSale"
+                        ? "transparent"
+                        : "#8C1C40",
+                    borderRadius: "10px",
+                    margin: "10px 0px",
+                    width: "150px",
+                    height: "60px",
+                    border: `5px solid ${
+                      selectedPropertyType === "ForSale" && "#8C1C40"
+                    }`,
+                  }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setSelectedPropertyType("ForRent");
+                  }}
+                >
+                  Rentals
+                </Button>
+              </Box>
+              <Box
+                sx={{
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                  margin: "50px 0px",
+                }}
+              >
+                <TextField
+                  required
+                  variant="outlined"
+                  placeholder="Type Anything to Search"
+                  InputProps={{ style: { color: "white" } }}
+                  type="text"
+                  size="small"
+                  sx={{
+                    border: "1px solid #8C1C40",
+                    color: "white",
+                    widht: "500px",
+                    borderRadius: "10px 0px 0px 10px",
+                  }}
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  fullWidth
+                />
+                <Button
+                  sx={{
+                    borderRadius: "0px 10px 10px 0px",
+                    border: "1px solid #8C1C40",
+                    backgroundColor: "#8C1C40",
+                    color: "white",
+                    height: "42px",
+                    width: "100px",
+                  }}
+                  type="submit"
+                  // disabled={!propertyId}
+                >
+                  Search
+                </Button>
+              </Box>
+              <Box sx={{ display: "flex", justifyContent: "space-around" }}>
+                <Box>
+                  <Typography
+                    variant="h6"
+                    style={{
+                      color: "#8C1C40",
+                      fontWeight: 500,
+                      fontSize: "22px",
+                      marginLeft: "10px",
+                    }}
+                  >
+                    Property Types
+                  </Typography>
+
+                  <Select
+                    required
+                    value={selectedProperty}
+                    onChange={(e) => setSelectedProperty(e.target.value)}
+                    inputProps={{ style: { color: "white" } }}
+                    size="small"
+                    sx={{
+                      border: "1px solid #8C1C40",
+                      color: "white",
+                      width: "300px",
+                      borderRadius: "5px",
+                    }}
+                    fullWidth
+                  >
+                    {PropertyTypes.map((type, index) => (
+                      <MenuItem key={index} value={type.value}>
+                        {type.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </Box>
+                <Box>
+                  <Typography
+                    variant="h6"
+                    style={{
+                      color: "#8C1C40",
+                      fontWeight: 500,
+                      fontSize: "22px",
+                      marginLeft: "10px",
+                    }}
+                  >
+                    City
+                  </Typography>
+                  <select
+                    required
+                    style={{
+                      width: "300px",
+                      border: "1px solid #8C1C40",
+                      height: "42px",
+                      borderRadius: "5px",
+                      backgroundColor: "transparent",
+                      color: "white",
+                    }}
+                    value={city}
+                    onChange={(e) => {
+                      const selectedCity = e.target.value;
+                      setCity(selectedCity);
+                      setOpenCityDropDown(false);
+                    }}
+                  >
+                    {Cities.map((cityItem) => (
+                      <optgroup
+                        label={cityItem.label}
+                        key={cityItem.value}
+                        style={{
+                          backgroundColor: "black",
+                          padding: "5px 20px",
+                        }}
+                      >
+                        {cityItem.subheadings.map((subheading) => (
+                          <option
+                            value={subheading.value}
+                            key={subheading.value}
+                          >
+                            └ {subheading.label}
+                          </option>
+                        ))}
+                      </optgroup>
+                    ))}
+                  </select>
+                </Box>
+                <Box>
+                  <Typography
+                    variant="h6"
+                    style={{
+                      color: "#8C1C40",
+                      fontWeight: 500,
+                      fontSize: "22px",
+                      marginLeft: "10px",
+                    }}
+                  >
+                    {selectedPropertyType === "ForSale" ? "Price" : "Rent"}
+                  </Typography>
+                  <Select
+                    required
+                    value={selectedPropertyType === "ForSale" ? price : rent}
+                    onChange={(e) =>
+                      selectedPropertyType === "ForSale"
+                        ? setPrice(e.target.value)
+                        : setRent(e.target.value)
+                    }
+                    inputProps={{ style: { color: "white" } }}
+                    size="small"
+                    sx={{
+                      border: "1px solid #8C1C40",
+                      color: "white",
+                      width: "300px",
+                      borderRadius: "5px",
+                    }}
+                    fullWidth
+                  >
+                    {Prices.map((priceOption, index) => (
+                      <MenuItem key={index} value={priceOption.value}>
+                        {priceOption.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </Box>
+              </Box>
+            </Box>
+          </form>
         </Box>
       </Box>
 
@@ -282,7 +484,12 @@ function Home() {
           >
             Showcase Properties
           </Typography>
-          <Showcase data={collectionData} user={"user"} />
+          <Showcase
+            data={collectionData}
+            user={"user"}
+            property={property}
+            propertyType={propertyType}
+          />
         </Container>
       </Box>
     </>

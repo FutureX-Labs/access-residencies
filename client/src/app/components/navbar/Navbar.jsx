@@ -17,6 +17,8 @@ import Button from "@mui/material/Button";
 import Image from "next/image";
 import { FaAngleDown } from "react-icons/fa6";
 import { FaAngleUp } from "react-icons/fa6";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const drawerWidth = 900;
 
@@ -24,14 +26,16 @@ function Navbar(props) {
   const { window, type } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [showProperty, setShowProperty] = React.useState(false);
+  const router = useRouter();
 
   const handleDrawerToggle = () => {
     setMobileOpen((prevState) => !prevState);
   };
 
   const adminNavItems = [
-    { title: "Property View", path: "/property/view" },
-    { title: "Property Add", path: "/property/add" },
+    { title: "Customize", path: "/admin/customize" },
+    { title: "Property View", path: "/admin/view" },
+    { title: "Property Add", path: "/admin/add" },
   ];
 
   const userNavItems = [
@@ -39,10 +43,15 @@ function Navbar(props) {
     { title: "About us", path: "#about" },
     { title: "Gallery", path: "#gallery" },
     { title: "Contact Us", path: "#contact" },
+    { title: "Property View", path: "/user/filter" },
     { title: "Login", path: "/auth" },
   ];
 
   const navItems = type === "admin" ? adminNavItems : userNavItems;
+
+  const handleLogoClick = () => {
+    router.push("/");
+  };
 
   const drawer = (
     <Box
@@ -60,7 +69,10 @@ function Navbar(props) {
             flexGrow: 1,
             alignItems: "center",
           }}
+          onClick={handleLogoClick}
         >
+          {/* Wrap the Image component inside a Link */}
+
           <Image
             component="div"
             src="/logo.png"
@@ -151,7 +163,11 @@ function Navbar(props) {
         }}
       >
         <Toolbar>
-          <Box variant="h6" sx={{ flexGrow: 1, alignItems: "center" }}>
+          <Box
+            variant="h6"
+            sx={{ flexGrow: 1, alignItems: "center" }}
+            onClick={handleLogoClick}
+          >
             <Image
               component="div"
               src="/logo.png"

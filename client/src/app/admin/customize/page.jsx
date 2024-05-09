@@ -17,9 +17,7 @@ import Container from "@mui/material/Container";
 import Swal from "sweetalert2";
 import { ConvertToBase64 } from "../../utility/Conversion";
 import Items from "@/app/components/items/Items";
-import customizeImage from '../../../../public/images/customize.png';
-
-
+import customizeImage from "../../../../public/images/customize.png";
 
 const bannerURL = "http://localhost:4000/api/customize/banners/add";
 const featureURL = "http://localhost:4000/api/customize/features/add";

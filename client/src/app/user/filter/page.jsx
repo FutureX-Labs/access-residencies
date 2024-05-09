@@ -1,18 +1,42 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
+import Slider from "react-slick";
 import Navbar from "../../components/navbar/Navbar";
 import Image from "next/image";
-import { Box, Item, Grid, Typography, Select, MenuItem } from "@mui/material";
+import {
+  Box,
+  Item,
+  Grid,
+  Typography,
+  Select,
+  Button,
+  MenuItem,
+} from "@mui/material";
 import Container from "@mui/material/Container";
+import BannerSlider from "@/app/components/bannerslider/BannerSlider";
+import FeatureSlider from "../../components/featureslider/FeatureSlider";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import Showcase from "../../components/showcase/Showcase";
+import Subheader from "../../components/subheader/subheader";
+import { GetAll } from "../../utility/getAll";
+import Filter from "@/app/components/filter/Filter";
+import Breadcrumbs from "@mui/material/Breadcrumbs";
+import Link from "@mui/material/Link";
+import { IoIosArrowForward } from "react-icons/io";
+import { Padding } from "@mui/icons-material";
 
 const url = "http://localhost:4000/api/appartmentForRent/add";
 
-function Add() {
+function UserFilter() {
   const [postImage, setPostImage] = useState(null);
   const [formData, setFormData] = useState(new FormData());
-  const [propertyType, setPropertyType] = useState("");
-  const [property, setProperty] = useState("");
+  const [Banners, setBanners] = useState([]);
+  const [features, setFeatures] = useState([]);
+  const [collectionData, setCollectionData] = useState([]);
+  const [property, setProperty] = useState(null);
+  const [propertyType, setPropertyType] = useState(null);
 
   console.log(propertyType, property);
   const createPost = async () => {
@@ -69,120 +93,151 @@ function Add() {
     }
     console.log("files", allFiles);
   };
+  console.log("Banners", Banners);
+  console.log("features", features);
+
+  const FetchBanners = async () => {
+    try {
+      const response = await axios.get(
+        // Use axios.get instead of just axios
+        "http://localhost:4000/api/customize/banners",
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      setBanners(response?.data[0]);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    FetchBanners();
+  }, []);
+  const FetchFeatures = async () => {
+    try {
+      const response = await axios.get(
+        // Use axios.get instead of just axios
+        "http://localhost:4000/api/customize/features",
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      setFeatures(response?.data[0].features);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    FetchFeatures();
+  }, []);
+  console.log("collectionData", collectionData);
+  const Fetch = async (property, propertyType) => {
+    try {
+      const response = await axios.get(
+        // Use axios.get instead of just axios
+        GetAll(property, propertyType),
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      console.log("response", response);
+      setCollectionData(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    Fetch(property, propertyType);
+  }, [property, propertyType]);
+
+  const FetchPropertyIDs = async () => {
+    try {
+      const propertyIDResponse = await axios.get(
+        `http://localhost:4000/api/customize/propertyid/`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("Properties response", propertyIDResponse.data[0].propertyId);
+      const propertyIds = propertyIDResponse.data[0].propertyId;
+
+      const response = await axios.post(
+        `http://localhost:4000/api/properties`,
+        {
+          propertyIds: propertyIds,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("Properties response", response.data.data);
+      setCollectionData(response.data.data);
+    } catch (error) {
+      console.log("error in fetching properties", error);
+    }
+  };
+
+  useEffect(() => {
+    FetchPropertyIDs();
+  }, []);
 
   return (
     <>
-      <Navbar type={"admin"} />
-      <div>
-        <Box style={{ width: "100vw", minheight: "550px", overflow: "hidden" }}>
-          <Image
-            src="/images/AdminAdd.png"
-            alt="Admin Add"
-            layout="responsive"
-            width={100}
-            height={55}
-            quality={100}
-            style={{ objectFit: "cover" }}
-          />
-        </Box>
-        <Container maxWidth="lg" sx={{ backgroundColor: "red", mt: "50px" }}>
-          <Typography
-            sx={{
-              fontFamily: "Roboto",
-              fontWeight: "900",
-              fontSize: "32px",
-              lineHeight: "37.5px",
-              color: "white",
-            }}
-          >
-            Add New Properties
-          </Typography>
-          <Typography
-            sx={{
-              fontFamily: "Roboto",
-              fontWeight: "400",
-              fontSize: "22px",
-              lineHeight: "33.5px",
-              color: "white",
-              mt: "30px",
-            }}
-          >
-            Type
-          </Typography>
-          <Box sx={{ display: "flex", ml: "20px", my: "10px" }}>
-            <Select
-              value={property}
-              onChange={(e) => setProperty(e.target.value)}
-              sx={{
-                minWidth: 320,
-                mr: "10px",
-                "&:focus": { backgroundColor: "transparent" },
-              }}
-              size="small"
-              displayEmpty
-            >
-              <MenuItem value="" disabled>
-                <em>Select Property</em>
-              </MenuItem>
-              <MenuItem value="House">House</MenuItem>
-              <MenuItem value="Land">Land</MenuItem>
-              <MenuItem value="Apartment">Apartment</MenuItem>
-              <MenuItem value="Commercial">Commercial</MenuItem>
-            </Select>
+      <Navbar type={"user"} />
+      <Subheader setProperty={setProperty} setPropertyType={setPropertyType} />
+      <Filter
+        property={property}
+        propertyType={propertyType}
+        setCollectionData={setCollectionData}
+        collectionData={collectionData}
+      />
 
-            <Select
-              value={propertyType}
-              onChange={(e) => setPropertyType(e.target.value)}
-              sx={{
-                minWidth: 320,
-                "&:focus": { backgroundColor: "transparent" },
+      <Box sx={{ margin: "10px 0px", textAlign: "center" }}>
+        <Container>
+          <Box sx={{ display: "flex", justifyContent: "center" }}>
+            <hr
+              style={{
+                margin: "auto",
+                width: "90%",
+                border: "1px solid #1e1e1e",
+                margin: "50px 0px",
               }}
-              size="small"
-              displayEmpty
-            >
-              <MenuItem value="" disabled>
-                <em>Select Property Type</em>
-              </MenuItem>
-              <MenuItem value="ForSale">For Sale</MenuItem>
-              <MenuItem value="ForRent">For Rent</MenuItem>
-            </Select>
+            />
           </Box>
-          <form onSubmit={handleSubmit}>
-            <label htmlFor="file-upload" className="custom-file-upload">
-              {postImage && <img src={URL.createObjectURL(postImage)} alt="" />}
-            </label>
-
-            <input
-              type="file"
-              label="Image"
-              name="myFile"
-              id="file-upload"
-              accept=".jpeg, .png, .jpg"
-              onChange={(e) => handleFileUpload(e)}
-            />
-
-            <hr />
-            <hr />
-            <hr />
-            <hr />
-            <hr />
-
-            <input
-              type="file"
-              label="Image"
-              name="myFiles"
-              id="file-uploads"
-              accept=".jpeg, .png, .jpg"
-              onChange={(e) => handleMultipleFileUpload(e)}
-              multiple
-            />
-
-            <button type="submit">Submit</button>
-          </form>
+          <Typography
+            sx={{
+              fontWeight: "700",
+              lineHeight: "30px",
+              fontSize: "35px",
+              color: "white",
+              textAlign: "center",
+              mb: "30px",
+            }}
+          >
+            Showcase Properties
+          </Typography>
+          <Showcase
+            data={collectionData}
+            property={property}
+            propertyType={propertyType}
+            user={"user"}
+          />
         </Container>
-      </div>
+      </Box>
     </>
   );
 }
 
-export default Add;
+export default UserFilter;

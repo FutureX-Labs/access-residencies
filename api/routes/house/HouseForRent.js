@@ -104,7 +104,7 @@ router.put("/edit/:id", upload.array("myFiles"), async (req, res) => {
     if (!files || files.length === 0) {
       const id = req.params.id;
 
-      const result = await houseForSale.findByIdAndUpdate(id, {
+      const result = await houseForRent.findByIdAndUpdate(id, {
         propertyId,
         title,
         rent,
@@ -138,6 +138,21 @@ router.put("/edit/:id", upload.array("myFiles"), async (req, res) => {
     });
 
     res.status(200).json("House edited successfully");
+  } catch (error) {
+    console.error(error);
+    res.status(400).json(error);
+  }
+});
+
+router.post("/edit/isVisible/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { isVisibale } = req.body;
+    const result = await houseForRent.findByIdAndUpdate(id, {
+      isVisibale,
+    });
+
+    res.status(200).json(result);
   } catch (error) {
     console.error(error);
     res.status(400).json(error);
