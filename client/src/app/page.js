@@ -4,6 +4,7 @@ import axios from "axios";
 import Slider from "react-slick";
 import Navbar from "./components/navbar/Navbar";
 import Image from "next/image";
+import Swal from "sweetalert2";
 import {
   Box,
   Item,
@@ -26,6 +27,8 @@ import { GetAll } from "./utility/getAll";
 import { PropertyTypes } from "@/app/list/propertyTypes";
 import { Cities } from "@/app/list/city";
 import { Prices } from "@/app/list/price";
+import { FilterUrl } from "./utility/filterUrls";
+
 
 const url = "http://localhost:4000/api/appartmentForRent/add";
 
@@ -42,9 +45,10 @@ function Home() {
   const [price, setPrice] = useState(null);
   const [rent, setRent] = useState(null);
   const [city, setCity] = useState("All of Colombo");
-  const [search, setSearch] = useState(null);
+  const [title, setTitle] = useState(null);
 
-  console.log(propertyType, property);
+console.log("titile", title)
+console.log("price", price)
   const createPost = async () => {
     try {
       const additionalData = {
@@ -69,15 +73,58 @@ function Home() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    createPost();
-    if (postImage) {
-      //   formData.append("myFile", postImage);
-    } else {
-      console.log("No image selected");
+    console.log("submit")
+    try {
+      let additionalData = {
+        title: title,
+        city: city,
+      };
+
+      if (selectedPropertyType === "ForSale") {
+        additionalData.price = parseInt(price);
+      } else if (selectedPropertyType === "ForRent") {
+        additionalData.rent = parseInt(rent);
+      }
+
+      const initialUrl = FilterUrl(selectedPropertyType, selectedProperty);
+
+      const url = initialUrl.replace("filter", "filter/main");
+      console.log("url",url)
+      const response = await axios.post(
+        url,
+        additionalData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      Swal.fire({
+        title: "Received filter Data Successfully",
+        icon: "success",
+        timer: 1500,
+      });
+      setCollectionData(response.data)
+      // setTimeout(() => {
+      //   window.location.reload();
+      // }, 1000);
+      console.log(response);
+    } catch (error) {
+      Swal.fire({
+        title: "Unable to Filter Data",
+        icon: "error",
+        timer: 1500,
+      });
+      // setTimeout(() => {
+      //   window.location.reload();
+      // }, 1000);
+      console.log(error);
     }
   };
+
+  
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
@@ -197,6 +244,8 @@ function Home() {
   useEffect(() => {
     FetchPropertyIDs();
   }, []);
+
+
   return (
     <>
       <Navbar type={"user"} />
@@ -211,10 +260,10 @@ function Home() {
             justifyContent: "center",
 
             margin: "0px 30px",
-            marginTop: "-140px",
-            position: "absolute",
+            marginTop: "-380px",
+            position: "relative",
             bottom: "-170px",
-            left: "10%",
+            // left: "13%",
             zIndex: "10",
           }}
         >
@@ -222,8 +271,8 @@ function Home() {
             <Box
               sx={{
                 backgroundColor: "rgba(10, 10, 10, 0.76)",
-                width: "1047px",
-                height: "350px",
+                width: {md:"1047px", xs: "300px"},
+                height: {md:"350px", xs:"500px"},
                 padding: "5px 20px",
                 display: "flex",
                 flexDirection: "column",
@@ -297,8 +346,8 @@ function Home() {
                     widht: "500px",
                     borderRadius: "10px 0px 0px 10px",
                   }}
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
                   fullWidth
                 />
                 <Button
@@ -316,7 +365,7 @@ function Home() {
                   Search
                 </Button>
               </Box>
-              <Box sx={{ display: "flex", justifyContent: "space-around" }}>
+              <Box sx={{ display: "flex", justifyContent: "space-between", flexDirection:{md:"row", xs:"column"} }}>
                 <Box>
                   <Typography
                     variant="h6"
@@ -377,7 +426,7 @@ function Home() {
                     onChange={(e) => {
                       const selectedCity = e.target.value;
                       setCity(selectedCity);
-                      setOpenCityDropDown(false);
+              
                     }}
                   >
                     {Cities.map((cityItem) => (

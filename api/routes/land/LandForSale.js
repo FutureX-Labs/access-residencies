@@ -179,6 +179,38 @@ router.post("/filter", async (req, res) => {
     res.status(400).json(error);
   }
 });
+router.post("/filter/main", async (req, res) => {
+  try {
+    const { city, price, title } = req.body;
+console.log(city, title, price)
+    const filter = {};
+
+    // Filtering by price if provided
+    if (price !== undefined) { 
+      filter.price = price;
+    }
+
+    // Filtering by city using a case-insensitive regex for flexible matching
+    if (city) {
+      filter.city = { $regex: new RegExp(city, "i") };
+    }
+
+    // Filtering by title using a case-insensitive regex for partial matches
+    if (title) {
+      filter.title = { $regex: new RegExp(title, "i") };
+    }
+
+    // Perform the search with the constructed filter
+    let filtered = await landForSale.find(filter).exec();
+
+    // Sending the filtered results back to the client
+    res.status(200).json(filtered);
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ message: "Error processing your request", error: error });
+  }
+});
+
 router.post("/filterId", async (req, res) => {
   try {
     const { propertyId } = req.body;
