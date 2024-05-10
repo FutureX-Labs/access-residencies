@@ -9,7 +9,7 @@ const Items = ({ data, deleteData, disableDelete }) => {
         display: "flex",
         flexDirection: "row",
         alignItems: "flex-start",
-        gap: "5px",
+        gap: "10px",
         marginBottom: "20px",
         maxWidth: "100%",
         height: "auto",

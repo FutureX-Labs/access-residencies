@@ -3,7 +3,6 @@ export const Cities = [
     label: "Colombo",
     value: "Colombo",
     subheadings: [
-      { label: "All of Colombo", value: "All of Colombo" },
       { label: "Maharagama", value: "Maharagama" },
       { label: "Nugegoda", value: "Nugegoda" },
       { label: "Piliyandala", value: "Piliyandala" },
@@ -43,7 +42,6 @@ export const Cities = [
     label: "Kandy",
     value: "Kandy",
     subheadings: [
-      { label: "All of Kandy", value: "All of Kandy" },
       { label: "Kandy City", value: "Kandy City" },
       { label: "Gampola", value: "Gampola" },
       { label: "Peradeniya", value: "Peradeniya" },
@@ -66,7 +64,6 @@ export const Cities = [
     label: "Galle",
     value: "Galle",
     subheadings: [
-      { label: "All of Galle", value: "All of Galle" },
       { label: "Galle City", value: "Galle City" },
       { label: "Ambalangoda", value: "Ambalangoda" },
       { label: "Elpitiya", value: "Elpitiya" },
@@ -79,7 +76,6 @@ export const Cities = [
     label: "Ampara",
     value: "Ampara",
     subheadings: [
-      { label: "All of Ampara", value: "All of Ampara" },
       { label: "Akkarepattu", value: "Akkarepattu" },
       { label: "Ampara City", value: "Ampara City" },
       { label: "Kalmunei", value: "Kalmunei" },
@@ -90,7 +86,6 @@ export const Cities = [
     label: "Anuradhapura",
     value: "Anuradhapura",
     subheadings: [
-      { label: "All of Anuradhapura", value: "All of Anuradhapura" },
       { label: "Kekirawa", value: "Kekirawa" },
       { label: "Medawachchiya", value: "Medawachchiya" },
       { label: "Tambuttegama", value: "Tambuttegama" },
@@ -107,7 +102,6 @@ export const Cities = [
     label: "Badulla",
     value: "Badulla",
     subheadings: [
-      { label: "All of Badulla", value: "All of Badulla" },
       { label: "Badulla City", value: "Badulla City" },
       { label: "Bandarawela", value: "Bandarawela" },
       { label: "Welimada", value: "Welimada" },
@@ -121,16 +115,12 @@ export const Cities = [
   {
     label: "Batticaloa",
     value: "Batticaloa",
-    subheadings: [
-      { label: "All of Batticaloa", value: "All of Batticaloa" },
-      { label: "Batticaloa City", value: "Batticaloa City" },
-    ],
+    subheadings: [{ label: "Batticaloa City", value: "Batticaloa City" }],
   },
   {
     label: "Gampaha",
     value: "Gampaha",
     subheadings: [
-      { label: "All of Gampaha", value: "All of Gampaha" },
       { label: "Negambo", value: "Negambo" },
       { label: "Kadawatha", value: "Kadawatha" },
       { label: "Kiribathgoda", value: "Kiribathgoda" },
@@ -152,7 +142,6 @@ export const Cities = [
     label: "Hambantota",
     value: "Hambantota",
     subheadings: [
-      { label: "All of Hambantota", value: "All of Hambantota" },
       { label: "Tangalla", value: "Tangalla" },
       { label: "Beliatta", value: "Beliatta" },
       { label: "Hambantota City", value: "Hambantota City" },
@@ -164,7 +153,6 @@ export const Cities = [
     label: "Jaffna",
     value: "Jaffna",
     subheadings: [
-      { label: "All of Jaffna", value: "All of Jaffna" },
       { label: "Jaffna City", value: "Jaffna City" },
       { label: "Nallur", value: "Nallur" },
       { label: "Chavakachcheri", value: "Chavakachcheri" },
@@ -174,7 +162,6 @@ export const Cities = [
     label: "Kalutara",
     value: "Kalutara",
     subheadings: [
-      { label: "All of Kalutara", value: "All of Kalutara" },
       { label: "Panadura", value: "Panadura" },
       { label: "Horana", value: "Horana" },
       { label: "Kalutara", value: "Kalutara" },
@@ -191,7 +178,6 @@ export const Cities = [
     label: "Polonnaruwa",
     value: "Polonnaruwa",
     subheadings: [
-      { label: "All of Polonnaruwa", value: "All of Polonnaruwa" },
       { label: "Polonnaruwa City", value: "Polonnaruwa City" },
       { label: "Kaduruwela", value: "Kaduruwela" },
       { label: "Hingurakgoda", value: "Hingurakgoda" },
@@ -202,7 +188,6 @@ export const Cities = [
     label: "Puttalam",
     value: "Puttalam",
     subheadings: [
-      { label: "All of Puttalam", value: "All of Puttalam" },
       { label: "Chilaw", value: "Chilaw" },
       { label: "Puttalam City", value: "Puttalam City" },
       { label: "Wennappuwa", value: "Wennappuwa" },
@@ -216,7 +201,6 @@ export const Cities = [
     label: "Ratanapura",
     value: "Ratanapura",
     subheadings: [
-      { label: "All of Ratanapura", value: "All of Ratanapura" },
       { label: "Ratnapura City", value: "Ratnapura City" },
       { label: "Embilipitiya", value: "Embilipitiya" },
       { label: "Balangoda", value: "Balangoda" },
@@ -229,7 +213,6 @@ export const Cities = [
     label: "Trincomalee",
     value: "Trincomalee",
     subheadings: [
-      { label: "All of Trincomalee", value: "All of Trincomalee" },
       { label: "Trincomalee City", value: "Trincomalee City" },
       { label: "Kinniya", value: "Kinniya" },
     ],
@@ -237,9 +220,6 @@ export const Cities = [
   {
     label: "Vavuniya",
     value: "Vavuniya",
-    subheadings: [
-      { label: "All of Vavuniya", value: "All of Vavuniya" },
-      { label: "Vavuniya City", value: "Vavuniya City" },
-    ],
+    subheadings: [{ label: "Vavuniya City", value: "Vavuniya City" }],
   },
 ];

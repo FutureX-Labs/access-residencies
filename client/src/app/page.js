@@ -29,7 +29,6 @@ import { Cities } from "@/app/list/city";
 import { Prices } from "@/app/list/price";
 import { FilterUrl } from "./utility/filterUrls";
 
-
 const url = "http://localhost:4000/api/appartmentForRent/add";
 
 function Home() {
@@ -44,11 +43,12 @@ function Home() {
   const [selectedPropertyType, setSelectedPropertyType] = useState("ForSale");
   const [price, setPrice] = useState(null);
   const [rent, setRent] = useState(null);
-  const [city, setCity] = useState("All of Colombo");
+  const [city, setCity] = useState("Colombo");
   const [title, setTitle] = useState(null);
 
-console.log("titile", title)
-console.log("price", price)
+  console.log("titile", title);
+  console.log("price", price);
+  console.log("city", city);
   const createPost = async () => {
     try {
       const additionalData = {
@@ -75,7 +75,7 @@ console.log("price", price)
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("submit")
+    console.log("submit");
     try {
       let additionalData = {
         title: title,
@@ -91,22 +91,18 @@ console.log("price", price)
       const initialUrl = FilterUrl(selectedPropertyType, selectedProperty);
 
       const url = initialUrl.replace("filter", "filter/main");
-      console.log("url",url)
-      const response = await axios.post(
-        url,
-        additionalData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      console.log("url", url);
+      const response = await axios.post(url, additionalData, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
       Swal.fire({
         title: "Received filter Data Successfully",
         icon: "success",
         timer: 1500,
       });
-      setCollectionData(response.data)
+      setCollectionData(response.data);
       // setTimeout(() => {
       //   window.location.reload();
       // }, 1000);
@@ -123,8 +119,6 @@ console.log("price", price)
       console.log(error);
     }
   };
-
-  
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
@@ -245,7 +239,6 @@ console.log("price", price)
     FetchPropertyIDs();
   }, []);
 
-
   return (
     <>
       <Navbar type={"user"} />
@@ -271,8 +264,8 @@ console.log("price", price)
             <Box
               sx={{
                 backgroundColor: "rgba(10, 10, 10, 0.76)",
-                width: {md:"1047px", xs: "300px"},
-                height: {md:"350px", xs:"500px"},
+                width: { md: "1047px", xs: "300px" },
+                height: { md: "350px", xs: "500px" },
                 padding: "5px 20px",
                 display: "flex",
                 flexDirection: "column",
@@ -365,7 +358,13 @@ console.log("price", price)
                   Search
                 </Button>
               </Box>
-              <Box sx={{ display: "flex", justifyContent: "space-between", flexDirection:{md:"row", xs:"column"} }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  flexDirection: { md: "row", xs: "column" },
+                }}
+              >
                 <Box>
                   <Typography
                     variant="h6"
@@ -412,6 +411,7 @@ console.log("price", price)
                   >
                     City
                   </Typography>
+
                   <select
                     required
                     style={{
@@ -426,24 +426,26 @@ console.log("price", price)
                     onChange={(e) => {
                       const selectedCity = e.target.value;
                       setCity(selectedCity);
-              
+                      // setOpenCityDropDown(false);
                     }}
                   >
                     {Cities.map((cityItem) => (
                       <optgroup
-                        label={cityItem.label}
-                        key={cityItem.value}
                         style={{
                           backgroundColor: "black",
                           padding: "5px 20px",
                         }}
                       >
+                        <option value={cityItem.value} key={cityItem.value}>
+                          {cityItem.label}
+                        </option>
+
                         {cityItem.subheadings.map((subheading) => (
                           <option
                             value={subheading.value}
                             key={subheading.value}
                           >
-                            └ {subheading.label}
+                            -- {subheading.label}
                           </option>
                         ))}
                       </optgroup>

@@ -29,7 +29,7 @@ import { Perches } from "@/app/list/perches";
 import { Acres } from "@/app/list/acres";
 import { Cities } from "@/app/list/city";
 import { PropertyTypes } from "@/app/list/propertyTypes";
-import EditImage from '../../../../public/images/edit.png';
+import EditImage from "../../../../public/images/edit.png";
 
 const url = "http://localhost:4000/api/appartmentForRent/add";
 const Input = ({ label, value, onChange }) => {
@@ -877,14 +877,14 @@ function Edit() {
                   }}
                 >
                   {Cities.map((cityItem) => (
-                    <optgroup
-                      label={cityItem.label}
-                      key={cityItem.value}
-                      style={{ padding: "20px" }}
-                    >
+                    <optgroup>
+                      <option value={cityItem.value} key={cityItem.value}>
+                        {cityItem.label}
+                      </option>
+
                       {cityItem.subheadings.map((subheading) => (
                         <option value={subheading.value} key={subheading.value}>
-                          └ {subheading.label}
+                          -- {subheading.label}
                         </option>
                       ))}
                     </optgroup>

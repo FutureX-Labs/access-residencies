@@ -49,7 +49,7 @@ const Filter = ({
   const [price, setPrice] = useState(null);
   const [rent, setRent] = useState(null);
   const [size, setSize] = useState(null);
-  const [city, setCity] = useState("All of Colombo");
+  const [city, setCity] = useState("Colombo");
   const [bedrooms, setBedrooms] = useState(null);
   const [bathrooms, setBathrooms] = useState(null);
   const [perches, setPerches] = useState(null);
@@ -57,7 +57,12 @@ const Filter = ({
   const [propertyTypes, setPropertyTypes] = useState(null);
   const [openCityDropDown, setOpenCityDropDown] = useState(false);
   const [filteredBy, setFilteredBy] = useState([]);
+  const [topCities, setTopCities] = useState([]);
   console.log(" property, propertyType", property, propertyType);
+
+  console.log("city", city);
+  console.log("topCities", topCities);
+  console.log("filteredBy", filteredBy);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -117,6 +122,8 @@ const Filter = ({
               return `${key}: ${JSON.stringify(value)}`;
             }
             switch (key) {
+              case "city":
+                return value;
               case "bedrooms":
                 return `${value} bedrooms`;
               case "bathrooms":
@@ -132,8 +139,34 @@ const Filter = ({
             }
           }
         );
+
+        const transformedCities = Cities.map((city) => ({
+          label: city.label,
+          subheadings: city.subheadings.map((subheading) => subheading.value),
+        }));
+
+        console.log("transformedCities", transformedCities);
+        let topCities = [];
+
+        transformedCities?.forEach((transformedCity) => {
+          console.log("transformedCity.label", transformedCity.label);
+          console.log("additionalData?.city", additionalData?.city);
+
+          if (additionalData?.city == transformedCity.label) {
+            topCities = transformedCity.subheadings;
+            // No need to break out of the loop here since we want to check all items
+          }
+        });
+
+        // After the loop, check if topCities is still an empty array
+        if (topCities.length === 0) {
+          // If no match was found, assign [city] to topCities
+          topCities = [city];
+        }
+
         console.log("filteredBy", filteredBy);
         setFilteredBy(filteredBy);
+        setTopCities(topCities);
       }
     } catch (error) {
       console.debug(error);
@@ -196,7 +229,6 @@ const Filter = ({
                     height: "50px",
                     width: "200px",
                     border: "1px solid grey",
-
                     backgroundColor: "black",
                     color: "white",
                     borderRadius: "10px 0px 0px 10px",
@@ -209,14 +241,14 @@ const Filter = ({
                   }}
                 >
                   {Cities.map((cityItem) => (
-                    <optgroup
-                      label={cityItem.label}
-                      key={cityItem.value}
-                      style={{ padding: "20px" }}
-                    >
+                    <optgroup>
+                      <option value={cityItem.value} key={cityItem.value}>
+                        {cityItem.label}
+                      </option>
+
                       {cityItem.subheadings.map((subheading) => (
                         <option value={subheading.value} key={subheading.value}>
-                          └ {subheading.label}
+                          -- {subheading.label}
                         </option>
                       ))}
                     </optgroup>
@@ -619,27 +651,31 @@ const Filter = ({
 
           <Box sx={{ margin: "20px 0px" }}>
             <Box sx={{ display: "flex", flexDirection: "column" }}>
-              <Box sx={{ display: "flex", gap: "10px" }}>
-                <Typography
-                  sx={{ color: "white", fontSize: "20px", marginTop: "2px" }}
-                >
-                  Filtered By:
-                </Typography>
-                <Box>
-                  <Items data={filteredBy} disableDelete={true} />
+              {filteredBy.length > 0 && (
+                <Box sx={{ display: "flex", gap: "10px" }}>
+                  <Typography
+                    sx={{ color: "white", fontSize: "20px", marginTop: "2px" }}
+                  >
+                    Filtered By:
+                  </Typography>
+                  <Box>
+                    <Items data={filteredBy} disableDelete={true} />
+                  </Box>
                 </Box>
-              </Box>
-              <Box sx={{ display: "flex", gap: "17px" }}>
-                <Typography
-                  sx={{ color: "white", fontSize: "20px", marginTop: "2px" }}
-                >
-                  Top Cities:
-                </Typography>
-                <Box>
-                  {" "}
-                  <Items data={[city]} disableDelete={true} />{" "}
+              )}
+              {topCities.length > 0 && (
+                <Box sx={{ display: "flex", gap: "17px" }}>
+                  <Typography
+                    sx={{ color: "white", fontSize: "20px", marginTop: "2px" }}
+                  >
+                    Top Cities:
+                  </Typography>
+                  <Box>
+                    {" "}
+                    <Items data={topCities} disableDelete={true} />{" "}
+                  </Box>
                 </Box>
-              </Box>
+              )}
               {/* <Items data={city}  /> */}
             </Box>
           </Box>
