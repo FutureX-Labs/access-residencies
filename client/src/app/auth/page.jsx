@@ -6,12 +6,13 @@ import { TextField, Button, Box } from "@mui/material";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { useRouter } from "next/navigation";
+import { useAuth } from "../context/AuthContext";
 
 const Auth = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
+  const { setIsAdminAuthenticated } = useAuth();
 
   const handleLogin = async () => {
     try {
@@ -21,12 +22,14 @@ const Auth = () => {
       });
       console.log("result", result);
       if (result) {
+        // Update isAdminAuthenticated in sessionStorage
+        localStorage.setItem("isAdminAuthenticated", JSON.stringify(true));
+        console.log(localStorage.getItem("isAdminAuthenticated"));
         Swal.fire({
-          title: "Login successfull",
+          title: "Login successful",
           icon: "success",
         });
-        console.log(result.data.isAdmin);
-        router.push("/admin/view");
+        router.push("/admin/view/House/ForSale");
       }
     } catch (error) {
       Swal.fire({
@@ -39,10 +42,11 @@ const Auth = () => {
   };
 
   const handleLogout = () => {
-    setIsLoggedIn(false);
-    setUsername("");
-    setPassword("");
+    // Clear isAdminAuthenticated from sessionStorage
+    sessionStorage.removeItem("isAdminAuthenticated");
+    router.push("/"); // Redirect to the landing page
   };
+
   return (
     <div className={Style.root}>
       <div className={Style.loginBox}>

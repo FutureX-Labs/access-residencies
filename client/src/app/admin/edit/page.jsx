@@ -30,6 +30,8 @@ import { Acres } from "@/app/list/acres";
 import { Cities } from "@/app/list/city";
 import { PropertyTypes } from "@/app/list/propertyTypes";
 import EditImage from "../../../../public/images/edit.png";
+import { useAuth } from "@/app/context/AuthContext";
+import UseSessionStorage from "@/app/UseSessionStorage";
 
 const url = "http://localhost:4000/api/appartmentForRent/add";
 const Input = ({ label, value, onChange }) => {
@@ -66,6 +68,15 @@ function Edit() {
   const [acres, setAcres] = useState(null);
   const [propertyTypes, setPropertyTypes] = useState(null);
   const [editFormData, setEditFormData] = useState(null);
+  const { isAdminAuthenticated } = useAuth();
+  const router = useRouter();
+  const isAuthenticated = UseSessionStorage("isAdminAuthenticated");
+
+  useEffect(() => {
+    if (isAuthenticated === "false") {
+      router.push("/");
+    }
+  }, [isAuthenticated, router]);
 
   const submitThumbnailRef = useRef(null);
   const submitMulImageRef = useRef(null);

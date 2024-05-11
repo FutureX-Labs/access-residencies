@@ -1,5 +1,6 @@
 import Head from "next/head";
-import "./globals.css"; // Assuming this file contains global styles
+import "./globals.css";
+import { AuthProvider } from "./context/AuthContext";
 
 export const metadata = {
   title: "Create Next App",
@@ -22,7 +23,10 @@ export default function RootLayout({ children }) {
           href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css"
         />
       </Head>
-      <body>{children}</body>
+      <body>
+        {" "}
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   );
 }

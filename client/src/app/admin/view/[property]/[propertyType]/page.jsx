@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Slider from "react-slick";
-import Navbar from "../../components/navbar/Navbar";
+import Navbar from "../../../../components/navbar/Navbar";
 import Image from "next/image";
 import {
   Box,
@@ -15,17 +15,20 @@ import {
 } from "@mui/material";
 import Container from "@mui/material/Container";
 import BannerSlider from "@/app/components/bannerslider/BannerSlider";
-import FeatureSlider from "../../components/featureslider/FeatureSlider";
+import FeatureSlider from "../../../../components/featureslider/FeatureSlider";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import Showcase from "../../components/showcase/Showcase";
-import Subheader from "../../components/subheader/subheader";
-import { GetAll } from "../../utility/getAll";
+import Showcase from "../../../../components/showcase/Showcase";
+import Subheader from "../../../../components/subheader/subheader";
+import { GetAll } from "../../../../utility/getAll";
 import Filter from "@/app/components/filter/Filter";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import Link from "@mui/material/Link";
 import { IoIosArrowForward } from "react-icons/io";
 import { Padding } from "@mui/icons-material";
+import { useAuth } from "@/app/context/AuthContext";
+import { useRouter } from "next/navigation";
+import UseSessionStorage from "@/app/UseSessionStorage";
 
 const url = "http://localhost:4000/api/appartmentForRent/add";
 
@@ -38,6 +41,48 @@ function View() {
   const [property, setProperty] = useState(null);
   const [propertyType, setPropertyType] = useState(null);
   const [showHidden, setShowHidden] = useState(false);
+  const { isAdminAuthenticated } = useAuth();
+  const router = useRouter();
+  const isAuthenticated = UseSessionStorage("isAdminAuthenticated");
+
+  if (isAuthenticated) {
+    if (isAuthenticated == "true") {
+      console.log("redirecting not ");
+    } else {
+      console.log("redirecting... ");
+      router.push("/");
+    }
+  }
+
+  useEffect(() => {
+    const currentUrl = window.location.href;
+    const urlParts = currentUrl.split("/");
+    const propertyValue = urlParts[5];
+    const propertyTypeValue = urlParts[6];
+
+    setProperty(propertyValue);
+    setPropertyType(propertyTypeValue);
+  }, []);
+
+  // useEffect(() => {
+  //   console.log("isAuthenticated inside useEffect", isAuthenticated);
+  //   if (isAuthenticated) {
+  //     if (typeof isAuthenticated === "string") {
+  //       const trimmedIsAuthenticated = isAuthenticated.trim(); // Trim the string
+  //       if (trimmedIsAuthenticated === "true") {
+  //         console.log("User is authenticated, no redirect needed");
+  //       } else {
+  //         console.log("User is not authenticated, redirecting...");
+  //       }
+  //     } else {
+  //       console.log("isAuthenticated is not a string or is undefined");
+  //       router.push("/");
+  //       // Handle this case as per your requirements
+  //     }
+  //   } else {
+  //     router.push("/");
+  //   }
+  // }, [isAuthenticated, router]);
 
   console.log("propertyType", property);
   console.log("showHidden", showHidden);
@@ -104,7 +149,11 @@ function View() {
   return (
     <>
       <Navbar type={"admin"} />
-      <Subheader setProperty={setProperty} setPropertyType={setPropertyType} />
+      <Subheader
+        setProperty={setProperty}
+        setPropertyType={setPropertyType}
+        user={"admin"}
+      />
       <Filter
         property={property}
         propertyType={propertyType}

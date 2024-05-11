@@ -1,11 +1,13 @@
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Box, Typography, Menu, MenuItem, Button } from "@mui/material";
 
-const Subheader = ({ setProperty, setPropertyType }) => {
+const Subheader = ({ setProperty, setPropertyType, user }) => {
   const [anchorElForSale, setAnchorElForSale] = useState(null);
   const [anchorElForRent, setAnchorElForRent] = useState(null);
   const [selectedSaleOption, setSelectedSaleOption] = useState("");
   const [selectedRentOption, setSelectedRentOption] = useState("");
+  const router = useRouter();
 
   const handleOpenMenuForSale = (event) => {
     setAnchorElForSale(event.currentTarget);
@@ -28,6 +30,13 @@ const Subheader = ({ setProperty, setPropertyType }) => {
     setPropertyType(type);
     setProperty(property);
     handleCloseMenuForSale();
+
+    // Conditionally navigate based on user role
+    if (user === "admin") {
+      router.push(`/admin/view/${property}/${type}`);
+    } else {
+      router.push(`/user/filter/${property}/${type}`);
+    }
   };
 
   const handleRentOptionChange = (property, type) => {
@@ -35,6 +44,13 @@ const Subheader = ({ setProperty, setPropertyType }) => {
     setPropertyType(type);
     setProperty(property);
     handleCloseMenuForRent();
+
+    // Conditionally navigate based on user role
+    if (user === "admin") {
+      router.push(`/admin/view/${property}/${type}`);
+    } else {
+      router.push(`/user/filter/${property}/${type}`);
+    }
   };
 
   return (

@@ -156,21 +156,23 @@ router.post("/filter", async (req, res) => {
 
     const filter = {};
 
-    if (rent !== undefined) {
+    if (rent !== undefined && rent !== null) {
       filter.rent = rent;
     }
 
-    if (perches !== undefined) {
+    if (perches !== undefined && perches !== null) {
       filter["landExtent.perches"] = perches;
     }
 
-    if (acres !== undefined) {
+    if (acres !== undefined && acres !== null) {
       filter["landExtent.acres"] = acres;
     }
 
-    if (city) {
+    if (city !== undefined && city !== null) {
       filter.city = { $regex: new RegExp(city, "i") };
     }
+
+    console.log("filter", filter);
 
     let filtered = await landForRent.find(filter).exec();
 
@@ -188,17 +190,17 @@ router.post("/filter/main", async (req, res) => {
     const filter = {};
 
     // Filtering by price if provided
-    if (rent !== undefined) { 
+    if (rent !== undefined && rent !== null) {
       filter.rent = rent;
     }
 
     // Filtering by city using a case-insensitive regex for flexible matching
-    if (city) {
+    if (city !== undefined && city !== null) {
       filter.city = { $regex: new RegExp(city, "i") };
     }
 
     // Filtering by title using a case-insensitive regex for partial matches
-    if (title) {
+    if (title !== undefined && title !== null) {
       filter.title = { $regex: new RegExp(title, "i") };
     }
 
@@ -209,7 +211,9 @@ router.post("/filter/main", async (req, res) => {
     res.status(200).json(filtered);
   } catch (error) {
     console.error(error);
-    res.status(400).json({ message: "Error processing your request", error: error });
+    res
+      .status(400)
+      .json({ message: "Error processing your request", error: error });
   }
 });
 

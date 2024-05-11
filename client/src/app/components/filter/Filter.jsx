@@ -49,7 +49,7 @@ const Filter = ({
   const [price, setPrice] = useState(null);
   const [rent, setRent] = useState(null);
   const [size, setSize] = useState(null);
-  const [city, setCity] = useState("Colombo");
+  const [city, setCity] = useState();
   const [bedrooms, setBedrooms] = useState(null);
   const [bathrooms, setBathrooms] = useState(null);
   const [perches, setPerches] = useState(null);
@@ -117,10 +117,13 @@ const Filter = ({
       if (response.data && additionalData) {
         const filteredBy = Object.entries(additionalData).map(
           ([key, value]) => {
+            console.log("filterd by values", key, ":", value);
+
             if (typeof value === "object") {
               console.log("Object found:", key, value);
               return `${key}: ${JSON.stringify(value)}`;
             }
+
             switch (key) {
               case "city":
                 return value;
@@ -165,7 +168,11 @@ const Filter = ({
         }
 
         console.log("filteredBy", filteredBy);
-        setFilteredBy(filteredBy);
+        const filteredByWithoutNullNaN = filteredBy.filter(
+          (str) => !str.includes("null") && !str.includes("NaN")
+        );
+
+        setFilteredBy(filteredByWithoutNullNaN);
         setTopCities(topCities);
       }
     } catch (error) {
@@ -224,7 +231,6 @@ const Filter = ({
                   City
                 </Typography>
                 <select
-                  required
                   style={{
                     height: "50px",
                     width: "200px",
@@ -268,7 +274,6 @@ const Filter = ({
                   {propertyType === "ForSale" ? "Price" : "Rent"}
                 </Typography>
                 <Select
-                  required
                   placeholder={
                     propertyType === "ForSale" ? "Select price" : "Select rent"
                   }
@@ -312,7 +317,6 @@ const Filter = ({
                       Property Types
                     </Typography>
                     <Select
-                      required
                       value={propertyTypes}
                       onChange={(e) => setPropertyTypes(e.target.value)}
                       inputProps={{ style: { color: "white" } }}
@@ -353,7 +357,6 @@ const Filter = ({
                       Size
                     </Typography>
                     <Select
-                      required
                       value={size}
                       onChange={(e) => setSize(e.target.value)}
                       inputProps={{ style: { color: "white" } }}
@@ -392,7 +395,6 @@ const Filter = ({
                       Bedrooms
                     </Typography>
                     <Select
-                      required
                       value={bedrooms}
                       onChange={(e) => setBedrooms(e.target.value)}
                       inputProps={{ style: { color: "white" } }}
@@ -431,7 +433,6 @@ const Filter = ({
                       Bathrooms
                     </Typography>
                     <Select
-                      required
                       value={bathrooms}
                       onChange={(e) => setBathrooms(e.target.value)}
                       inputProps={{ style: { color: "white" } }}
@@ -470,7 +471,6 @@ const Filter = ({
                       Perches
                     </Typography>
                     <Select
-                      required
                       value={perches}
                       onChange={(e) => setPerches(e.target.value)}
                       inputProps={{ style: { color: "white" } }}
@@ -509,7 +509,6 @@ const Filter = ({
                       Acres
                     </Typography>
                     <Select
-                      required
                       value={acres}
                       onChange={(e) => setAcres(e.target.value)}
                       inputProps={{ style: { color: "white" } }}
@@ -580,7 +579,6 @@ const Filter = ({
               }}
             >
               <TextField
-                required
                 variant="outlined"
                 placeholder="Property ID"
                 InputProps={{ style: { color: "white" } }}
@@ -617,20 +615,14 @@ const Filter = ({
 
         <Box sx={{ margin: "10px 0px " }}>
           <Breadcrumbs aria-label="breadcrumb" sx={{ margin: "15px 0px" }}>
-            {property && propertyType ? (
+            {property && propertyType && (
               <Box sx={{ display: "flex", alignItems: "center" }}>
-                <Link underline="hover" color="#fff" href="#">
+                <Link style={{ textDecoration: "none" }} color="#fff" href="#">
                   <Typography color={"#8C1C40"}>{property}</Typography>
                 </Link>
                 <IoIosArrowForward color={"#8C1C40"} sx={{ padding: "0px" }} />
-                <Link color="#fff" href="#">
-                  <Typography color={"#8C1C40"}>Admin</Typography>
-                </Link>
-              </Box>
-            ) : (
-              <Box sx={{ display: "flex", alignItems: "center" }}>
-                <Link color="#fff" href="#">
-                  <Typography color={"#8C1C40"}>Admin</Typography>
+                <Link style={{ textDecoration: "none" }} color="#fff" href="#">
+                  <Typography color={"#8C1C40"}>{propertyType}</Typography>
                 </Link>
               </Box>
             )}

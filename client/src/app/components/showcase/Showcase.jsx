@@ -136,6 +136,8 @@ const Showcase = ({ data, user, property, propertyType, showHidden }) => {
     }
   };
 
+  console.log("showHidden", showHidden);
+
   return (
     <>
       <Box>

@@ -242,7 +242,11 @@ function Home() {
   return (
     <>
       <Navbar type={"user"} />
-      <Subheader setProperty={setProperty} setPropertyType={setPropertyType} />
+      <Subheader
+        setProperty={setProperty}
+        setPropertyType={setPropertyType}
+        user={"user"}
+      />
       <Box sx={{ position: "relative" }}>
         <Box>
           <BannerSlider imageData={Banners?.banners} />
@@ -327,7 +331,6 @@ function Home() {
                 }}
               >
                 <TextField
-                  required
                   variant="outlined"
                   placeholder="Type Anything to Search"
                   InputProps={{ style: { color: "white" } }}
@@ -379,7 +382,6 @@ function Home() {
                   </Typography>
 
                   <Select
-                    required
                     value={selectedProperty}
                     onChange={(e) => setSelectedProperty(e.target.value)}
                     inputProps={{ style: { color: "white" } }}
@@ -413,7 +415,6 @@ function Home() {
                   </Typography>
 
                   <select
-                    required
                     style={{
                       width: "300px",
                       border: "1px solid #8C1C40",
@@ -465,7 +466,6 @@ function Home() {
                     {selectedPropertyType === "ForSale" ? "Price" : "Rent"}
                   </Typography>
                   <Select
-                    required
                     value={selectedPropertyType === "ForSale" ? price : rent}
                     onChange={(e) =>
                       selectedPropertyType === "ForSale"
@@ -538,8 +538,8 @@ function Home() {
           <Showcase
             data={collectionData}
             user={"user"}
-            property={property}
-            propertyType={propertyType}
+            // property={property}
+            // propertyType={propertyType}
           />
         </Container>
       </Box>

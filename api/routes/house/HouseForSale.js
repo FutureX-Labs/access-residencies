@@ -168,23 +168,23 @@ router.post("/filter", async (req, res) => {
 
     const filter = {};
 
-    if (price !== undefined) {
+    if (price !== undefined && price !== null) {
       filter.price = price;
     }
 
-    if (city) {
+    if (city !== undefined && city !== null) {
       filter.city = { $regex: new RegExp(city, "i") };
     }
 
-    if (size !== undefined) {
+    if (size !== undefined && size !== null) {
       filter.size = size;
     }
 
-    if (bedrooms !== undefined) {
+    if (bedrooms !== undefined && bedrooms !== null) {
       filter.bedrooms = bedrooms;
     }
 
-    if (bathrooms !== undefined) {
+    if (bathrooms !== undefined && bathrooms !== null) {
       filter.bathrooms = bathrooms;
     }
 
@@ -204,17 +204,17 @@ router.post("/filter/main", async (req, res) => {
     const filter = {};
 
     // Filtering by price if provided
-    if (price !== undefined) { 
+    if (price !== undefined && price !== null) {
       filter.price = price;
     }
 
     // Filtering by city using a case-insensitive regex for flexible matching
-    if (city) {
+    if (city !== undefined && city !== null) {
       filter.city = { $regex: new RegExp(city, "i") };
     }
 
     // Filtering by title using a case-insensitive regex for partial matches
-    if (title) {
+    if (title !== undefined && title !== null) {
       filter.title = { $regex: new RegExp(title, "i") };
     }
 
@@ -225,7 +225,9 @@ router.post("/filter/main", async (req, res) => {
     res.status(200).json(filtered);
   } catch (error) {
     console.error(error);
-    res.status(400).json({ message: "Error processing your request", error: error });
+    res
+      .status(400)
+      .json({ message: "Error processing your request", error: error });
   }
 });
 

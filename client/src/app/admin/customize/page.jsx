@@ -18,6 +18,8 @@ import Swal from "sweetalert2";
 import { ConvertToBase64 } from "../../utility/Conversion";
 import Items from "@/app/components/items/Items";
 import customizeImage from "../../../../public/images/customize.png";
+import { useAuth } from "@/app/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 const bannerURL = "http://localhost:4000/api/customize/banners/add";
 const featureURL = "http://localhost:4000/api/customize/features/add";
@@ -37,6 +39,14 @@ function Customize() {
   const [showSaveFeature, setShowSaveFeature] = useState(false);
   const submitButtonRef = useRef(null);
   const submitFeatureButtonRef = useRef(null);
+  const { isAdminAuthenticated } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isAdminAuthenticated) {
+      router.push("/");
+    }
+  }, [isAdminAuthenticated, router]);
 
   console.log("allPropertyId", allPropertyId);
   const handleSubmitPropertyId = async () => {
