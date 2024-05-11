@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useContext } from "react";
 import axios from "axios";
 import Navbar from "../../components/navbar/Navbar";
 import Image from "next/image";
@@ -27,9 +27,8 @@ import { Acres } from "@/app/list/acres";
 import { Cities } from "@/app/list/city";
 import { PropertyTypes } from "@/app/list/propertyTypes";
 import AddImage from "../../../../public/images/add.png";
-import { useAuth } from "@/app/context/AuthContext";
+import AuthContext from "@/app/context/AuthContext";
 import { useRouter } from "next/navigation";
-import UseSessionStorage from "@/app/UseSessionStorage";
 
 const url = "http://localhost:4000/api/appartmentForRent/add";
 const Input = ({ label, value, onChange }) => {
@@ -68,17 +67,14 @@ function Add() {
   const [openCityDropDown, setOpenCityDropDown] = useState(false);
   const submitThumbnailRef = useRef(null);
   const submitMulImageRef = useRef(null);
-  const { isAdminAuthenticated } = useAuth();
   const router = useRouter();
-  const isAuthenticated = UseSessionStorage("isAdminAuthenticated");
+  const { user } = useContext(AuthContext);
+
+  console.log("user", user);
 
   useEffect(() => {
-    if (isAuthenticated == "true") {
-      return;
-    } else {
-      router.push("/");
-    }
-  }, [isAuthenticated, router]);
+    if (!user) router.push("/");
+  }, [user]);
 
   const createPost = async () => {
     try {

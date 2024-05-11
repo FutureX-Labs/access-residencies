@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import Slider from "react-slick";
 import Navbar from "../../../../components/navbar/Navbar";
@@ -26,9 +26,8 @@ import Breadcrumbs from "@mui/material/Breadcrumbs";
 import Link from "@mui/material/Link";
 import { IoIosArrowForward } from "react-icons/io";
 import { Padding } from "@mui/icons-material";
-import { useAuth } from "@/app/context/AuthContext";
+import AuthContext from "@/app/context/AuthContext";
 import { useRouter } from "next/navigation";
-import UseSessionStorage from "@/app/UseSessionStorage";
 
 const url = "http://localhost:4000/api/appartmentForRent/add";
 
@@ -41,18 +40,14 @@ function View() {
   const [property, setProperty] = useState(null);
   const [propertyType, setPropertyType] = useState(null);
   const [showHidden, setShowHidden] = useState(false);
-  const { isAdminAuthenticated } = useAuth();
   const router = useRouter();
-  const isAuthenticated = UseSessionStorage("isAdminAuthenticated");
+  const { user } = useContext(AuthContext);
 
-  if (isAuthenticated) {
-    if (isAuthenticated == "true") {
-      console.log("redirecting not ");
-    } else {
-      console.log("redirecting... ");
-      router.push("/");
-    }
-  }
+  console.log("user", user);
+
+  useEffect(() => {
+    if (!user) router.push("/");
+  }, [user]);
 
   useEffect(() => {
     const currentUrl = window.location.href;

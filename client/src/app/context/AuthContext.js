@@ -1,40 +1,21 @@
 "use client";
-import { createContext, useState, useContext, useEffect } from "react";
+import { createContext, useEffect, useState } from "react";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    // Check if localStorage is available (runs only in the browser)
-    const storedAuth = localStorage.getItem("isAdminAuthenticated");
-    if (storedAuth) {
-      setIsAdminAuthenticated(JSON.parse(storedAuth));
-    }
-  }, []); // Empty dependency array ensures this effect runs only once
-
-  const loginAdmin = () => {
-    setIsAdminAuthenticated(true);
-    localStorage.setItem("isAdminAuthenticated", JSON.stringify(true));
-  };
-
-  const logoutAdmin = () => {
-    setIsAdminAuthenticated(false);
-    localStorage.removeItem("isAdminAuthenticated");
-  };
+    const sessionUser = sessionStorage.getItem("contact_user");
+    setUser(sessionUser ? JSON.parse(sessionUser) : null);
+  }, []);
 
   return (
-    <AuthContext.Provider
-      value={{
-        isAdminAuthenticated,
-        loginAdmin,
-        logoutAdmin,
-      }}
-    >
+    <AuthContext.Provider value={{ user, setUser }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export default AuthContext;

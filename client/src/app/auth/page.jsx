@@ -1,18 +1,18 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import Style from "./style.module.css";
 import Image from "next/image";
 import { TextField, Button, Box } from "@mui/material";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { useRouter } from "next/navigation";
-import { useAuth } from "../context/AuthContext";
+import AuthContext from "../context/AuthContext";
 
 const Auth = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
-  const { setIsAdminAuthenticated } = useAuth();
+  const { setUser } = useContext(AuthContext);
 
   const handleLogin = async () => {
     try {
@@ -23,8 +23,9 @@ const Auth = () => {
       console.log("result", result);
       if (result) {
         // Update isAdminAuthenticated in sessionStorage
-        localStorage.setItem("isAdminAuthenticated", JSON.stringify(true));
-        console.log(localStorage.getItem("isAdminAuthenticated"));
+        setUser(true);
+        // sessionStorage.setItem("isAdminAuthenticated", JSON.stringify(true));
+        // console.log(sessionStorage.getItem("isAdminAuthenticated"));
         Swal.fire({
           title: "Login successful",
           icon: "success",

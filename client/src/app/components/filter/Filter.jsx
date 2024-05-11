@@ -567,7 +567,16 @@ const Filter = ({
                 height: "42px",
                 width: "40%",
               }}
-              onClick={() => setShowHidden(!showHidden)}
+              onClick={(e) => {
+                e.preventDefault();
+                const hiddenProperties = collectionData.filter(
+                  (data) => data.isVisibale === false
+                );
+
+                console.log("hiddenProperties", hiddenProperties);
+                setCollectionData(hiddenProperties);
+                setShowHidden(true);
+              }}
             >
               All Hidden Properties
             </Button>

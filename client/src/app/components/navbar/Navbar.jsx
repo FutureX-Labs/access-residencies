@@ -34,7 +34,7 @@ function Navbar(props) {
 
   const adminNavItems = [
     { title: "Customize", path: "/admin/customize" },
-    { title: "Property View", path: "/admin/view" },
+    { title: "Property View", path: "/admin/view/House/ForSale" },
     { title: "Property Add", path: "/admin/add" },
   ];
 
@@ -43,7 +43,6 @@ function Navbar(props) {
     { title: "About us", path: "#about" },
     { title: "Gallery", path: "#gallery" },
     { title: "Contact Us", path: "#contact" },
-    { title: "Property View", path: "/user/filter" },
     { title: "Login", path: "/auth" },
   ];
 
@@ -99,9 +98,10 @@ function Navbar(props) {
           <>
             {item.title !== "Property Management" ? (
               <ListItem key={item.title} disablePadding>
-                <ListItemButton
+                <Link
                   sx={{
                     textAlign: "left",
+                    textDecoration: "none",
                   }}
                   // component="a"
                   href={item.path}
@@ -110,13 +110,14 @@ function Navbar(props) {
                     primary={item.title}
                     sx={{
                       color: "white",
+                      textDecoration: "none",
                       fontFamily: "Roboto Condensed",
                       fontWeight: "800",
                       fontSize: "24px",
                       lingHeight: " 28.13px",
                     }}
                   />
-                </ListItemButton>
+                </Link>
               </ListItem>
             ) : (
               <></>
@@ -181,13 +182,9 @@ function Navbar(props) {
           <Box sx={{ display: { xs: "none", md: "block" } }}>
             {navItems.map((item) => (
               <>
-                <Button
-                  key={item.title}
-                  sx={{ color: "#fff" }}
-                  href={item.path}
-                >
-                  <>{item.title}</>
-                </Button>
+                <Link key={item.title} href={item.path}>
+                  <Button sx={{ color: "white" }}>{item.title}</Button>
+                </Link>
               </>
             ))}
           </Box>

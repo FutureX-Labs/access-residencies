@@ -1,13 +1,12 @@
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Box, Typography, Menu, MenuItem, Button } from "@mui/material";
+import { Box, Menu, MenuItem, Button } from "@mui/material";
+import Link from "next/link";
 
 const Subheader = ({ setProperty, setPropertyType, user }) => {
   const [anchorElForSale, setAnchorElForSale] = useState(null);
   const [anchorElForRent, setAnchorElForRent] = useState(null);
   const [selectedSaleOption, setSelectedSaleOption] = useState("");
   const [selectedRentOption, setSelectedRentOption] = useState("");
-  const router = useRouter();
 
   const handleOpenMenuForSale = (event) => {
     setAnchorElForSale(event.currentTarget);
@@ -30,13 +29,6 @@ const Subheader = ({ setProperty, setPropertyType, user }) => {
     setPropertyType(type);
     setProperty(property);
     handleCloseMenuForSale();
-
-    // Conditionally navigate based on user role
-    if (user === "admin") {
-      router.push(`/admin/view/${property}/${type}`);
-    } else {
-      router.push(`/user/filter/${property}/${type}`);
-    }
   };
 
   const handleRentOptionChange = (property, type) => {
@@ -44,13 +36,6 @@ const Subheader = ({ setProperty, setPropertyType, user }) => {
     setPropertyType(type);
     setProperty(property);
     handleCloseMenuForRent();
-
-    // Conditionally navigate based on user role
-    if (user === "admin") {
-      router.push(`/admin/view/${property}/${type}`);
-    } else {
-      router.push(`/user/filter/${property}/${type}`);
-    }
   };
 
   return (
@@ -67,21 +52,53 @@ const Subheader = ({ setProperty, setPropertyType, user }) => {
           open={Boolean(anchorElForSale)}
           onClose={handleCloseMenuForSale}
         >
-          <MenuItem onClick={() => handleSaleOptionChange("House", "ForSale")}>
-            House
+          <MenuItem>
+            <Link
+              style={{ textDecoration: "none", color: "black" }}
+              href={
+                user === "admin"
+                  ? "/admin/view/House/ForSale"
+                  : "/user/filter/House/ForSale"
+              }
+            >
+              House
+            </Link>
           </MenuItem>
-          <MenuItem onClick={() => handleSaleOptionChange("Land", "ForSale")}>
-            Land
+          <MenuItem>
+            <Link
+              style={{ textDecoration: "none", color: "black" }}
+              href={
+                user === "admin"
+                  ? "/admin/view/Land/ForSale"
+                  : "/user/filter/Land/ForSale"
+              }
+            >
+              Land
+            </Link>
           </MenuItem>
-          <MenuItem
-            onClick={() => handleSaleOptionChange("Appartment", "ForSale")}
-          >
-            Appartment
+          <MenuItem>
+            <Link
+              style={{ textDecoration: "none", color: "black" }}
+              href={
+                user === "admin"
+                  ? "/admin/view/Appartment/ForSale"
+                  : "/user/filter/Appartment/ForSale"
+              }
+            >
+              Appartment
+            </Link>
           </MenuItem>
-          <MenuItem
-            onClick={() => handleSaleOptionChange("Commercial", "ForSale")}
-          >
-            Commercial
+          <MenuItem>
+            <Link
+              style={{ textDecoration: "none", color: "black" }}
+              href={
+                user === "admin"
+                  ? "/admin/view/Commercial/ForSale"
+                  : "/user/filter/Commercial/ForSale"
+              }
+            >
+              Commercial
+            </Link>
           </MenuItem>
         </Menu>
         <Button
@@ -95,21 +112,53 @@ const Subheader = ({ setProperty, setPropertyType, user }) => {
           open={Boolean(anchorElForRent)}
           onClose={handleCloseMenuForRent}
         >
-          <MenuItem onClick={() => handleRentOptionChange("House", "ForRent")}>
-            House
+          <MenuItem>
+            <Link
+              style={{ textDecoration: "none", color: "black" }}
+              href={
+                user === "admin"
+                  ? "/admin/view/House/ForRent"
+                  : "/user/filter/House/ForRent"
+              }
+            >
+              House
+            </Link>
           </MenuItem>
-          <MenuItem onClick={() => handleRentOptionChange("Land", "ForRent")}>
-            Land
+          <MenuItem>
+            <Link
+              style={{ textDecoration: "none", color: "black" }}
+              href={
+                user === "admin"
+                  ? "/admin/view/Land/ForRent"
+                  : "/user/filter/Land/ForRent"
+              }
+            >
+              Land
+            </Link>
           </MenuItem>
-          <MenuItem
-            onClick={() => handleRentOptionChange("Appartment", "ForRent")}
-          >
-            Appartment
+          <MenuItem>
+            <Link
+              style={{ textDecoration: "none", color: "black" }}
+              href={
+                user === "admin"
+                  ? "/admin/view/Appartment/ForRent"
+                  : "/user/filter/Appartment/ForRent"
+              }
+            >
+              Appartment
+            </Link>
           </MenuItem>
-          <MenuItem
-            onClick={() => handleRentOptionChange("Commercial", "ForRent")}
-          >
-            Commercial
+          <MenuItem>
+            <Link
+              style={{ textDecoration: "none", color: "black" }}
+              href={
+                user === "admin"
+                  ? "/admin/view/Commercial/ForRent"
+                  : "/user/filter/Commercial/ForRent"
+              }
+            >
+              Commercial
+            </Link>
           </MenuItem>
         </Menu>
       </Box>

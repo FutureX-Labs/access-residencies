@@ -341,7 +341,7 @@ const Showcase = ({ data, user, property, propertyType, showHidden }) => {
             {data
               .slice((page - 1) * itemsPerPage, page * itemsPerPage)
               .map((item) =>
-                showHidden && item.isVisibale === false ? (
+                item.isVisibale === false ? (
                   <Grid
                     item
                     key={item.id}

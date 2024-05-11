@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useContext } from "react";
 import axios from "axios";
 import Navbar from "../../components/navbar/Navbar";
 import Image from "next/image";
@@ -30,7 +30,7 @@ import { Acres } from "@/app/list/acres";
 import { Cities } from "@/app/list/city";
 import { PropertyTypes } from "@/app/list/propertyTypes";
 import EditImage from "../../../../public/images/edit.png";
-import { useAuth } from "@/app/context/AuthContext";
+import AuthContext from "@/app/context/AuthContext";
 import UseSessionStorage from "@/app/UseSessionStorage";
 
 const url = "http://localhost:4000/api/appartmentForRent/add";
@@ -68,15 +68,14 @@ function Edit() {
   const [acres, setAcres] = useState(null);
   const [propertyTypes, setPropertyTypes] = useState(null);
   const [editFormData, setEditFormData] = useState(null);
-  const { isAdminAuthenticated } = useAuth();
   const router = useRouter();
-  const isAuthenticated = UseSessionStorage("isAdminAuthenticated");
+  const { user } = useContext(AuthContext);
+
+  console.log("user", user);
 
   useEffect(() => {
-    if (isAuthenticated === "false") {
-      router.push("/");
-    }
-  }, [isAuthenticated, router]);
+    if (!user) router.push("/");
+  }, [user]);
 
   const submitThumbnailRef = useRef(null);
   const submitMulImageRef = useRef(null);

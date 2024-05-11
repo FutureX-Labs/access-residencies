@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useContext } from "react";
 import axios, { all } from "axios";
 import Navbar from "../../components/navbar/Navbar";
 import Image from "next/image";
@@ -18,8 +18,8 @@ import Swal from "sweetalert2";
 import { ConvertToBase64 } from "../../utility/Conversion";
 import Items from "@/app/components/items/Items";
 import customizeImage from "../../../../public/images/customize.png";
-import { useAuth } from "@/app/context/AuthContext";
 import { useRouter } from "next/navigation";
+import AuthContext from "@/app/context/AuthContext";
 
 const bannerURL = "http://localhost:4000/api/customize/banners/add";
 const featureURL = "http://localhost:4000/api/customize/features/add";
@@ -39,14 +39,15 @@ function Customize() {
   const [showSaveFeature, setShowSaveFeature] = useState(false);
   const submitButtonRef = useRef(null);
   const submitFeatureButtonRef = useRef(null);
-  const { isAdminAuthenticated } = useAuth();
   const router = useRouter();
+  const { user } = useContext(AuthContext);
+
+  console.log("user", user);
 
   useEffect(() => {
-    if (!isAdminAuthenticated) {
-      router.push("/");
-    }
-  }, [isAdminAuthenticated, router]);
+    console.log("user inside the effect", user);
+    // if (!user) router.push("/");
+  }, [user]);
 
   console.log("allPropertyId", allPropertyId);
   const handleSubmitPropertyId = async () => {
