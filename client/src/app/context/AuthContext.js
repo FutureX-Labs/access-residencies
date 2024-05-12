@@ -8,7 +8,7 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const sessionUser = sessionStorage.getItem("contact_user");
-    setUser(sessionUser ? JSON.parse(sessionUser) : null);
+    setUser(sessionUser ? sessionUser : null);
   }, []);
 
   return (

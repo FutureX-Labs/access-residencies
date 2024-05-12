@@ -19,6 +19,7 @@ import { FaAngleDown } from "react-icons/fa6";
 import { FaAngleUp } from "react-icons/fa6";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import AuthContext from "@/app/context/AuthContext";
 
 const drawerWidth = 900;
 
@@ -27,7 +28,7 @@ function Navbar(props) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [showProperty, setShowProperty] = React.useState(false);
   const router = useRouter();
-
+  const { user } = React.useContext(AuthContext);
   const handleDrawerToggle = () => {
     setMobileOpen((prevState) => !prevState);
   };
@@ -43,7 +44,7 @@ function Navbar(props) {
     { title: "About us", path: "#about" },
     { title: "Gallery", path: "#gallery" },
     { title: "Contact Us", path: "#contact" },
-    { title: "Login", path: "/auth" },
+    { title: user ? "Logout" : "Login", path: "/auth" },
   ];
 
   const navItems = type === "admin" ? adminNavItems : userNavItems;

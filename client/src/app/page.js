@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import Slider from "react-slick";
 import Navbar from "./components/navbar/Navbar";
@@ -28,6 +28,8 @@ import { PropertyTypes } from "@/app/list/propertyTypes";
 import { Cities } from "@/app/list/city";
 import { Prices } from "@/app/list/price";
 import { FilterUrl } from "./utility/filterUrls";
+import AuthContext from "./context/AuthContext";
+import { useRouter } from "next/navigation";
 
 const url = "http://localhost:4000/api/appartmentForRent/add";
 
@@ -45,6 +47,8 @@ function Home() {
   const [rent, setRent] = useState(null);
   const [city, setCity] = useState("Colombo");
   const [title, setTitle] = useState(null);
+  const router = useRouter();
+  const { user } = useContext(AuthContext);
 
   console.log("titile", title);
   console.log("price", price);

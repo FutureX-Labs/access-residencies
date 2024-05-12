@@ -71,11 +71,10 @@ function Edit() {
   const router = useRouter();
   const { user } = useContext(AuthContext);
 
-  console.log("user", user);
-
   useEffect(() => {
-    if (!user) router.push("/");
-  }, [user]);
+    const isUserLoggedIn = sessionStorage.getItem("contact_user");
+    if (!isUserLoggedIn) router.push("/");
+  }, []);
 
   const submitThumbnailRef = useRef(null);
   const submitMulImageRef = useRef(null);
