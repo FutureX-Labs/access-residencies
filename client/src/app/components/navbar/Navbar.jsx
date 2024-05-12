@@ -17,6 +17,8 @@ import Button from "@mui/material/Button";
 import Image from "next/image";
 import { FaAngleDown } from "react-icons/fa6";
 import { FaAngleUp } from "react-icons/fa6";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const drawerWidth = 900;
 
@@ -24,38 +26,31 @@ function Navbar(props) {
   const { window, type } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [showProperty, setShowProperty] = React.useState(false);
+  const router = useRouter();
 
   const handleDrawerToggle = () => {
     setMobileOpen((prevState) => !prevState);
   };
 
   const adminNavItems = [
-    { title: "Property View", path: "/property/view" },
-    { title: "Property Add", path: "/property/add" },
+    { title: "Customize", path: "/admin/customize" },
+    { title: "Property View", path: "/admin/view/House/ForSale" },
+    { title: "Property Add", path: "/admin/add" },
   ];
 
   const userNavItems = [
     { title: "Home", path: "/" },
-    { title: "About us", path: "/about" },
-    { title: "Gallery", path: "/gallery" },
-
-    {
-      title: "Property Management",
-      dropdown: true,
-      subItems: [
-        { title: "House For Sale", path: "/Property Management/project1" },
-        { title: "House For Rent", path: "/Property Management/project2" },
-        { title: "Land For Sale", path: "/Property Management/project3" },
-        { title: "Commercial For Sale", path: "/Property Management/project5" },
-        { title: "Commercial For Rent", path: "/Property Management/project6" },
-        { title: "Appartment For Sale", path: "/Property Management/project6" },
-        { title: "Appartment For Rent", path: "/Property Management/project6" },
-      ],
-    },
-    { title: "Contact Us", path: "/contact" },
+    { title: "About us", path: "#about" },
+    { title: "Gallery", path: "#gallery" },
+    { title: "Contact Us", path: "#contact" },
+    { title: "Login", path: "/auth" },
   ];
 
   const navItems = type === "admin" ? adminNavItems : userNavItems;
+
+  const handleLogoClick = () => {
+    router.push("/");
+  };
 
   const drawer = (
     <Box
@@ -73,7 +68,10 @@ function Navbar(props) {
             flexGrow: 1,
             alignItems: "center",
           }}
+          onClick={handleLogoClick}
         >
+          {/* Wrap the Image component inside a Link */}
+
           <Image
             component="div"
             src="/logo.png"
@@ -100,9 +98,10 @@ function Navbar(props) {
           <>
             {item.title !== "Property Management" ? (
               <ListItem key={item.title} disablePadding>
-                <ListItemButton
+                <Link
                   sx={{
                     textAlign: "left",
+                    textDecoration: "none",
                   }}
                   // component="a"
                   href={item.path}
@@ -111,13 +110,14 @@ function Navbar(props) {
                     primary={item.title}
                     sx={{
                       color: "white",
+                      textDecoration: "none",
                       fontFamily: "Roboto Condensed",
                       fontWeight: "800",
                       fontSize: "24px",
                       lingHeight: " 28.13px",
                     }}
                   />
-                </ListItemButton>
+                </Link>
               </ListItem>
             ) : (
               <></>
@@ -133,7 +133,6 @@ function Navbar(props) {
                 href={userNavItems[3].path}
               >
                 <ListItemText
-                  primary={userNavItems[3].title}
                   sx={{
                     color: "white",
                     fontFamily: "Roboto Condensed",
@@ -143,46 +142,8 @@ function Navbar(props) {
                   }}
                   onClick={() => setShowProperty((prev) => !prev)}
                 />
-
-                {showProperty ? (
-                  <FaAngleUp style={{ marginLeft: 5 }} color="white" />
-                ) : (
-                  <FaAngleDown style={{ marginLeft: 5 }} color="white" />
-                )}
               </ListItemButton>
             </ListItem>
-            <List>
-              {userNavItems
-                .find((item) => item.title === "Property Management")
-                .subItems.map((subItem) =>
-                  showProperty ? (
-                    <ListItem
-                      key={subItem.title}
-                      disablePadding
-                      sx={{ ml: "15px", width: "200px" }}
-                    >
-                      <ListItemButton
-                        sx={{ textAlign: "left" }}
-                        component="a"
-                        href={subItem.path}
-                      >
-                        <ListItemText
-                          primary={subItem.title}
-                          sx={{
-                            color: "white",
-                            fontFamily: "Roboto Condensed",
-                            fontWeight: "800",
-                            fontSize: "24px",
-                            lingHeight: " 28.13px",
-                          }}
-                        />
-                      </ListItemButton>
-                    </ListItem>
-                  ) : (
-                    <></>
-                  )
-                )}
-            </List>
           </React.Fragment>
         )}
       </List>
@@ -203,7 +164,11 @@ function Navbar(props) {
         }}
       >
         <Toolbar>
-          <Box variant="h6" sx={{ flexGrow: 1, alignItems: "center" }}>
+          <Box
+            variant="h6"
+            sx={{ flexGrow: 1, alignItems: "center" }}
+            onClick={handleLogoClick}
+          >
             <Image
               component="div"
               src="/logo.png"
@@ -214,85 +179,12 @@ function Navbar(props) {
               variant="h6"
             />
           </Box>
-          <Box
-            sx={{ display: { xs: "none", md: "block" }, position: "relative" }}
-          >
+          <Box sx={{ display: { xs: "none", md: "block" } }}>
             {navItems.map((item) => (
               <>
-                <Button
-                  key={item.title}
-                  sx={{ color: "#fff" }}
-                  href={item.path}
-                  onClick={
-                    item.title === "Property Management"
-                      ? () => setShowProperty((prev) => !prev)
-                      : null
-                  }
-                >
-                  {item.title === "Property Management" ? (
-                    <>
-                      <span>{item.title}</span>
-                      {showProperty ? (
-                        <FaAngleUp style={{ marginLeft: 5 }} />
-                      ) : (
-                        <FaAngleDown style={{ marginLeft: 5 }} />
-                      )}
-                    </>
-                  ) : (
-                    <>{item.title}</>
-                  )}
-                </Button>
-                <Box
-                  sx={{
-                    position: "absolute",
-                    top: "62px",
-                    right: "112px",
-                    borderRadius: "5px",
-                  }}
-                >
-                  {showProperty &&
-                    item?.subItems?.map((subItem, index) => (
-                      <div
-                        key={subItem.title}
-                        style={{
-                          display: "flex",
-                          flexDirection: "column",
-                          background: "grey",
-                          padding: "0px",
-                          margin: "0px",
-                        }}
-                      >
-                        <ListItem
-                          sx={{
-                            width: "100%",
-                          }}
-                        >
-                          <ListItemButton
-                            sx={{
-                              textAlign: "left",
-                              "&:hover": {
-                                backgroundColor: "rgba(255, 255, 255, 0.1)",
-                              },
-                            }}
-                            component="a"
-                            href={subItem.path}
-                          >
-                            <ListItemText
-                              primary={subItem.title}
-                              sx={{
-                                color: "white",
-                                textAlign: "center",
-                                fontFamily: "Roboto Condensed",
-                                fontWeight: "800",
-                                fontSize: "24px",
-                                lingHeight: " 28.13px",
-                              }}
-                            />
-                          </ListItemButton>
-                        </ListItem>
-                      </div>
-                    ))}
-                </Box>
+                <Link key={item.title} href={item.path}>
+                  <Button sx={{ color: "white" }}>{item.title}</Button>
+                </Link>
               </>
             ))}
           </Box>

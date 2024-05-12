@@ -4,6 +4,8 @@ const { Schema } = mongoose;
 const landForRent = new Schema(
   {
     propertyId: String,
+    property: String,
+    propertyType: String,
     title: String,
     rent: Number,
     thumbnailImage: String,
@@ -13,7 +15,9 @@ const landForRent = new Schema(
       perches: Number,
       acres: Number,
     },
-    town: String,
+
+    city: String,
+    isVisibale: Boolean,
   },
   {
     timestamps: true,

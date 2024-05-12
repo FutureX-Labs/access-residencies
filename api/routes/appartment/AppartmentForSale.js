@@ -5,10 +5,30 @@ const multer = require("multer");
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-router.get("/getdata", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const houses = await appartmentForSale.find();
     res.status(200).json(houses);
+  } catch (error) {
+    console.error(error);
+    res.status(400).json(error);
+  }
+});
+
+router.get("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Find document by ID
+    const response = await appartmentForSale.findById(id);
+
+    if (!response) {
+      // If no document found with the given ID, return 404 Not Found
+      return res.status(404).json({ message: "not found" });
+    }
+
+    // If document found, return it
+    res.status(200).json(response);
   } catch (error) {
     console.error(error);
     res.status(400).json(error);
@@ -26,7 +46,8 @@ router.post("/add", upload.array("myFiles"), async (req, res) => {
       size,
       bedrooms,
       bathrooms,
-      town,
+
+      city,
     } = JSON.parse(req.body.additionalData);
     const images = files.map((file) => file.buffer.toString("base64"));
     const thumbnailImage = images[images.length - 1];
@@ -34,6 +55,8 @@ router.post("/add", upload.array("myFiles"), async (req, res) => {
 
     const result = new appartmentForSale({
       propertyId,
+      property: "Appartment",
+      propertyType: "ForSale",
       title,
       price,
       thumbnailImage,
@@ -42,7 +65,9 @@ router.post("/add", upload.array("myFiles"), async (req, res) => {
       size,
       bedrooms,
       bathrooms,
-      town,
+
+      city,
+      isVisibale: false,
     });
 
     const response = await result.save();
@@ -57,10 +82,6 @@ router.post("/add", upload.array("myFiles"), async (req, res) => {
 router.put("/edit/:id", upload.array("myFiles"), async (req, res) => {
   try {
     const files = req.files;
-    const images = files.map((file) => file.buffer.toString("base64"));
-    const thumbnailImage = images[images.length - 1];
-    thumbnailImage ? images.pop() : thumbnailImage;
-    const Id = req.params.id;
     const {
       propertyId,
       title,
@@ -69,8 +90,28 @@ router.put("/edit/:id", upload.array("myFiles"), async (req, res) => {
       size,
       bedrooms,
       bathrooms,
-      town,
-    } = req.body;
+      city,
+    } = JSON.parse(req.body.additionalData);
+    if (!files || files.length === 0) {
+      const id = req.params.id;
+
+      const result = await appartmentForSale.findByIdAndUpdate(id, {
+        propertyId,
+        title,
+        price,
+        description,
+        size,
+        bedrooms,
+        bathrooms,
+        city,
+      });
+
+      return res.status(200).json(result);
+    }
+    const images = files.map((file) => file.buffer.toString("base64"));
+    const thumbnailImage = images[images.length - 1];
+    thumbnailImage ? images.pop() : thumbnailImage;
+    const Id = req.params.id;
 
     const result = await appartmentForSale.findByIdAndUpdate(Id, {
       propertyId,
@@ -82,9 +123,24 @@ router.put("/edit/:id", upload.array("myFiles"), async (req, res) => {
       size,
       bedrooms,
       bathrooms,
-      town,
+      city,
     });
 
+    res.status(200).json(result);
+  } catch (error) {
+    console.error(error);
+    res.status(400).json(error);
+  }
+});
+
+router.post("/edit/isVisible/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { isVisibale } = req.body;
+    const result = await appartmentForSale.findByIdAndUpdate(id, {
+      isVisibale,
+    });
+    s;
     res.status(200).json(result);
   } catch (error) {
     console.error(error);
@@ -108,52 +164,84 @@ router.delete("/delete/:id", async (req, res) => {
 
 router.post("/filter", async (req, res) => {
   try {
-    const {
-      propertyId,
-      title,
-      minPrice,
-      maxPrice,
-      description,
-      size,
-      bedrooms,
-      bathrooms,
-      town,
-    } = req.body;
+    const { city, price, size, bedrooms, bathrooms } = req.body;
 
     const filter = {};
 
-    if (propertyId) {
-      filter.propertyId = propertyId;
-    }
-    if (title) {
-      filter.title = { $regex: new RegExp(title, "i") };
-    }
-    if (minPrice || maxPrice) {
-      filter.price = {};
-      if (minPrice) {
-        filter.price.$gte = minPrice;
-      }
-      if (maxPrice) {
-        filter.price.$lte = maxPrice;
-      }
-    }
-    if (description) {
-      filter.description = { $regex: new RegExp(description, "i") };
-    }
-    if (size) {
-      filter.size = size;
-    }
-    if (bedrooms) {
-      filter.bedrooms = bedrooms;
-    }
-    if (bathrooms) {
-      filter.bathrooms = bathrooms;
-    }
-    if (town) {
-      filter.town = { $regex: new RegExp(town, "i") };
+    if (price !== undefined && price !== null) {
+      filter.price = price;
     }
 
-    const filtered = await appartmentForSale.find(filter);
+    if (city !== undefined && city !== null) {
+      filter.city = { $regex: new RegExp(city, "i") };
+    }
+
+    if (size !== undefined && size !== null) {
+      filter.size = size;
+    }
+
+    if (bedrooms !== undefined && bedrooms !== null) {
+      filter.bedrooms = bedrooms;
+    }
+
+    if (bathrooms !== undefined && bathrooms !== null) {
+      filter.bathrooms = bathrooms;
+    }
+
+    let filtered = await appartmentForSale.find(filter).exec();
+
+    res.status(200).json(filtered);
+  } catch (error) {
+    console.error(error);
+    res.status(400).json(error);
+  }
+});
+
+router.post("/filter/main", async (req, res) => {
+  try {
+    const { city, price, title } = req.body;
+
+    const filter = {};
+
+    // Filtering by price if provided
+    if (price !== undefined && price !== null) {
+      filter.price = price;
+    }
+
+    // Filtering by city using a case-insensitive regex for flexible matching
+    if (city !== undefined && city !== null) {
+      filter.city = { $regex: new RegExp(city, "i") };
+    }
+
+    // Filtering by title using a case-insensitive regex for partial matches
+    if (title !== undefined && title !== null) {
+      filter.title = { $regex: new RegExp(title, "i") };
+    }
+
+    // Perform the search with the constructed filter
+    let filtered = await appartmentForSale.find(filter).exec();
+
+    // Sending the filtered results back to the client
+    res.status(200).json(filtered);
+  } catch (error) {
+    console.error(error);
+    res
+      .status(400)
+      .json({ message: "Error processing your request", error: error });
+  }
+});
+
+router.post("/filterId", async (req, res) => {
+  try {
+    const { propertyId } = req.body;
+
+    const filter = {};
+
+    if (propertyId !== undefined) {
+      filter.propertyId = propertyId;
+    }
+
+    const filtered = await appartmentForSale.find(filter).exec();
 
     res.status(200).json(filtered);
   } catch (error) {

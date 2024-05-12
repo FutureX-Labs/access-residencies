@@ -1,16 +1,18 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import Style from "./style.module.css";
 import Image from "next/image";
 import { TextField, Button, Box } from "@mui/material";
-import { useRouter } from "next/navigation";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { useRouter } from "next/navigation";
+import AuthContext from "../context/AuthContext";
 
 const Auth = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const router = useRouter();
+  const { setUser } = useContext(AuthContext);
 
   const handleLogin = async () => {
     try {
@@ -18,30 +20,34 @@ const Auth = () => {
         username,
         password,
       });
-      if (!result) {
+      console.log("result", result);
+      if (result) {
+        // Update isAdminAuthenticated in sessionStorage
+        setUser(true);
+        // sessionStorage.setItem("isAdminAuthenticated", JSON.stringify(true));
+        // console.log(sessionStorage.getItem("isAdminAuthenticated"));
         Swal.fire({
-          title: "Error!",
-          text: "Do you want to continue",
-          icon: "error",
-          confirmButtonText: "Cool",
+          title: "Login successful",
+          icon: "success",
         });
+        router.push("/admin/view/House/ForSale");
       }
-      Swal.fire({
-        title: "Good job!",
-        text: "You clicked the button!",
-        icon: "success",
-      });
-      console.log(result.data.isAdmin);
     } catch (error) {
+      Swal.fire({
+        title: "Incorrect username or password",
+        icon: "error",
+        confirmButtonText: "Cancel",
+      });
       console.log(error);
     }
   };
 
   const handleLogout = () => {
-    setIsLoggedIn(false);
-    setUsername("");
-    setPassword("");
+    // Clear isAdminAuthenticated from sessionStorage
+    sessionStorage.removeItem("isAdminAuthenticated");
+    router.push("/"); // Redirect to the landing page
   };
+
   return (
     <div className={Style.root}>
       <div className={Style.loginBox}>
