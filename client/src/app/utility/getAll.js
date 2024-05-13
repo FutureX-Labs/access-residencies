@@ -1,5 +1,7 @@
+import BASE_URL from "./config";
+
 export function GetAll(property, propertyType) {
-  let url = "http://localhost:4000/api/";
+  let url = `${BASE_URL}/api/`;
   console.log(property, propertyType);
 
   switch (propertyType) {

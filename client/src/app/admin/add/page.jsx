@@ -30,7 +30,9 @@ import AddImage from "../../../../public/images/add.png";
 import AuthContext from "@/app/context/AuthContext";
 import { useRouter } from "next/navigation";
 
-const url = "http://localhost:4000/api/appartmentForRent/add";
+import BASE_URL from "./config";
+const url = `${BASE_URL}/api/appartmentForRent/add`;
+
 const Input = ({ label, value, onChange }) => {
   return (
     <Grid item md={12}>

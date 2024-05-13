@@ -29,7 +29,9 @@ import { Padding } from "@mui/icons-material";
 import AuthContext from "@/app/context/AuthContext";
 import { useRouter } from "next/navigation";
 
-const url = "http://localhost:4000/api/appartmentForRent/add";
+
+import BASE_URL from "./config";
+const url = `${BASE_URL}/api/appartmentForRent/add`;
 
 function View() {
   const [postImage, setPostImage] = useState(null);
@@ -111,7 +113,7 @@ function View() {
   const FetchPropertyIDs = async () => {
     try {
       const propertyIDResponse = await axios.get(
-        `http://localhost:4000/api/customize/propertyid/`,
+        `${BASE_URL}/api/customize/propertyid/`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -122,7 +124,7 @@ function View() {
       const propertyIds = propertyIDResponse.data[0].propertyId;
 
       const response = await axios.post(
-        `http://localhost:4000/api/properties`,
+        `${BASE_URL}/api/properties`,
         {
           propertyIds: propertyIds,
         },

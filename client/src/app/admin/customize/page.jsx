@@ -21,9 +21,12 @@ import customizeImage from "../../../../public/images/customize.png";
 import { useRouter } from "next/navigation";
 import AuthContext from "@/app/context/AuthContext";
 
-const bannerURL = "http://localhost:4000/api/customize/banners/add";
-const featureURL = "http://localhost:4000/api/customize/features/add";
-const propertyIdUrl = "http://localhost:4000/api/customize/propertyid/add";
+import BASE_URL from "./config";
+const url = `${BASE_URL}/api/appartmentForRent/add`;
+
+const bannerURL = `${BASE_URL}/api/customize/banners/add`;
+const featureURL = `${BASE_URL}/api/customize/features/add`;
+const propertyIdUrl = `${BASE_URL}/api/customize/propertyid/add`;
 
 function Customize() {
   const [bannerImages, setBannerImages] = useState(null);
