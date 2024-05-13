@@ -1,4 +1,4 @@
-import BASE_URL from "./config";
+import BASE_URL from "../config";
 
 export function GetAll(property, propertyType) {
   let url = `${BASE_URL}/api/`;

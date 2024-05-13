@@ -1,4 +1,4 @@
-import BASE_URL from "./config";
+import BASE_URL from "../config";
 const url = `${BASE_URL}/api/appartmentForRent/add`;
 
 export function AddUrl(propertyType, property) {

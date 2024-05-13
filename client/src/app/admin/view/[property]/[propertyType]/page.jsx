@@ -30,7 +30,7 @@ import AuthContext from "@/app/context/AuthContext";
 import { useRouter } from "next/navigation";
 
 
-import BASE_URL from "./config";
+import BASE_URL from "../../../../config";
 const url = `${BASE_URL}/api/appartmentForRent/add`;
 
 function View() {

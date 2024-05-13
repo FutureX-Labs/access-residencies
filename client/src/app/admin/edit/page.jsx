@@ -33,7 +33,7 @@ import EditImage from "../../../../public/images/edit.png";
 import AuthContext from "@/app/context/AuthContext";
 import UseSessionStorage from "@/app/UseSessionStorage";
 
-import BASE_URL from "./config";
+import BASE_URL from "../../config";
 
 const url = `${BASE_URL}/api/appartmentForRent/add`;
 const Input = ({ label, value, onChange }) => {

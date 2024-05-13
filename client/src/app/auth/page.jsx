@@ -10,7 +10,7 @@ import AuthContext from "../context/AuthContext";
 import { KoHo, Sonsie_One } from "next/font/google";
 import { OneK } from "@mui/icons-material";
 
-import BASE_URL from "./config";
+import BASE_URL from "../config";
 
 const Auth = () => {
   const [username, setUsername] = useState("");
