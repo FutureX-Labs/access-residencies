@@ -95,7 +95,7 @@ app.post("/api/properties", async (req, res) => {
 });
 
 mongoose
-  .connect("mongodb://127.0.0.1:27017/accessResidencies")
+  .connect(process.env.MONGOURI)
   .then(() => {
     app.listen(process.env.PORT, () => {
       console.log("server started at port", process.env.PORT);
