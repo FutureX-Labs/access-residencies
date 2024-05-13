@@ -1,5 +1,7 @@
+import BASE_URL from "./config";
+
 export function EditUrl(property, propertyType, id) {
-  let url = "http://localhost:4000/api/";
+  let url = `${BASE_URL}/api/`;
 
   switch (propertyType) {
     case "ForSale":

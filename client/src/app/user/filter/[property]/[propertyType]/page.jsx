@@ -28,7 +28,9 @@ import { IoIosArrowForward } from "react-icons/io";
 import { Padding } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 
-const url = "http://localhost:4000/api/appartmentForRent/add";
+
+import BASE_URL from "./config";
+const url = `${BASE_URL}/api/appartmentForRent/add`;
 
 function UserFilter() {
   const [postImage, setPostImage] = useState(null);
@@ -112,7 +114,7 @@ function UserFilter() {
     try {
       const response = await axios.get(
         // Use axios.get instead of just axios
-        "http://localhost:4000/api/customize/banners",
+        `${BASE_URL}/api/customize/banners`,
         {
           headers: {
             "Content-Type": "multipart/form-data",
@@ -131,7 +133,7 @@ function UserFilter() {
     try {
       const response = await axios.get(
         // Use axios.get instead of just axios
-        "http://localhost:4000/api/customize/features",
+        `${BASE_URL}/api/customize/features`,
         {
           headers: {
             "Content-Type": "multipart/form-data",
@@ -173,7 +175,7 @@ function UserFilter() {
   const FetchPropertyIDs = async () => {
     try {
       const propertyIDResponse = await axios.get(
-        `http://localhost:4000/api/customize/propertyid/`,
+        `${BASE_URL}/api/customize/propertyid/`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -184,7 +186,7 @@ function UserFilter() {
       const propertyIds = propertyIDResponse.data[0].propertyId;
 
       const response = await axios.post(
-        `http://localhost:4000/api/properties`,
+        `${BASE_URL}/api/properties`,
         {
           propertyIds: propertyIds,
         },

@@ -31,7 +31,8 @@ import { FilterUrl } from "./utility/filterUrls";
 import AuthContext from "./context/AuthContext";
 import { useRouter } from "next/navigation";
 
-const url = "http://localhost:4000/api/appartmentForRent/add";
+import BASE_URL from "./config";
+const url = `${BASE_URL}/api/appartmentForRent/add`;
 
 function Home() {
   const [postImage, setPostImage] = useState(null);
@@ -151,7 +152,7 @@ function Home() {
     try {
       const response = await axios.get(
         // Use axios.get instead of just axios
-        "http://localhost:4000/api/customize/banners",
+        `${BASE_URL}api/customize/banners`,
         {
           headers: {
             "Content-Type": "multipart/form-data",
@@ -170,7 +171,7 @@ function Home() {
     try {
       const response = await axios.get(
         // Use axios.get instead of just axios
-        "http://localhost:4000/api/customize/features",
+        `${BASE_URL}/api/customize/features`,
         {
           headers: {
             "Content-Type": "multipart/form-data",
@@ -211,7 +212,7 @@ function Home() {
   const FetchPropertyIDs = async () => {
     try {
       const propertyIDResponse = await axios.get(
-        `http://localhost:4000/api/customize/propertyid/`,
+        `${BASE_URL}/api/customize/propertyid/`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -222,7 +223,7 @@ function Home() {
       const propertyIds = propertyIDResponse.data[0].propertyId;
 
       const response = await axios.post(
-        `http://localhost:4000/api/properties`,
+        `${BASE_URL}/api/properties`,
         {
           propertyIds: propertyIds,
         },

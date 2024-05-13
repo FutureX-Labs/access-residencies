@@ -10,6 +10,8 @@ import AuthContext from "../context/AuthContext";
 import { KoHo, Sonsie_One } from "next/font/google";
 import { OneK } from "@mui/icons-material";
 
+import BASE_URL from "./config";
+
 const Auth = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -18,7 +20,7 @@ const Auth = () => {
 
   const handleLogin = async () => {
     try {
-      const result = await axios.post("http://localhost:4000/api/auth/login", {
+      const result = await axios.post(`${BASE_URL}/api/auth/login`, {
         username,
         password,
       });
