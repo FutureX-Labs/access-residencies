@@ -21,7 +21,7 @@ import customizeImage from "../../../../public/images/customize.png";
 import { useRouter } from "next/navigation";
 import AuthContext from "@/app/context/AuthContext";
 
-import BASE_URL from "./config";
+import BASE_URL from "../../config";
 const url = `${BASE_URL}/api/appartmentForRent/add`;
 
 const bannerURL = `${BASE_URL}/api/customize/banners/add`;
