@@ -8,8 +8,10 @@ const upload = multer({ storage: storage });
 router.post("/login", async (req, res) => {
   try {
     const { username, password } = req.body;
+    console.log("username", username);
+    console.log("password", password);
     const user = await auth.findOne({ username, password });
-    if (user) {
+    if (user) { 
       res.status(200).json(user);
     } else {
       res.status(401).json({ message: "Invalid username or password" });

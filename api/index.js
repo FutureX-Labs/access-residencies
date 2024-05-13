@@ -1,5 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const multer = require("multer");
 const app = express();
 const bodyParser = require("body-parser");
 var cors = require("cors");
@@ -29,7 +30,9 @@ const Features = require("./routes/customize/Features");
 const PropertyId = require("./routes/customize/PropertyId");
 const auth = require("./routes/auth/Auth");
 
-app.use("/api/auth", auth);
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+app.use("/api/auth", upload.none(), auth);
 
 app.use("/api/houseforsale", HouseForSale);
 app.use("/api/houseforrent", HouseForRent);
