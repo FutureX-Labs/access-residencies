@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import Style from "./style.module.css";
 import Image from "next/image";
 import { TextField, Button, Box } from "@mui/material";
@@ -7,6 +7,8 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { useRouter } from "next/navigation";
 import AuthContext from "../context/AuthContext";
+import { KoHo, Sonsie_One } from "next/font/google";
+import { OneK } from "@mui/icons-material";
 
 const Auth = () => {
   const [username, setUsername] = useState("");
@@ -22,15 +24,13 @@ const Auth = () => {
       });
       console.log("result", result);
       if (result) {
-        // Update isAdminAuthenticated in sessionStorage
+        sessionStorage.setItem("contact_user", true);
         setUser(true);
-        // sessionStorage.setItem("isAdminAuthenticated", JSON.stringify(true));
-        // console.log(sessionStorage.getItem("isAdminAuthenticated"));
         Swal.fire({
           title: "Login successful",
           icon: "success",
         });
-        router.push("/admin/view/House/ForSale");
+        router.replace("/admin/view/House/ForSale");
       }
     } catch (error) {
       Swal.fire({
@@ -42,12 +42,11 @@ const Auth = () => {
     }
   };
 
-  const handleLogout = () => {
-    // Clear isAdminAuthenticated from sessionStorage
-    sessionStorage.removeItem("isAdminAuthenticated");
-    router.push("/"); // Redirect to the landing page
-  };
+  // clear session storage it willclear storage whenever we visit to /auth so user will be logged out automatically
 
+  useEffect(() => {
+    sessionStorage.clear();
+  }, []);
   return (
     <div className={Style.root}>
       <div className={Style.loginBox}>

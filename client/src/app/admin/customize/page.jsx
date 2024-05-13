@@ -42,12 +42,15 @@ function Customize() {
   const router = useRouter();
   const { user } = useContext(AuthContext);
 
-  console.log("user", user);
-
   useEffect(() => {
-    console.log("user inside the effect", user);
-    // if (!user) router.push("/");
-  }, [user]);
+    const isUserLoggedIn = sessionStorage.getItem("contact_user");
+    if (!isUserLoggedIn) router.push("/");
+  }, []);
+
+  // useEffect(() => {
+  //   console.log("user inside the effect", user);
+  //   // if (!user) router.push("/");
+  // }, [user]);
 
   console.log("allPropertyId", allPropertyId);
   const handleSubmitPropertyId = async () => {

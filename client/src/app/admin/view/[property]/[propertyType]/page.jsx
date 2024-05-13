@@ -46,8 +46,10 @@ function View() {
   console.log("user", user);
 
   useEffect(() => {
-    if (!user) router.push("/");
-  }, [user]);
+    console.log("user inside the useEffect:", user);
+    const isUserLoggedIn = sessionStorage.getItem("contact_user");
+    if (!isUserLoggedIn) router.push("/");
+  }, []);
 
   useEffect(() => {
     const currentUrl = window.location.href;
