@@ -178,7 +178,6 @@ function Navbar(props) {
                   }}
                   onClick={() => {
                     sessionStorage.removeItem("contact_user");
-                    window.location.reload(false);
                   }}
                 >
                   {item.title}
