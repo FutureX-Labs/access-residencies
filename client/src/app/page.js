@@ -79,11 +79,11 @@ function Home() {
           "Content-Type": "application/json",
         },
       });
-      Swal.fire({
-        title: "Received filter Data Successfully",
-        icon: "success",
-        timer: 1500,
-      });
+      // Swal.fire({
+      //   title: "Received filter Data Successfully",
+      //   icon: "success",
+      //   timer: 1500,
+      // });
       setCollectionData(response.data);
       // setTimeout(() => {
       //   window.location.reload();
@@ -197,12 +197,10 @@ function Home() {
           sx={{
             display: "flex",
             justifyContent: "center",
-
             margin: "0px 30px",
             marginTop: "-380px",
             position: "relative",
             bottom: "-170px",
-            // left: "13%",
             zIndex: "10",
           }}
         >

@@ -21,7 +21,7 @@ import { Bedrooms } from "@/app/list/bedrooms";
 import { Perches } from "@/app/list/perches";
 import { Acres } from "@/app/list/acres";
 import { Cities } from "@/app/list/city";
-import { PropertyTypes } from "@/app/list/propertyTypes";
+import { comProperty } from "@/app/list/comProperty";
 import Showcase from "../showcase/Showcase";
 import axios from "axios";
 import Items from "@/app/components/items/Items";
@@ -29,6 +29,7 @@ import Breadcrumbs from "@mui/material/Breadcrumbs";
 import { IoIosArrowForward } from "react-icons/io";
 import { Padding } from "@mui/icons-material";
 import Link from "next/link";
+import UseSessionStorage from "@/app/UseSessionStorage";
 
 const Filter = ({
   property,
@@ -54,7 +55,7 @@ const Filter = ({
   const [bathrooms, setBathrooms] = useState("All");
   const [perches, setPerches] = useState("All");
   const [acres, setAcres] = useState("All");
-  const [propertyTypes, setPropertyTypes] = useState(null);
+  const [comPropertyS, setComPropertyS] = useState("All");
   const [openCityDropDown, setOpenCityDropDown] = useState(false);
   const [filteredBy, setFilteredBy] = useState([]);
   const [topCities, setTopCities] = useState([]);
@@ -63,12 +64,17 @@ const Filter = ({
     handleSubmit();
   }, []);
 
+  const role = UseSessionStorage("contact_user") ? "admin" : "user";
+  console.log("role", role);
+
   const handleSubmit = async (e) => {
     e && e.preventDefault();
     try {
       let additionalData = {
         city: city,
+        role: role,
       };
+      console.log("additionalData", additionalData);
 
       if (propertyType === "ForSale") {
         additionalData.price = parseInt(price);
@@ -87,7 +93,7 @@ const Filter = ({
         additionalData = {
           ...additionalData,
           size: parseInt(size),
-          propertyTypes: propertyTypes,
+          propertyTypes: comPropertyS,
         };
       } else if (property === "Land") {
         additionalData = {
@@ -247,7 +253,7 @@ const Filter = ({
                 >
                   {Cities.map((cityItem) => (
                     <optgroup>
-                      <option value={cityItem.value} key={cityItem.value}>
+                      <option value={cityItem.value} key={cityItem}>
                         {cityItem.label}
                       </option>
 
@@ -316,8 +322,8 @@ const Filter = ({
                       Property Types
                     </Typography>
                     <Select
-                      value={propertyTypes || 'All'}
-                      onChange={(e) => setPropertyTypes(e.target.value)}
+                      value={comPropertyS || ''}
+                      onChange={(e) => setComPropertyS(e.target.value)}
                       inputProps={{ style: { color: "white" } }}
                       size="small"
                       sx={{
@@ -330,7 +336,7 @@ const Filter = ({
                       }}
                       fullWidth
                     >
-                      {PropertyTypes.map((type, index) => (
+                      {comProperty.map((type, index) => (
                         <MenuItem key={index} value={type.value}>
                           {type.label}
                         </MenuItem>
@@ -624,14 +630,10 @@ const Filter = ({
         <Box sx={{ margin: "10px 0px " }}>
           <Breadcrumbs aria-label="breadcrumb" sx={{ margin: "15px 0px" }}>
             {property && propertyType && (
-              <Box sx={{ display: "flex", alignItems: "center" }}>
-                <Link style={{ textDecoration: "none" }} color="#fff" href="#">
-                  <Typography color={"#8C1C40"}>{property}</Typography>
-                </Link>
+              <Box sx={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <Typography color={"#8C1C40"}>{property}</Typography>
                 <IoIosArrowForward color={"#8C1C40"} sx={{ padding: "0px" }} />
-                <Link style={{ textDecoration: "none" }} color="#fff" href="#">
-                  <Typography color={"#8C1C40"}>{propertyType}</Typography>
-                </Link>
+                <Typography color={"#8C1C40"}>{propertyType}</Typography>
               </Box>
             )}
           </Breadcrumbs>

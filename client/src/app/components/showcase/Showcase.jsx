@@ -48,28 +48,23 @@ const Showcase = ({ data, user, property, propertyType, showHidden }) => {
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
-  const handleRedirect = (propertyValue, propertyType, id) => {
-    router.push(
-      `/user/view?propertyValue=${propertyValue}&propertyType=${propertyType}&id=${id}`
-    );
-  };
+
   const handleDelete = async (e, id) => {
-    e.stopPropagation(); // Stop the event from bubbling up
-    console.log("Clicked ID:", id); // Confirm the ID is passed correctly
+    e.stopPropagation();
+    console.log("Clicked ID:", id);
     console.log(property, propertyType);
     try {
-      let url = EditUrl(property, propertyType, id); // Ensure these variables are defined and passed correctly
-      url = url.replace("edit", "delete"); // Modify the URL to change 'edit' to 'delete'
-      console.log("API URL:", url); // Check the final URL
+      let url = EditUrl(property, propertyType, id);
+      url = url.replace("edit", "delete");
+      console.log("API URL:", url);
 
       const response = await axios.delete(url, {
-        // Removed unnecessary headers if not needed
         headers: {
           "Content-Type": "application/json",
         },
       });
 
-      console.log("API Response:", response); // Log the response from the server
+      console.log("API Response:", response);
       Swal.fire({
         title: "Data Deleted Successfully",
         icon: "success",
@@ -78,10 +73,8 @@ const Showcase = ({ data, user, property, propertyType, showHidden }) => {
       setTimeout(() => {
         window.location.reload();
       }, 1000);
-      // Uncomment and modify as needed
-      // setCollectionData(response.data);
     } catch (error) {
-      console.error("API Error:", error); // More detailed error logging
+      console.error("API Error:", error);
       Swal.fire({
         title: "Unable to deleted",
         icon: "error",
@@ -139,10 +132,255 @@ const Showcase = ({ data, user, property, propertyType, showHidden }) => {
 
   console.log("showHidden", showHidden);
 
+
+  const childrenContent = (item) => (
+    <>
+      <CldImage
+        fill
+        src={item.thumbnailImage}
+        style={{ objectFit: "cover" }}
+        blur={400}
+        sizes="20vw"
+        opacity="50"
+        alt="Banner Image"
+      />
+      <Box sx={{ ml: "20px", mt: "16px", textAlign: "start", zIndex: 1 }}>
+        <Typography
+          sx={{
+            fontWeight: "500",
+            fontSize: "16px",
+            lineHeight: "18px",
+            margin: "5px 0px",
+          }}
+        >
+          {item.city}
+        </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "start",
+            alignItems: "center",
+            gap: "10px",
+            margin: "13px 0px",
+          }}
+        >
+          {item.size && (
+            <>
+              <Image src={squareFeet} alt="icon" size={26} />
+              <Typography
+                sx={{
+                  fontWeight: "700",
+                  fontSize: "18px",
+                  lineHeight: "21px",
+                }}
+              >
+                {item.size} sq. ft.{" "}
+              </Typography>
+            </>
+          )}
+        </Box>
+        <Box sx={{ display: "flex", gap: "10px" }}>
+          {item.bedrooms && (
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+              }}
+            >
+              <IoBedOutline size={26} />
+              <Typography
+                sx={{
+                  fontWeight: "700",
+                  fontSize: "18px",
+                  lineHeight: "21px",
+                }}
+              >
+                {item.bedrooms}
+              </Typography>
+            </Box>
+          )}
+
+          {item.bathrooms && (
+            <>
+              <Typography
+                sx={{ color: "#bdbdbd", fontWeight: "900" }}
+              >
+                .
+              </Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                }}
+              >
+                <MdBathtub size={26} />
+                <Typography
+                  sx={{
+                    fontWeight: "600",
+                    fontSize: "18px",
+                    lineHeight: "21px",
+                  }}
+                >
+                  {item.bathrooms}
+                </Typography>
+              </Box>
+            </>
+          )}
+        </Box>
+        <Typography
+          sx={{
+            fontWeight: "800",
+            fontSize: "20px",
+            lineHeight: "21px",
+            margin: "10px 0px",
+          }}
+        >
+          {item.title}
+        </Typography>
+      </Box>
+      <Box sx={{ zIndex: 1 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "end",
+            alignItems: "end",
+            position: "absolute",
+            [user === "admin" ? "top" : "bottom"]: "10px",
+            right: "10px",
+          }}
+        >
+          {item.price && (
+            <Typography
+              sx={{
+                backdropFilter: "#9B7490",
+                border: "4px solid #9B7490",
+                borderRadius: "4px",
+                textAlign: "center",
+                padding: "3px 6px",
+                height: "37px",
+              }}
+            >
+              RS.{item.price}
+            </Typography>
+          )}
+          {item.rent && (
+            <Typography
+              sx={{
+                backdropFilter: "#9B7490",
+                border: "4px solid #9B7490",
+                borderRadius: "4px",
+                textAlign: "center",
+                padding: "3px 6px",
+                height: "37px",
+              }}
+            >
+              RS.{item.rent}
+            </Typography>
+          )}
+        </Box>
+      </Box>
+      {user === "admin" ? (
+        <Box
+          sx={{
+            position: "absolute",
+            bottom: "0px",
+            display: "flex",
+            justifyContent: "space-around",
+            gap: "10px",
+            width: "100%",
+            margin: "0px",
+            backgroundColor: "#00000075",
+            alignItems: "center",
+            zIndex: 1
+          }}
+        >
+          <Link
+            href={`/admin/edit?propertyValue=${item?.property}&propertyType=${item?.propertyType}&id=${item?._id}`}
+          >
+            <Button
+              sx={{
+                padding: "13px 13px",
+                borderRight: " 1px solid #6c736b",
+                margin: "0px",
+                borderRadius: "0px",
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+            >
+              <Image src={ediImage} alt="" />
+            </Button>
+          </Link>
+
+          <Button
+            onClick={(e) => {
+              e.stopPropagation();
+              if (property && propertyType) {
+                handleIsVisibleEdit(
+                  e,
+                  item?._id,
+                  item?.isVisibale
+                );
+              } else {
+                Swal.fire({
+                  title:
+                    "Kindly select property and propertyType",
+                  icon: "error",
+                  timer: 1500,
+                });
+              }
+            }}
+          >
+            {item.isVisibale ? (
+              <IoIosEye size={"40px"} color="#6c736b" />
+            ) : (
+              <Image src={closeImage} alt="" />
+            )}
+          </Button>
+          <Button
+            sx={{
+              borderLeft: " 1px solid #6c736b",
+              padding: "10px 20px",
+              margin: "0px",
+              borderRadius: "0px",
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (property && propertyType) {
+                handleDelete(e, item._id);
+              } else {
+                Swal.fire({
+                  title:
+                    "Kindly select property and propertyType",
+                  icon: "error",
+                  timer: 1500,
+                });
+              }
+            }}
+          >
+            <Image src={binImage} alt="" />
+          </Button>
+        </Box>
+      ) : (<></>)}
+    </>
+  );
+
   return (
     <>
       <Box>
-        {!data && <Typography>No Record Found</Typography>}
+        {(data.length <= 0) &&
+          <Typography
+            sx={{
+              fontWeight: "600",
+              fontSize: "22px",
+              margin: "20px 20px",
+              color: "#ffffff70",
+            }}
+          >
+            No Record Found
+          </Typography>}
 
         <Grid container spacing={2}>
           {data
@@ -162,252 +400,35 @@ const Showcase = ({ data, user, property, propertyType, showHidden }) => {
                 }}
               >
                 <Box
-                  onClick={() =>
-                    handleRedirect(
-                      item.property,
-                      item.propertyType,
-                      item._id
-                    )
-                  }
                   sx={{
                     height: "250px",
                     width: "270px",
                     borderRadius: "10px",
-                    color: "#c2c6cf",
+                    color: "white",
                     display: "flex",
                     position: "relative",
                     overflow: "hidden",
                   }}
                 >
-                  <CldImage
-                    fill
-                    src={item.thumbnailImage}
-                    style={{ objectFit: "cover" }}
-                    blur={400}
-                    sizes="20vw"
-                    opacity="50"
-                    alt="Banner Image"
-                  />
-                  <Box sx={{ ml: "20px", mt: "16px", textAlign: "start", zIndex: 1 }}>
-                    <Typography
-                      sx={{
-                        fontWeight: "500",
-                        fontSize: "16px",
-                        lineHeight: "18px",
-                        margin: "5px 0px",
+                  {user === 'admin' ? (
+                    <>
+                      {childrenContent(item)}
+                    </>
+                  ) : (
+                    <Link
+                      href={`/user/view?propertyValue=${item.property}&propertyType=${item.propertyType}&id=${item._id}`}
+                      style={{
+                        textDecoration: 'none',
+                        color: 'inherit',
+                        display: 'block',
+                        width: '100%',
+                        height: '100%',
                       }}
                     >
-                      {item.city}
-                    </Typography>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "start",
-                        alignItems: "center",
-                        gap: "10px",
-                        margin: "13px 0px",
-                      }}
-                    >
-                      {item.size && (
-                        <>
-                          <Image src={squareFeet} alt="icon" size={26} />
-                          <Typography
-                            sx={{
-                              fontWeight: "700",
-                              fontSize: "18px",
-                              lineHeight: "21px",
-                            }}
-                          >
-                            {item.size} sq. ft.{" "}
-                          </Typography>
-                        </>
-                      )}
-                    </Box>
-                    <Box sx={{ display: "flex", gap: "10px" }}>
-                      {item.bedrooms && (
-                        <Box
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "10px",
-                          }}
-                        >
-                          <IoBedOutline size={26} />
-                          <Typography
-                            sx={{
-                              fontWeight: "700",
-                              fontSize: "18px",
-                              lineHeight: "21px",
-                            }}
-                          >
-                            {item.bedrooms}
-                          </Typography>
-                        </Box>
-                      )}
-
-                      {item.bathrooms && (
-                        <>
-                          <Typography
-                            sx={{ color: "#bdbdbd", fontWeight: "900" }}
-                          >
-                            .
-                          </Typography>
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "10px",
-                            }}
-                          >
-                            <MdBathtub size={26} />
-                            <Typography
-                              sx={{
-                                fontWeight: "600",
-                                fontSize: "18px",
-                                lineHeight: "21px",
-                              }}
-                            >
-                              {item.bathrooms}
-                            </Typography>
-                          </Box>
-                        </>
-                      )}
-                    </Box>
-                    <Typography
-                      sx={{
-                        fontWeight: "800",
-                        fontSize: "20px",
-                        lineHeight: "21px",
-                        margin: "10px 0px",
-                      }}
-                    >
-                      {item.title}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ zIndex: 1 }}>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "end",
-                        alignItems: "end",
-                        position: "absolute",
-                        [user === "admin" ? "top" : "bottom"]: "10px",
-                        right: "10px",
-                      }}
-                    >
-                      {item.price && ( 
-                        <Typography
-                          sx={{
-                            backdropFilter: "#9B7490",
-                            border: "4px solid #9B7490",
-                            borderRadius: "4px",
-                            textAlign: "center",
-                            padding: "3px 8px",
-                            height: "37px",
-                          }}
-                        >
-                          RS.{item.price}
-                        </Typography>
-                      )}
-                      {item.rent && ( 
-                        <Typography
-                          sx={{
-                            backdropFilter: "#9B7490",
-                            border: "4px solid #9B7490",
-                            borderRadius: "4px",
-                            textAlign: "center",
-                            padding: "3px 20px",
-                            height: "37px",
-                          }}
-                        >
-                          RS.{item.rent}
-                        </Typography>
-                      )}
-                    </Box>
-                  </Box>
-                  {user === "admin" ? (
-                    <Box
-                      sx={{
-                        position: "absolute",
-                        bottom: "0px",
-                        display: "flex",
-                        justifyContent: "space-around",
-                        gap: "10px",
-                        width: "100%",
-                        margin: "0px",
-                        backgroundColor: "#00000075",
-                        alignItems: "center",
-                        zIndex: 1
-                      }}
-                    >
-                      <Link
-                        href={`/admin/edit?propertyValue=${item?.property}&propertyType=${item?.propertyType}&id=${item?._id}`}
-                      >
-                        <Button
-                          sx={{
-                            padding: "13px 13px",
-                            borderRight: " 1px solid #6c736b",
-                            margin: "0px",
-                            borderRadius: "0px",
-                          }}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                          }}
-                        >
-                          <Image src={ediImage} alt="" />
-                        </Button>
-                      </Link>
-
-                      <Button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (property && propertyType) {
-                            handleIsVisibleEdit(
-                              e,
-                              item?._id,
-                              item?.isVisibale
-                            );
-                          } else {
-                            Swal.fire({
-                              title:
-                                "Kindly select property and propertyType",
-                              icon: "error",
-                              timer: 1500,
-                            });
-                          }
-                        }}
-                      >
-                        {item.isVisibale ? (
-                          <IoIosEye size={"40px"} color="#6c736b" />
-                        ) : (
-                          <Image src={closeImage} alt="" />
-                        )}
-                      </Button>
-                      <Button
-                        sx={{
-                          borderLeft: " 1px solid #6c736b",
-                          padding: "10px 20px",
-                          margin: "0px",
-                          borderRadius: "0px",
-                        }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (property && propertyType) {
-                            handleDelete(e, item._id);
-                          } else {
-                            Swal.fire({
-                              title:
-                                "Kindly select property and propertyType",
-                              icon: "error",
-                              timer: 1500,
-                            });
-                          }
-                        }}
-                      >
-                        <Image src={binImage} alt="" />
-                      </Button>
-                    </Box>
-                  ) : (<></>)}
+                      {childrenContent(item)}
+                    </Link>
+                  )
+                  }
                 </Box>
               </Grid>
             )}

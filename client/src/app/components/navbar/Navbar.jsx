@@ -37,26 +37,22 @@ function Navbar(props) {
     { title: "Customize", path: "/admin/customize" },
     { title: "Property View", path: "/admin/view/House/ForSale" },
     { title: "Property Add", path: "/admin/add" },
-    { title: user ? "Logout" : "Login", path: "/auth" },
+    { title: "Logout", path: "" },
   ];
 
   const userNavItems = [
-    { title: "Home", path: "/" },
-    { title: "About us", path: "#about" },
-    { title: "Gallery", path: "#gallery" },
-    { title: "Contact Us", path: "#contact" },
+    { title: "Home", path: "https://accessresidencies.com/" },
+    { title: "About us", path: "https://accessresidencies.com/?page_id=4099" },
+    { title: "Gallery", path: "https://accessresidencies.com/?page_id=1659" },
+    { title: "Contact Us", path: "https://accessresidencies.com/?page_id=1665" },
   ];
 
   const navItems = type === "admin" ? adminNavItems : userNavItems;
 
-  const handleLogoClick = () => {
-    router.push("/");
-  };
-
   const drawer = (
     <Box
       sx={{
-        textAlign: "left",
+        textAlign: "center",
         backgroundColor: "black",
         height: "100vh",
         p: { xs: "10px 5px", md: "10px 60px" },
@@ -65,14 +61,12 @@ function Navbar(props) {
       <Box sx={{ display: " flex", m: "10px" }}>
         <Box
           variant="h6"
+          ml={6}
           sx={{
             flexGrow: 1,
             alignItems: "center",
           }}
-          onClick={handleLogoClick}
         >
-          {/* Wrap the Image component inside a Link */}
-
           <Image
             component="div"
             src="/logo.png"
@@ -94,59 +88,50 @@ function Navbar(props) {
         </IconButton>
       </Box>
       <Divider />
-      <List>
+      <List sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "20px",
+        justifyContent: "center",
+        alignItems: "center",
+      }}>
         {navItems.map((item) => (
-          <>
-            {item.title !== "Property Management" ? (
-              <ListItem key={item.title} disablePadding>
-                <Link
-                  sx={{
-                    textAlign: "left",
-                    textDecoration: "none",
-                  }}
-                  // component="a"
-                  href={item.path}
-                >
-                  <ListItemText
-                    primary={item.title}
-                    sx={{
-                      color: "white",
-                      textDecoration: "none",
-                      fontFamily: "Roboto Condensed",
-                      fontWeight: "800",
-                      fontSize: "24px",
-                      lingHeight: " 28.13px",
-                    }}
-                  />
-                </Link>
-              </ListItem>
+          <ListItem key={item.title} sx={{ gap: "20px",
+          justifyContent: "center",
+          alignItems: "center", }}>
+            {item.title === "Logout" ? (
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => {
+                  sessionStorage.removeItem("contact_user");
+                }}
+              >
+                {item.title}
+              </Button>
             ) : (
-              <></>
-            )}
-          </>
-        ))}
-        {type === "user" && (
-          <React.Fragment>
-            <ListItem disablePadding>
-              <ListItemButton
-                sx={{ textAlign: "left" }}
-                component="a"
-                href={userNavItems[3].path}
+              <Link
+                sx={{
+                  textAlign: "left",
+                  textDecoration: "none",
+                }}
+                href={item.path}
               >
                 <ListItemText
+                  primary={item.title}
                   sx={{
                     color: "white",
+                    textDecoration: "none",
                     fontFamily: "Roboto Condensed",
                     fontWeight: "800",
                     fontSize: "24px",
-                    lingHeight: " 28.13px",
+                    lineHeight: "28.13px",
                   }}
-                  onClick={() => setShowProperty((prev) => !prev)}
                 />
-              </ListItemButton>
-            </ListItem>
-          </React.Fragment>
-        )}
+              </Link>
+            )}
+          </ListItem>
+        ))}
       </List>
     </Box>
   );
@@ -168,7 +153,6 @@ function Navbar(props) {
           <Box
             variant="h6"
             sx={{ flexGrow: 1, alignItems: "center" }}
-            onClick={handleLogoClick}
           >
             <Link href="/">
               <Image
@@ -181,11 +165,36 @@ function Navbar(props) {
               />
             </Link>
           </Box>
-          <Box sx={{ display: { xs: "none", md: "block" } }}>
+          <Box sx={{ display: { md: "flex", sm: "none" }, gap: "20px" }}>
             {navItems.map((item) => (
-              <Link key={item.title} href={item.path}>
-                <Button sx={{ color: "white" }}>{item.title}</Button>
-              </Link>
+              item.title === "Logout" ? (
+                <Button
+                  variant="outlined"
+                  sx={{
+                    backgroundColor: "#8c1b3f",
+                    color: "white",
+                    fontSize: "15px",
+                    fontFamily: "Roboto Condensed",
+                  }}
+                  onClick={() => {
+                    sessionStorage.removeItem("contact_user");
+                    window.location.reload(false);
+                  }}
+                >
+                  {item.title}
+                </Button>
+              ) : (
+                <Link key={item.title} href={item.path}>
+                  <Button sx={{
+                    color: "white",
+                    fontFamily: "Roboto Condensed",
+                    fontSize: "15px",
+                  }}
+                  >
+                    {item.title}
+                  </Button>
+                </Link>
+              )
             ))}
           </Box>
 
@@ -225,10 +234,6 @@ function Navbar(props) {
 }
 
 Navbar.propTypes = {
-  /**
-   * Injected by the documentation to work in an iframe.
-   * You won't need it on your project.
-   */
   window: PropTypes.func,
   type: PropTypes.oneOf(["admin", "user"]).isRequired,
 };

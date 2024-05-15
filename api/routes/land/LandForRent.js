@@ -166,25 +166,37 @@ router.post("/edit/isVisible/:id", async (req, res) => {
   }
 });
 
-router.delete("/delete/:id", async (req, res) => {
-  try {
-    const id = req.params.id;
-
-    // Delete house object
-    await landForRent.findByIdAndDelete(id);
-
-    res.status(200).json("House deleted successfully");
-  } catch (error) {
-    console.error(error);
-    res.status(400).json(error);
-  }
+router.delete("/delete/:id", (req, res) => {
+  let fetchedDetails;
+  landForRent.findById(req.params.id, { propertyId: 1, images: 1, thumbnailImage: 1, _id: 0 })
+    .then(details => {
+      fetchedDetails = details;
+      return cloudinary.api.delete_resources([details.thumbnailImage, ...details.images], { type: 'upload', resource_type: 'image' });
+    })
+    .then(() => {
+      return cloudinary.api.delete_folder(`land-rent/${fetchedDetails.propertyId}`);
+    })
+    .then(() => {
+      return landForRent.findByIdAndDelete(req.params.id);
+    })
+    .then(result => {
+      res.status(200).json(result);
+    })
+    .catch(error => {
+      console.error(error);
+      res.status(400).json(error);
+    });
 });
 
 router.post("/filter", async (req, res) => {
   try {
-    const { city, rent, perches, acres } = req.body;
+    const { city, rent, perches, acres, role } = req.body;
 
     const filter = {};
+
+    if (role !== "admin") {
+      filter.isVisibale = true;
+    }
 
     if (rent !== NaN && rent !== null && rent !== "All") {
       filter.rent = { $lt: rent };
@@ -215,9 +227,13 @@ router.post("/filter", async (req, res) => {
 
 router.post("/filter/main", async (req, res) => {
   try {
-    const { city, rent, title } = req.body;
+    const { city, rent, title, role } = req.body;
 
     const filter = {};
+
+    if (role !== "admin") {
+      filter.isVisibale = true;
+    }
 
     if (rent !== NaN && rent !== null && rent !== "All") {
       filter.rent = { $lt: rent };

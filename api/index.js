@@ -56,7 +56,7 @@ app.use("/api/customize/features", Features);
 app.use("/api/customize/propertyid", PropertyId);
 
 app.post("/api/properties", async (req, res) => {
-  const { propertyIds } = req.body; // Extract array of propertyIds from request body
+  const { propertyIds } = req.body;
   console.log("Received propertyIds:", propertyIds);
 
   if (!propertyIds || !Array.isArray(propertyIds) || propertyIds.length === 0) {
@@ -66,7 +66,6 @@ app.post("/api/properties", async (req, res) => {
   }
 
   try {
-    // List all models that might contain the propertyIds
     const models = [
       houseForSale,
       houseForRent,
@@ -78,18 +77,14 @@ app.post("/api/properties", async (req, res) => {
       apartmentForRent,
     ];
 
-    // Create a promise array to handle multiple asynchronous queries for each model
     const promises = models.map((model) =>
-      model.find({ propertyId: { $in: propertyIds } })
+      model.find({ propertyId: { $in: propertyIds }, isVisibale: true })
     );
 
-    // Wait for all promises to resolve
     const results = await Promise.all(promises);
 
-    // Flatten the results array
     const mergedResults = results.flat();
 
-    // Send the merged results back as a JSON response
     if (mergedResults.length === 0) {
       res
         .status(404)

@@ -46,7 +46,7 @@ router.post("/add", upload.array("myFiles"), async (req, res) => {
       bathrooms,
       city,
     } = JSON.parse(req.body.additionalData);
-    
+
     const uploadedImages = [];
 
     for (let i = 0; i < files.length; i++) {
@@ -65,7 +65,7 @@ router.post("/add", upload.array("myFiles"), async (req, res) => {
 
     const result = new apartmentForRent({
       propertyId,
-      property: "apartment",
+      property: "Apartment",
       propertyType: "ForRent",
       title,
       rent,
@@ -170,25 +170,37 @@ router.post("/edit/isVisible/:id", async (req, res) => {
   }
 });
 
-router.delete("/delete/:id", async (req, res) => {
-  try {
-    const Id = req.params.id;
-
-    // Delete house object
-    const result = await apartmentForRent.findByIdAndDelete(Id);
-
-    res.status(200).json(result);
-  } catch (error) {
-    console.error(error);
-    res.status(400).json(error);
-  }
+router.delete("/delete/:id", (req, res) => {
+  let fetchedDetails;
+  apartmentForRent.findById(req.params.id, { propertyId: 1, images: 1, thumbnailImage: 1, _id: 0 })
+    .then(details => {
+      fetchedDetails = details;
+      return cloudinary.api.delete_resources([details.thumbnailImage, ...details.images], { type: 'upload', resource_type: 'image' });
+    })
+    .then(() => {
+      return cloudinary.api.delete_folder(`apartment-rent/${fetchedDetails.propertyId}`);
+    })
+    .then(() => {
+      return apartmentForRent.findByIdAndDelete(req.params.id);
+    })
+    .then(result => {
+      res.status(200).json(result);
+    })
+    .catch(error => {
+      console.error(error);
+      res.status(400).json(error);
+    });
 });
 
 router.post("/filter", async (req, res) => {
   try {
-    const { city, rent, size, bedrooms, bathrooms } = req.body;
+    const { city, rent, size, bedrooms, bathrooms, role } = req.body;
 
     const filter = {};
+
+    if (role !== "admin") {
+      filter.isVisibale = true;
+    }
 
     if (rent !== NaN && rent !== null && rent !== "All") {
       filter.rent = { $lt: rent };
@@ -211,7 +223,7 @@ router.post("/filter", async (req, res) => {
     }
 
     console.log(filter);
-    
+
     let filtered = await apartmentForRent.find(filter).exec();
 
     res.status(200).json(filtered);
@@ -223,9 +235,13 @@ router.post("/filter", async (req, res) => {
 
 router.post("/filter/main", async (req, res) => {
   try {
-    const { city, rent, title } = req.body;
+    const { city, rent, title, role } = req.body;
 
     const filter = {};
+
+    if (role !== "admin") {
+      filter.isVisibale = true;
+    }
 
     if (rent !== NaN && rent !== null && rent !== "All") {
       filter.rent = { $lt: rent };

@@ -55,6 +55,27 @@ function Customize() {
   //   // if (!user) router.push("/");
   // }, [user]);
 
+  const FetchPropertyIDs = async () => {
+    try {
+      const propertyIDResponse = await axios.get(
+        `${BASE_URL}/api/customize/propertyid`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const propertyIds = propertyIDResponse.data[0].propertyId;
+      setAllPropertyId(propertyIds);
+    } catch (error) {
+      console.log("error in fetching properties", error);
+    }
+  };
+
+  useEffect(() => {
+    FetchPropertyIDs();
+  }, []);
+
   console.log("allPropertyId", allPropertyId);
   const handleSubmitPropertyId = async () => {
     try {
