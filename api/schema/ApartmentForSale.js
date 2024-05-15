@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
-const appartmentForSale = new Schema(
+const apartmentForSale = new Schema(
   {
     propertyId: String,
     property: String,
@@ -22,4 +22,4 @@ const appartmentForSale = new Schema(
   }
 );
 
-module.exports = mongoose.model("appartmentForSale", appartmentForSale);
+module.exports = mongoose.model("apartmentForSale", apartmentForSale);

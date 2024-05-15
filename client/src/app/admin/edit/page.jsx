@@ -35,7 +35,7 @@ import UseSessionStorage from "@/app/UseSessionStorage";
 
 import BASE_URL from "../../config";
 
-const url = `${BASE_URL}/api/appartmentForRent/add`;
+const url = `${BASE_URL}/api/apartmentForRent/add`;
 const Input = ({ label, value, onChange }) => {
   return (
     <Grid item md={12}>
@@ -72,6 +72,8 @@ function Edit() {
   const [editFormData, setEditFormData] = useState(null);
   const router = useRouter();
   const { user } = useContext(AuthContext);
+  const [imageUploaded, setImageUploaded] = useState(false);
+  const [thumbnailUploaded, setThumbnailUploaded] = useState(false);
 
   useEffect(() => {
     const isUserLoggedIn = sessionStorage.getItem("contact_user");
@@ -160,7 +162,7 @@ function Edit() {
         additionalData.rent = parseInt(rent);
       }
 
-      if (property === "House" || property === "Appartment") {
+      if (property === "House" || property === "Apartment") {
         additionalData = {
           ...additionalData,
           size: size,
@@ -235,15 +237,18 @@ function Edit() {
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
+    setThumbnailUploaded(true);
     setThumbnail(file);
     console.log("thumbnail", typeof thumbnail);
   };
   console.log(thumbnail);
+
+
   const handleMultipleFileUpload = (e) => {
     const files = e.target.files;
+    setImageUploaded(true);
     console.log("before Files", files);
     formData.delete("myFiles");
-    setImages([]);
 
     if (files.length > 3) {
       Swal.fire({
@@ -254,20 +259,14 @@ function Edit() {
       return;
     }
 
-    // Convert thumbnail to an array if it's not already
+    setImages(files);
+
     const thumbnailsArray = thumbnail ? [thumbnail] : [];
-    console.log("thumbnailsArray", thumbnailsArray);
-    // Concatenate thumbnail with files
-    const allFiles = [...files, ...thumbnailsArray];
+    const allFiles = [...thumbnailsArray, ...files];
 
     for (let i = 0; i < allFiles.length; i++) {
       formData.append("myFiles", allFiles[i]);
     }
-    if (thumbnail) {
-      allFiles.pop();
-    }
-    setImages(allFiles);
-    console.log("files", allFiles);
   };
 
   return (
@@ -331,7 +330,7 @@ function Edit() {
             >
               <MenuItem value="House">House</MenuItem>
               <MenuItem value="Land">Land</MenuItem>
-              <MenuItem value="Appartment">Appartment</MenuItem>
+              <MenuItem value="Apartment">Apartment</MenuItem>
               <MenuItem value="Commercial">Commercial</MenuItem>
             </Select>
 
@@ -449,21 +448,13 @@ function Edit() {
                       justifyContent: "center",
                     }}
                   >
-                    {thumbnail && typeof thumbnail === "object" ? (
+                    {thumbnailUploaded && thumbnail && (
                       <Image
                         src={URL.createObjectURL(thumbnail)}
                         alt="Thumbnail"
                         width={150}
                         height={150}
-                        style={{ margin: "20px 10px", borderRadius: "5px" }}
-                      />
-                    ) : (
-                      <Image
-                        src={`data:image/jpeg;base64,${thumbnail}`}
-                        alt="thumbnailImage"
-                        width={150}
-                        height={150}
-                        style={{ margin: "20px 10px", borderRadius: "5px" }}
+                        style={{ margin: "20px 10px", borderRadius: "5px", objectFit: "cover" }}
                       />
                     )}
 
@@ -513,33 +504,20 @@ function Edit() {
                     }}
                   >
                     <Box sx={{ display: "flex" }}>
-                      {images?.map((img, index) => (
-                        <Box key={index}>
-                          {img && typeof img === "string" ? (
-                            <Image
-                              src={`data:image/jpeg;base64,${img}`}
-                              alt={`Image ${index + 1}`}
-                              width={150}
-                              height={150}
-                              style={{
-                                margin: "20px 10px",
-                                borderRadius: "5px",
-                              }}
-                            />
-                          ) : (
-                            <Image
-                              src={URL.createObjectURL(img)}
-                              alt={`Image ${index + 1}`}
-                              width={150}
-                              height={150}
-                              style={{
-                                margin: "20px 10px",
-                                borderRadius: "5px",
-                              }}
-                            />
-                          )}
-                        </Box>
-                      ))}
+
+                      {imageUploaded && images && Array.from(images).map((img, index) => {
+                        return (
+                          <Image
+                            key={index}
+                            src={URL.createObjectURL(img)}
+                            alt="img"
+                            width={150}
+                            height={150}
+                            style={{ margin: "20px 10px", borderRadius: "5px", objectFit: "cover" }}
+                          />
+                        );
+                      })}
+
                     </Box>
                     <Button
                       sx={{
@@ -573,7 +551,7 @@ function Edit() {
               </Typography>
               <TextField
                 required
-                value={description}
+                value={description || ''}
                 InputProps={{ style: { color: "white" } }}
                 size="small"
                 multiline
@@ -598,11 +576,11 @@ function Edit() {
                   marginLeft: "10px",
                 }}
               >
-                {propertyType === "ForSale" ? "Price" : "Rent"}
+                {propertyType === "ForSale" ? "Max Price" : "Max Rent"}
               </Typography>
               <Select
                 required
-                value={propertyType === "ForSale" ? price : rent}
+                value={propertyType === "ForSale" ?  (price || 'All') : (rent || 'All')}
                 onChange={(e) =>
                   propertyType === "ForSale"
                     ? setPrice(e.target.value)
@@ -639,7 +617,7 @@ function Edit() {
                   </Typography>
                   <Select
                     required
-                    value={propertyTypes}
+                    value={propertyTypes || 'All'}
                     onChange={(e) => setPropertyTypes(e.target.value)}
                     inputProps={{ style: { color: "white" } }}
                     size="small"
@@ -662,20 +640,20 @@ function Edit() {
 
               {(property === "House" ||
                 property === "Commercial" ||
-                property === "Appartment") && (
-                <>
-                  <Typography
-                    variant="h6"
-                    style={{
-                      color: "white",
-                      fontWeight: 500,
-                      fontSize: "22px",
-                      marginLeft: "10px",
-                    }}
-                  >
-                    Size
-                  </Typography>
-                  {/* <TextField
+                property === "Apartment") && (
+                  <>
+                    <Typography
+                      variant="h6"
+                      style={{
+                        color: "white",
+                        fontWeight: 500,
+                        fontSize: "22px",
+                        marginLeft: "10px",
+                      }}
+                    >
+                      Size
+                    </Typography>
+                    {/* <TextField
                     required
                     value={size}
                     InputProps={{ style: { color: "white" } }}
@@ -691,30 +669,30 @@ function Edit() {
                     fullWidth
                   /> */}
 
-                  <Select
-                    required
-                    value={size}
-                    onChange={(e) => setSize(e.target.value)}
-                    inputProps={{ style: { color: "white" } }}
-                    size="small"
-                    sx={{
-                      border: "1px solid grey",
-                      color: "white",
-                      marginLeft: "20px",
-                      borderRadius: "5px",
-                    }}
-                    fullWidth
-                  >
-                    {Sizes.map((sizeOption, index) => (
-                      <MenuItem key={index} value={sizeOption.value}>
-                        {sizeOption.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </>
-              )}
+                    <Select
+                      required
+                      value={size || 'All'}
+                      onChange={(e) => setSize(e.target.value)}
+                      inputProps={{ style: { color: "white" } }}
+                      size="small"
+                      sx={{
+                        border: "1px solid grey",
+                        color: "white",
+                        marginLeft: "20px",
+                        borderRadius: "5px",
+                      }}
+                      fullWidth
+                    >
+                      {Sizes.map((sizeOption, index) => (
+                        <MenuItem key={index} value={sizeOption.value}>
+                          {sizeOption.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </>
+                )}
 
-              {(property === "House" || property === "Appartment") && (
+              {(property === "House" || property === "Apartment") && (
                 <>
                   <Typography
                     variant="h6"
@@ -729,7 +707,7 @@ function Edit() {
                   </Typography>
                   <Select
                     required
-                    value={bedrooms}
+                    value={bedrooms || 'All'}
                     onChange={(e) => setBedrooms(e.target.value)}
                     inputProps={{ style: { color: "white" } }}
                     size="small"
@@ -750,7 +728,7 @@ function Edit() {
                 </>
               )}
 
-              {(property === "House" || property === "Appartment") && (
+              {(property === "House" || property === "Apartment") && (
                 <>
                   <Typography
                     variant="h6"
@@ -765,7 +743,7 @@ function Edit() {
                   </Typography>
                   <Select
                     required
-                    value={bathrooms}
+                    value={bathrooms || 'All'}
                     onChange={(e) => setBathrooms(e.target.value)}
                     inputProps={{ style: { color: "white" } }}
                     size="small"
@@ -801,7 +779,7 @@ function Edit() {
                   </Typography>
                   <Select
                     required
-                    value={perches}
+                    value={perches || 'All'}
                     onChange={(e) => setPerches(e.target.value)}
                     inputProps={{ style: { color: "white" } }}
                     size="small"
@@ -836,7 +814,7 @@ function Edit() {
                   </Typography>
                   <Select
                     required
-                    value={acres}
+                    value={acres || 'All'}
                     onChange={(e) => setAcres(e.target.value)}
                     inputProps={{ style: { color: "white" } }}
                     size="small"
@@ -893,7 +871,7 @@ function Edit() {
                         {cityItem.label}
                       </option>
 
-                      {cityItem.subheadings.map((subheading) => (
+                      {cityItem.subheadings && cityItem.subheadings.map((subheading) => (
                         <option value={subheading.value} key={subheading.value}>
                           -- {subheading.label}
                         </option>

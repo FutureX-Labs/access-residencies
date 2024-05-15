@@ -3,13 +3,22 @@ const mongoose = require("mongoose");
 const multer = require("multer");
 const app = express();
 const bodyParser = require("body-parser");
+const cloudinary = require("cloudinary").v2;
 var cors = require("cors");
 require("dotenv").config();
 app.use(express.json());
 app.use(cors());
 app.use(bodyParser.json());
-const appartmentForRent = require("./schema/AppartmentForRent");
-const appartmentForSale = require("./schema/AppartmentForSale");
+
+cloudinary.config({
+  cloud_name: "dpzlg0mru",
+  api_key: "444118675797768",
+  api_secret: "uymmOwa5HdAIGGDw_nmzbKct9us"
+});
+
+
+const apartmentForRent = require("./schema/ApartmentForRent");
+const apartmentForSale = require("./schema/ApartmentForSale");
 const commercialForRent = require("./schema/CommercialForRent");
 const commercialForSale = require("./schema/CommercialForSale");
 const houseForRent = require("./schema/HouseForRent");
@@ -21,8 +30,8 @@ const HouseForSale = require("./routes/house/HouseForSale");
 const HouseForRent = require("./routes/house/HouseForRent");
 const LandForSale = require("./routes/land/LandForSale");
 const LandForRent = require("./routes/land/LandForRent");
-const AppartmentForSale = require("./routes/appartment/AppartmentForSale");
-const AppartmentForRent = require("./routes/appartment/AppartmentForRent");
+const ApartmentForSale = require("./routes/apartment/ApartmentForSale");
+const ApartmentForRent = require("./routes/apartment/ApartmentForRent");
 const CommercialForSale = require("./routes/commercial/CommercialForSale");
 const CommercialForRent = require("./routes/commercial/CommercialForRent");
 const Banners = require("./routes/customize/Banners");
@@ -38,8 +47,8 @@ app.use("/api/houseforsale", HouseForSale);
 app.use("/api/houseforrent", HouseForRent);
 app.use("/api/landforsale", LandForSale);
 app.use("/api/landforrent", LandForRent);
-app.use("/api/appartmentforsale", AppartmentForSale);
-app.use("/api/appartmentforrent", AppartmentForRent);
+app.use("/api/apartmentforsale", ApartmentForSale);
+app.use("/api/apartmentforrent", ApartmentForRent);
 app.use("/api/commercialforsale", CommercialForSale);
 app.use("/api/commercialforrent", CommercialForRent);
 app.use("/api/customize/banners", Banners);
@@ -47,7 +56,7 @@ app.use("/api/customize/features", Features);
 app.use("/api/customize/propertyid", PropertyId);
 
 app.post("/api/properties", async (req, res) => {
-  const { propertyIds } = req.body; // Extract array of propertyIds from request body
+  const { propertyIds } = req.body;
   console.log("Received propertyIds:", propertyIds);
 
   if (!propertyIds || !Array.isArray(propertyIds) || propertyIds.length === 0) {
@@ -57,7 +66,6 @@ app.post("/api/properties", async (req, res) => {
   }
 
   try {
-    // List all models that might contain the propertyIds
     const models = [
       houseForSale,
       houseForRent,
@@ -65,22 +73,18 @@ app.post("/api/properties", async (req, res) => {
       landForRent,
       commercialForSale,
       commercialForRent,
-      appartmentForSale,
-      appartmentForRent,
+      apartmentForSale,
+      apartmentForRent,
     ];
 
-    // Create a promise array to handle multiple asynchronous queries for each model
     const promises = models.map((model) =>
-      model.find({ propertyId: { $in: propertyIds } })
+      model.find({ propertyId: { $in: propertyIds }, isVisibale: true })
     );
 
-    // Wait for all promises to resolve
     const results = await Promise.all(promises);
 
-    // Flatten the results array
     const mergedResults = results.flat();
 
-    // Send the merged results back as a JSON response
     if (mergedResults.length === 0) {
       res
         .status(404)

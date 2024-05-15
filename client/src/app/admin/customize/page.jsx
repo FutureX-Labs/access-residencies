@@ -20,9 +20,9 @@ import Items from "@/app/components/items/Items";
 import customizeImage from "../../../../public/images/customize.png";
 import { useRouter } from "next/navigation";
 import AuthContext from "@/app/context/AuthContext";
-
 import BASE_URL from "../../config";
-const url = `${BASE_URL}/api/appartmentForRent/add`;
+
+const url = `${BASE_URL}/api/apartmentForRent/add`;
 
 const bannerURL = `${BASE_URL}/api/customize/banners/add`;
 const featureURL = `${BASE_URL}/api/customize/features/add`;
@@ -54,6 +54,27 @@ function Customize() {
   //   console.log("user inside the effect", user);
   //   // if (!user) router.push("/");
   // }, [user]);
+
+  const FetchPropertyIDs = async () => {
+    try {
+      const propertyIDResponse = await axios.get(
+        `${BASE_URL}/api/customize/propertyid`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const propertyIds = propertyIDResponse.data[0].propertyId;
+      setAllPropertyId(propertyIds);
+    } catch (error) {
+      console.log("error in fetching properties", error);
+    }
+  };
+
+  useEffect(() => {
+    FetchPropertyIDs();
+  }, []);
 
   console.log("allPropertyId", allPropertyId);
   const handleSubmitPropertyId = async () => {
@@ -253,7 +274,7 @@ function Customize() {
                   alt="img"
                   width={150}
                   height={150}
-                  style={{ margin: "20px 10px", borderRadius: "5px" }}
+                  style={{ margin: "20px 10px", borderRadius: "5px", objectFit: "cover" }}
                 />
               );
             })}
@@ -318,7 +339,7 @@ function Customize() {
                     alt="img"
                     width={150}
                     height={150}
-                    style={{ margin: "20px 10px", borderRadius: "5px" }}
+                    style={{ margin: "20px 10px", borderRadius: "5px", objectFit: "cover" }}
                   />
                   <TextField
                     InputProps={{
@@ -416,9 +437,10 @@ function Customize() {
                   marginLeft: "20px",
                   borderRadius: "5px",
                 }}
-                onClick={() =>
-                  setAllPropertyId((prev) => [...prev, propertyId])
-                }
+                onClick={() => {
+                  setAllPropertyId((prev) => [...prev, propertyId]);
+                  setPropertyId("");
+                }}
               >
                 Add Property Ids
               </Button>

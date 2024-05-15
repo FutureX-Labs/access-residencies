@@ -30,9 +30,10 @@ import { Prices } from "@/app/list/price";
 import { FilterUrl } from "./utility/filterUrls";
 import AuthContext from "./context/AuthContext";
 import { useRouter } from "next/navigation";
+import UseSessionStorage from "@/app/UseSessionStorage";
 
 import BASE_URL from "./config";
-const url = `${BASE_URL}/api/appartmentForRent/add`;
+const url = `${BASE_URL}/api/apartmentForRent/add`;
 
 function Home() {
   const [postImage, setPostImage] = useState(null);
@@ -44,39 +45,10 @@ function Home() {
   const [propertyType, setPropertyType] = useState(null);
   const [selectedProperty, setSelectedProperty] = useState();
   const [selectedPropertyType, setSelectedPropertyType] = useState("ForSale");
-  const [price, setPrice] = useState(null);
-  const [rent, setRent] = useState(null);
-  const [city, setCity] = useState("Colombo");
+  const [price, setPrice] = useState("All");
+  const [rent, setRent] = useState("All");
+  const [city, setCity] = useState("All");
   const [title, setTitle] = useState(null);
-  const router = useRouter();
-  const { user } = useContext(AuthContext);
-
-  console.log("titile", title);
-  console.log("price", price);
-  console.log("city", city);
-  const createPost = async () => {
-    try {
-      const additionalData = {
-        propertyId: "5wfdfwe",
-        title: "house beautifyll",
-        price: 4324,
-        description: "dsfsdfdsfsdfsd",
-        size: 2,
-        bedrooms: 4,
-        bathrooms: 5,
-        city: "dfgfdgd",
-      };
-      formData.append("additionalData", JSON.stringify(additionalData));
-      const response = await axios.post(url, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      console.log(response);
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -92,8 +64,13 @@ function Home() {
       } else if (selectedPropertyType === "ForRent") {
         additionalData.rent = parseInt(rent);
       }
+      console.log("additionalData", additionalData);
 
+      console.log("selectedPropertyType", selectedPropertyType);
+      console.log("selectedProperty", selectedProperty);
+      
       const initialUrl = FilterUrl(selectedPropertyType, selectedProperty);
+      console.log("initialUrl", initialUrl);
 
       const url = initialUrl.replace("filter", "filter/main");
       console.log("url", url);
@@ -102,11 +79,11 @@ function Home() {
           "Content-Type": "application/json",
         },
       });
-      Swal.fire({
-        title: "Received filter Data Successfully",
-        icon: "success",
-        timer: 1500,
-      });
+      // Swal.fire({
+      //   title: "Received filter Data Successfully",
+      //   icon: "success",
+      //   timer: 1500,
+      // });
       setCollectionData(response.data);
       // setTimeout(() => {
       //   window.location.reload();
@@ -125,34 +102,15 @@ function Home() {
     }
   };
 
-  const handleFileUpload = (e) => {
-    const file = e.target.files[0];
-    setPostImage(file);
-  };
   console.log(postImage);
-  const handleMultipleFileUpload = (e) => {
-    const files = e.target.files;
-    console.log("before Files", files);
 
-    // Convert postImage to an array if it's not already
-    const postImagesArray = postImage ? [postImage] : [];
-    console.log("postImagesArray", postImagesArray);
-    // Concatenate postImage with files
-    const allFiles = [...files, ...postImagesArray];
-
-    for (let i = 0; i < allFiles.length; i++) {
-      formData.append("myFiles", allFiles[i]);
-    }
-    console.log("files", allFiles);
-  };
   console.log("Banners", Banners);
   console.log("features", features);
 
   const FetchBanners = async () => {
     try {
       const response = await axios.get(
-        // Use axios.get instead of just axios
-        `${BASE_URL}api/customize/banners`,
+        `${BASE_URL}/api/customize/banners`,
         {
           headers: {
             "Content-Type": "multipart/form-data",
@@ -167,10 +125,10 @@ function Home() {
   useEffect(() => {
     FetchBanners();
   }, []);
+
   const FetchFeatures = async () => {
     try {
       const response = await axios.get(
-        // Use axios.get instead of just axios
         `${BASE_URL}/api/customize/features`,
         {
           headers: {
@@ -187,32 +145,11 @@ function Home() {
   useEffect(() => {
     FetchFeatures();
   }, []);
-  console.log("collectionData", collectionData);
-  const Fetch = async (property, propertyType) => {
-    try {
-      const response = await axios.get(
-        // Use axios.get instead of just axios
-        GetAll(property, propertyType),
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      console.log("response", response);
-      setCollectionData(response.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  useEffect(() => {
-    Fetch(property, propertyType);
-  }, [property, propertyType]);
-
+  
   const FetchPropertyIDs = async () => {
     try {
       const propertyIDResponse = await axios.get(
-        `${BASE_URL}/api/customize/propertyid/`,
+        `${BASE_URL}/api/customize/propertyid`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -233,7 +170,7 @@ function Home() {
           },
         }
       );
-      console.log("Properties response", response.data.data);
+      console.log("Properties responses data", response.data.data);
       setCollectionData(response.data.data);
     } catch (error) {
       console.log("error in fetching properties", error);
@@ -246,11 +183,11 @@ function Home() {
 
   return (
     <>
-      <Navbar type={"user"} />
+      <Navbar type={UseSessionStorage("contact_user") ? "admin" : "user"} />
       <Subheader
         setProperty={setProperty}
         setPropertyType={setPropertyType}
-        user={"user"}
+        user={UseSessionStorage("contact_user") ? "admin" : "user"}
       />
       <Box sx={{ position: "relative" }}>
         <Box>
@@ -260,12 +197,10 @@ function Home() {
           sx={{
             display: "flex",
             justifyContent: "center",
-
             margin: "0px 30px",
             marginTop: "-380px",
             position: "relative",
             bottom: "-170px",
-            // left: "13%",
             zIndex: "10",
           }}
         >
@@ -292,9 +227,8 @@ function Home() {
                     margin: "10px 0px",
                     width: "150px",
                     height: "60px",
-                    border: `5px solid ${
-                      selectedPropertyType === "ForRent" && "#8C1C40"
-                    }`,
+                    border: `5px solid ${selectedPropertyType === "ForRent" && "#8C1C40"
+                      }`,
                     marginRight: "10px",
                   }}
                   onClick={(e) => {
@@ -315,9 +249,8 @@ function Home() {
                     margin: "10px 0px",
                     width: "150px",
                     height: "60px",
-                    border: `5px solid ${
-                      selectedPropertyType === "ForSale" && "#8C1C40"
-                    }`,
+                    border: `5px solid ${selectedPropertyType === "ForSale" && "#8C1C40"
+                      }`,
                   }}
                   onClick={(e) => {
                     e.preventDefault();
@@ -344,7 +277,6 @@ function Home() {
                   sx={{
                     border: "1px solid #8C1C40",
                     color: "white",
-                    widht: "500px",
                     borderRadius: "10px 0px 0px 10px",
                   }}
                   value={title}
@@ -361,7 +293,7 @@ function Home() {
                     width: "100px",
                   }}
                   type="submit"
-                  // disabled={!propertyId}
+                // disabled={!propertyId}
                 >
                   Search
                 </Button>
@@ -387,7 +319,7 @@ function Home() {
                   </Typography>
 
                   <Select
-                    value={selectedProperty}
+                    value={selectedProperty || ''}
                     onChange={(e) => setSelectedProperty(e.target.value)}
                     inputProps={{ style: { color: "white" } }}
                     size="small"
@@ -398,6 +330,7 @@ function Home() {
                       borderRadius: "5px",
                     }}
                     fullWidth
+                    required
                   >
                     {PropertyTypes.map((type, index) => (
                       <MenuItem key={index} value={type.value}>
@@ -427,8 +360,10 @@ function Home() {
                       borderRadius: "5px",
                       backgroundColor: "transparent",
                       color: "white",
+                      fontSize: "16px",
+                      paddingLeft: "10px",
                     }}
-                    value={city}
+                    value={city || "All"}
                     onChange={(e) => {
                       const selectedCity = e.target.value;
                       setCity(selectedCity);
@@ -446,7 +381,7 @@ function Home() {
                           {cityItem.label}
                         </option>
 
-                        {cityItem.subheadings.map((subheading) => (
+                        {cityItem.subheadings && cityItem.subheadings.map((subheading) => (
                           <option
                             value={subheading.value}
                             key={subheading.value}
@@ -468,10 +403,10 @@ function Home() {
                       marginLeft: "10px",
                     }}
                   >
-                    {selectedPropertyType === "ForSale" ? "Price" : "Rent"}
+                    {selectedPropertyType === "ForSale" ? "Max Price" : "Max Rent"}
                   </Typography>
                   <Select
-                    value={selectedPropertyType === "ForSale" ? price : rent}
+                    value={selectedPropertyType === "ForSale" ? (price || "All") : (rent || "All")}
                     onChange={(e) =>
                       selectedPropertyType === "ForSale"
                         ? setPrice(e.target.value)
@@ -543,8 +478,8 @@ function Home() {
           <Showcase
             data={collectionData}
             user={"user"}
-            // property={property}
-            // propertyType={propertyType}
+          // property={property}
+          // propertyType={propertyType}
           />
         </Container>
       </Box>

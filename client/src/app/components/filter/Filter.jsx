@@ -21,7 +21,7 @@ import { Bedrooms } from "@/app/list/bedrooms";
 import { Perches } from "@/app/list/perches";
 import { Acres } from "@/app/list/acres";
 import { Cities } from "@/app/list/city";
-import { PropertyTypes } from "@/app/list/propertyTypes";
+import { comProperty } from "@/app/list/comProperty";
 import Showcase from "../showcase/Showcase";
 import axios from "axios";
 import Items from "@/app/components/items/Items";
@@ -29,6 +29,7 @@ import Breadcrumbs from "@mui/material/Breadcrumbs";
 import { IoIosArrowForward } from "react-icons/io";
 import { Padding } from "@mui/icons-material";
 import Link from "next/link";
+import UseSessionStorage from "@/app/UseSessionStorage";
 
 const Filter = ({
   property,
@@ -46,31 +47,34 @@ const Filter = ({
   const [propertyId, setPropertyId] = useState(null);
   const [title, setTitle] = useState(null);
   const [description, setDescription] = useState(null);
-  const [price, setPrice] = useState(null);
-  const [rent, setRent] = useState(null);
-  const [size, setSize] = useState(null);
-  const [city, setCity] = useState();
-  const [bedrooms, setBedrooms] = useState(null);
-  const [bathrooms, setBathrooms] = useState(null);
-  const [perches, setPerches] = useState(null);
-  const [acres, setAcres] = useState(null);
-  const [propertyTypes, setPropertyTypes] = useState(null);
+  const [price, setPrice] = useState("All");
+  const [rent, setRent] = useState("All");
+  const [size, setSize] = useState("All");
+  const [city, setCity] = useState("All");
+  const [bedrooms, setBedrooms] = useState("All");
+  const [bathrooms, setBathrooms] = useState("All");
+  const [perches, setPerches] = useState("All");
+  const [acres, setAcres] = useState("All");
+  const [comPropertyS, setComPropertyS] = useState("All");
   const [openCityDropDown, setOpenCityDropDown] = useState(false);
   const [filteredBy, setFilteredBy] = useState([]);
   const [topCities, setTopCities] = useState([]);
-  console.log(" property, propertyType", property, propertyType);
 
-  console.log("city", city);
-  console.log("topCities", topCities);
-  console.log("filteredBy", filteredBy);
+  useEffect(() => {
+    handleSubmit();
+  }, []);
+
+  const role = UseSessionStorage("contact_user") ? "admin" : "user";
+  console.log("role", role);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setFilteredBy([filteredBy]);
+    e && e.preventDefault();
     try {
       let additionalData = {
         city: city,
+        role: role,
       };
+      console.log("additionalData", additionalData);
 
       if (propertyType === "ForSale") {
         additionalData.price = parseInt(price);
@@ -78,7 +82,7 @@ const Filter = ({
         additionalData.rent = parseInt(rent);
       }
 
-      if (property === "House" || property === "Appartment") {
+      if (property === "House" || property === "Apartment") {
         additionalData = {
           ...additionalData,
           size: size,
@@ -89,7 +93,7 @@ const Filter = ({
         additionalData = {
           ...additionalData,
           size: parseInt(size),
-          propertyTypes: propertyTypes,
+          propertyTypes: comPropertyS,
         };
       } else if (property === "Land") {
         additionalData = {
@@ -100,7 +104,8 @@ const Filter = ({
       }
 
       console.log("additionalData", additionalData);
-      // formData.append("additionalData", additionalData);
+      console.log("propertyType", propertyType);
+      console.log("property", property);
 
       const response = await axios.post(
         FilterUrl(propertyType, property),
@@ -111,12 +116,12 @@ const Filter = ({
           },
         }
       );
-      console.log("filter response", response);
       setCollectionData(response.data);
 
       if (response.data && additionalData) {
         const filteredBy = Object.entries(additionalData).map(
           ([key, value]) => {
+            if (!value || value === "All") return null;
             console.log("filterd by values", key, ":", value);
 
             if (typeof value === "object") {
@@ -137,11 +142,17 @@ const Filter = ({
                 return `${value} perches`;
               case "acres":
                 return `${value} acres`;
-              default:
-                return `${key}: ${value}`;
             }
           }
         );
+
+        const filteredWithoutNull = filteredBy.filter((value) => value !== null);
+        const filteredWithoutAll = filteredWithoutNull.filter((value) => value !== "All");
+        const filteredArray = filteredWithoutAll.filter(Boolean);
+
+        console.log("filteredByCleaned", filteredArray);
+
+        setFilteredBy(filteredArray);
 
         const transformedCities = Cities.map((city) => ({
           label: city.label,
@@ -152,8 +163,6 @@ const Filter = ({
         let topCities = [];
 
         transformedCities?.forEach((transformedCity) => {
-          console.log("transformedCity.label", transformedCity.label);
-          console.log("additionalData?.city", additionalData?.city);
 
           if (additionalData?.city == transformedCity.label) {
             topCities = transformedCity.subheadings;
@@ -167,12 +176,6 @@ const Filter = ({
           topCities = [city];
         }
 
-        console.log("filteredBy", filteredBy);
-        const filteredByWithoutNullNaN = filteredBy.filter(
-          (str) => !str.includes("null") && !str.includes("NaN")
-        );
-
-        setFilteredBy(filteredByWithoutNullNaN);
         setTopCities(topCities);
       }
     } catch (error) {
@@ -236,10 +239,12 @@ const Filter = ({
                     width: "200px",
                     border: "1px solid grey",
                     backgroundColor: "black",
-                    color: "white",
                     borderRadius: "10px 0px 0px 10px",
+                    color: "white",
+                    fontSize: "16px",
+                    paddingLeft: "10px",
                   }}
-                  value={city}
+                  value={city || 'All'}
                   onChange={(e) => {
                     const selectedCity = e.target.value;
                     setCity(selectedCity);
@@ -248,11 +253,11 @@ const Filter = ({
                 >
                   {Cities.map((cityItem) => (
                     <optgroup>
-                      <option value={cityItem.value} key={cityItem.value}>
+                      <option value={cityItem.value} key={cityItem}>
                         {cityItem.label}
                       </option>
 
-                      {cityItem.subheadings.map((subheading) => (
+                      {cityItem.subheadings && cityItem.subheadings.map((subheading) => (
                         <option value={subheading.value} key={subheading.value}>
                           -- {subheading.label}
                         </option>
@@ -271,13 +276,13 @@ const Filter = ({
                     marginLeft: "10px",
                   }}
                 >
-                  {propertyType === "ForSale" ? "Price" : "Rent"}
+                  {propertyType === "ForSale" ? "Max Price" : "Max Rent"}
                 </Typography>
                 <Select
                   placeholder={
                     propertyType === "ForSale" ? "Select price" : "Select rent"
                   }
-                  value={propertyType === "ForSale" ? price : rent}
+                  value={propertyType === "ForSale" ? (price || 'All') : (rent || 'All')}
                   onChange={(e) =>
                     propertyType === "ForSale"
                       ? setPrice(e.target.value)
@@ -317,8 +322,8 @@ const Filter = ({
                       Property Types
                     </Typography>
                     <Select
-                      value={propertyTypes}
-                      onChange={(e) => setPropertyTypes(e.target.value)}
+                      value={comPropertyS || ''}
+                      onChange={(e) => setComPropertyS(e.target.value)}
                       inputProps={{ style: { color: "white" } }}
                       size="small"
                       sx={{
@@ -331,7 +336,7 @@ const Filter = ({
                       }}
                       fullWidth
                     >
-                      {PropertyTypes.map((type, index) => (
+                      {comProperty.map((type, index) => (
                         <MenuItem key={index} value={type.value}>
                           {type.label}
                         </MenuItem>
@@ -343,45 +348,45 @@ const Filter = ({
               <Box>
                 {(property === "House" ||
                   property === "Commercial" ||
-                  property === "Appartment") && (
-                  <>
-                    <Typography
-                      variant="h6"
-                      style={{
-                        color: "white",
-                        fontWeight: 500,
-                        fontSize: "16px",
-                        marginLeft: "10px",
-                      }}
-                    >
-                      Size
-                    </Typography>
-                    <Select
-                      value={size}
-                      onChange={(e) => setSize(e.target.value)}
-                      inputProps={{ style: { color: "white" } }}
-                      size="small"
-                      sx={{
-                        height: "50px",
-                        width: "200px",
-                        border: "1px solid grey",
+                  property === "Apartment") && (
+                    <>
+                      <Typography
+                        variant="h6"
+                        style={{
+                          color: "white",
+                          fontWeight: 500,
+                          fontSize: "16px",
+                          marginLeft: "10px",
+                        }}
+                      >
+                        Size
+                      </Typography>
+                      <Select
+                        value={size || 'All'}
+                        onChange={(e) => setSize(e.target.value)}
+                        inputProps={{ style: { color: "white" } }}
+                        size="small"
+                        sx={{
+                          height: "50px",
+                          width: "200px",
+                          border: "1px solid grey",
 
-                        backgroundColor: "black",
-                        color: "white",
-                      }}
-                      fullWidth
-                    >
-                      {Sizes.map((sizeOption, index) => (
-                        <MenuItem key={index} value={sizeOption.value}>
-                          {sizeOption.label}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </>
-                )}
+                          backgroundColor: "black",
+                          color: "white",
+                        }}
+                        fullWidth
+                      >
+                        {Sizes.map((sizeOption, index) => (
+                          <MenuItem key={index} value={sizeOption.value}>
+                            {sizeOption.label}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </>
+                  )}
               </Box>
               <Box>
-                {(property === "House" || property === "Appartment") && (
+                {(property === "House" || property === "Apartment") && (
                   <>
                     <Typography
                       variant="h6"
@@ -395,7 +400,7 @@ const Filter = ({
                       Bedrooms
                     </Typography>
                     <Select
-                      value={bedrooms}
+                      value={bedrooms || 'All'}
                       onChange={(e) => setBedrooms(e.target.value)}
                       inputProps={{ style: { color: "white" } }}
                       size="small"
@@ -419,7 +424,7 @@ const Filter = ({
                 )}
               </Box>
               <Box>
-                {(property === "House" || property === "Appartment") && (
+                {(property === "House" || property === "Apartment") && (
                   <>
                     <Typography
                       variant="h6"
@@ -433,7 +438,7 @@ const Filter = ({
                       Bathrooms
                     </Typography>
                     <Select
-                      value={bathrooms}
+                      value={bathrooms || 'All'}
                       onChange={(e) => setBathrooms(e.target.value)}
                       inputProps={{ style: { color: "white" } }}
                       size="small"
@@ -471,7 +476,7 @@ const Filter = ({
                       Perches
                     </Typography>
                     <Select
-                      value={perches}
+                      value={perches || 'All'}
                       onChange={(e) => setPerches(e.target.value)}
                       inputProps={{ style: { color: "white" } }}
                       size="small"
@@ -509,7 +514,7 @@ const Filter = ({
                       Acres
                     </Typography>
                     <Select
-                      value={acres}
+                      value={acres || 'All'}
                       onChange={(e) => setAcres(e.target.value)}
                       inputProps={{ style: { color: "white" } }}
                       size="small"
@@ -578,7 +583,7 @@ const Filter = ({
                 setShowHidden(true);
               }}
             >
-              All Hidden Properties
+              Show all Hidden Properties
             </Button>
             <Box
               sx={{
@@ -589,7 +594,7 @@ const Filter = ({
             >
               <TextField
                 variant="outlined"
-                placeholder="Property ID"
+                placeholder="Filter by Property ID"
                 InputProps={{ style: { color: "white" } }}
                 type="text"
                 size="small"
@@ -625,14 +630,10 @@ const Filter = ({
         <Box sx={{ margin: "10px 0px " }}>
           <Breadcrumbs aria-label="breadcrumb" sx={{ margin: "15px 0px" }}>
             {property && propertyType && (
-              <Box sx={{ display: "flex", alignItems: "center" }}>
-                <Link style={{ textDecoration: "none" }} color="#fff" href="#">
-                  <Typography color={"#8C1C40"}>{property}</Typography>
-                </Link>
+              <Box sx={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <Typography color={"#8C1C40"}>{property}</Typography>
                 <IoIosArrowForward color={"#8C1C40"} sx={{ padding: "0px" }} />
-                <Link style={{ textDecoration: "none" }} color="#fff" href="#">
-                  <Typography color={"#8C1C40"}>{propertyType}</Typography>
-                </Link>
+                <Typography color={"#8C1C40"}>{propertyType}</Typography>
               </Box>
             )}
           </Breadcrumbs>
@@ -664,7 +665,7 @@ const Filter = ({
                   </Box>
                 </Box>
               )}
-              {topCities.length > 0 && (
+              {/* {topCities.length > 0 && (
                 <Box sx={{ display: "flex", gap: "17px" }}>
                   <Typography
                     sx={{ color: "white", fontSize: "20px", marginTop: "2px" }}
@@ -676,7 +677,7 @@ const Filter = ({
                     <Items data={topCities} disableDelete={true} />{" "}
                   </Box>
                 </Box>
-              )}
+              )} */}
               {/* <Items data={city}  /> */}
             </Box>
           </Box>

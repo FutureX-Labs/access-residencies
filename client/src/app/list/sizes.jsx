@@ -1,4 +1,5 @@
 export const Sizes = [
+  { label: "All", value: "All" },
   { label: "500 sqft", value: 500 },
   { label: "600 sqft", value: 600 },
   { label: "700 sqft", value: 700 },

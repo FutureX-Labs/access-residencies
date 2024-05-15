@@ -2,8 +2,11 @@ const express = require("express");
 const router = express.Router();
 const Features = require("../../schema/Features");
 const multer = require("multer");
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+const fs = require('fs').promises;
+const cloudinary = require("cloudinary").v2;
+
+const upload = multer({ dest: 'uploads/' });
+
 
 router.get("/", async (req, res) => {
   try {
@@ -18,26 +21,34 @@ router.get("/", async (req, res) => {
 router.post("/add", upload.array("myFiles"), async (req, res) => {
   try {
     await Features.deleteMany({});
-    const files = req.files;
+
+    const uploadedImages = [];
+    const FeatureData = [];
+
     const urlData = req.body.urls;
 
-    console.log("files", files);
-    console.log("urlData", urlData);
+    for (let i = 0; i < req.files.length; i++) {
+      const publicId = `feature_${i + 1}`;
+      const result = await cloudinary.uploader.upload(req.files[i].path, {
+        public_id: publicId,
+        folder: "features"
+      });
+      uploadedImages.push(result.secure_url);
 
-    const features = files.map((file, index) => ({
-      file: file.buffer.toString("base64"),
-      url: urlData[index] || "#home",
-    }));
+      FeatureData.push({
+        file: `features/${publicId}`,
+        url: urlData[i] || "#home",
+      });
 
-    console.log("features", features);
+      await fs.unlink(req.files[i].path);
+    }
+    console.log(FeatureData);
 
-    const result = new Features({
-      features,
-    });
+    const newFeature = new Features({ features: FeatureData });
+    await newFeature.save();
 
-    const response = await result.save();
+    res.status(200).json({ success: true, images: uploadedImages });
 
-    res.status(200).json(response);
   } catch (error) {
     console.error(error);
     res.status(400).json(error);

@@ -2,11 +2,10 @@ import React, { useState } from "react";
 import { Box, Menu, MenuItem, Button } from "@mui/material";
 import Link from "next/link";
 
-const Subheader = ({ setProperty, setPropertyType, user }) => {
+const Subheader = ({ propertyType, user }) => {
+  console.log("Hader propertyType", propertyType);
   const [anchorElForSale, setAnchorElForSale] = useState(null);
   const [anchorElForRent, setAnchorElForRent] = useState(null);
-  const [selectedSaleOption, setSelectedSaleOption] = useState("");
-  const [selectedRentOption, setSelectedRentOption] = useState("");
 
   const handleOpenMenuForSale = (event) => {
     setAnchorElForSale(event.currentTarget);
@@ -24,26 +23,21 @@ const Subheader = ({ setProperty, setPropertyType, user }) => {
     setAnchorElForRent(null);
   };
 
-  const handleSaleOptionChange = (property, type) => {
-    setSelectedSaleOption(property);
-    setPropertyType(type);
-    setProperty(property);
-    handleCloseMenuForSale();
-  };
-
-  const handleRentOptionChange = (property, type) => {
-    setSelectedRentOption(property);
-    setPropertyType(type);
-    setProperty(property);
-    handleCloseMenuForRent();
-  };
-
   return (
     <Box sx={{ backgroundColor: "#8c1c40", width: "100vw" }}>
-      <Box sx={{ padding: "20px 80px", display: "flex", gap: "20px" }}>
+      <Box sx={{ display: "flex", gap: "0px"}}>
         <Button
           onClick={handleOpenMenuForSale}
-          sx={{ color: "white", textTransform: "none" }}
+          sx={{
+            padding: "20px 40px", 
+            color: "white",
+            backgroundColor: (propertyType === "ForSale") ? "#00000044" : "inherit",
+            fontFamily: "Roboto Condensed",
+            fontWeight: "800",
+            "&:hover": {
+              backgroundColor: "#00000088"
+            }
+          }}
         >
           For Sale
         </Button>
@@ -81,11 +75,11 @@ const Subheader = ({ setProperty, setPropertyType, user }) => {
               style={{ textDecoration: "none", color: "black" }}
               href={
                 user === "admin"
-                  ? "/admin/view/Appartment/ForSale"
-                  : "/user/filter/Appartment/ForSale"
+                  ? "/admin/view/Apartment/ForSale"
+                  : "/user/filter/Apartment/ForSale"
               }
             >
-              Appartment
+              Apartment
             </Link>
           </MenuItem>
           <MenuItem>
@@ -103,7 +97,16 @@ const Subheader = ({ setProperty, setPropertyType, user }) => {
         </Menu>
         <Button
           onClick={handleOpenMenuForRent}
-          sx={{ color: "white", textTransform: "none" }}
+          sx={{
+            padding: "20px 40px", 
+            color: "white",
+            fontFamily: "Roboto Condensed",
+            backgroundColor: (propertyType === "ForRent") ? "#00000044" : "inherit",
+            fontWeight: "800",
+            "&:hover": {
+              backgroundColor: "#00000088"
+            }
+          }}
         >
           For Rent
         </Button>
@@ -141,11 +144,11 @@ const Subheader = ({ setProperty, setPropertyType, user }) => {
               style={{ textDecoration: "none", color: "black" }}
               href={
                 user === "admin"
-                  ? "/admin/view/Appartment/ForRent"
-                  : "/user/filter/Appartment/ForRent"
+                  ? "/admin/view/Apartment/ForRent"
+                  : "/user/filter/Apartment/ForRent"
               }
             >
-              Appartment
+              Apartment
             </Link>
           </MenuItem>
           <MenuItem>

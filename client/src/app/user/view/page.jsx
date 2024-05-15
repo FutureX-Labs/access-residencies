@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import Link from "next/link";
 import { FaShareNodes } from "react-icons/fa6";
+import { IoIosArrowForward } from "react-icons/io";
 import { MdBed } from "react-icons/md";
 import bathroom from "../../../../public/bathroom.png";
 import squareFeet from "../../../../public/images/squareFeet.png";
@@ -71,39 +72,33 @@ function View() {
   return (
     <>
       <Navbar type={"user"} />
-      <BannerSlider imageData={selectedData?.images} />
+      {selectedData ? (<BannerSlider imageData={[selectedData.thumbnailImage, ...selectedData.images]} />) : null}
+
       <Breadcrumbs
         aria-label="breadcrumb"
         sx={{
-          width: { md: "50%", xs: "90%" },
-          margin: "auto",
+          width: { md: "60%", xs: "90%" },
+          margin: "10px auto",
         }}
       >
-        <Link
-          style={{ fontSize: "18px", color: "#FF6DD6", textDecoration: "none" }}
-          href="/"
-        >
-          Properties
-        </Link>
-        <Typography sx={{ fontSize: "18x" }} color="white">
-          {property}
-        </Typography>
-        <Typography sx={{ fontSize: "18x" }} color="white">
-          {propertyType}
-        </Typography>
+        {property && propertyType && (
+          <Box sx={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <Typography color={"#8C1C40"}>{property}</Typography>
+            <IoIosArrowForward color={"#8C1C40"} />
+            <Typography color={"#8C1C40"}>{propertyType}</Typography>
+          </Box>
+        )}
       </Breadcrumbs>
+
       <Box
         sx={{
-          height: { md: "630px", xs: "650px" },
-          backgroundColor: "#333",
+          height: { md: "60%", xs: "90%" },
+          backgroundColor: "#131313",
           color: "#fff",
-          boxShadow: "0px 0px 10px rgba(0,0,0,0.5)",
-          borderRadius: "8px",
-          width: { md: "50%", xs: "90%" },
-
-          margin: "auto",
+          width: { md: "60%", xs: "90%" },
+          marginX: "auto",
+          marginBottom: "40px",
         }}
-        my={4}
         display="flex"
         flexDirection="column"
         gap={2}
@@ -115,6 +110,7 @@ function View() {
             flexDirection: { md: "row", xs: "column" },
             justifyContent: "space-between",
             padding: "10px",
+            alignItems: "center"
           }}
         >
           <Box>
@@ -132,7 +128,7 @@ function View() {
                 textAlign: { md: "start", xs: "center" },
                 color: "#FF6DD6",
                 fontWeight: "600",
-                marginTop: "8px",
+                marginTop: "15px",
               }}
             >
               {selectedData.city}
@@ -169,9 +165,9 @@ function View() {
               sx={{
                 color: "#787878",
                 fontSize: "14px",
-                textAlign: { mdL: "end", xs: "center" },
+                textAlign: { md: "end", xs: "center" },
                 fontWeight: "600",
-                marginTop: "8px",
+                marginTop: "17px",
               }}
             >
               {selectedData.propertyId}
@@ -179,61 +175,103 @@ function View() {
           </Box>
         </Box>
 
-        <Box sx={{ width: "85%", margin: " 0px   auto" }}>
+        <Box sx={{ width: "85%", margin: "0 auto" }}>
           <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-            <Box sx={{ display: "flex", padding: "10px", gap: "20px" }}>
-              <MdBed size={22} />
-              <Typography
+            <Box sx={{ display: "flex", gap: "20px" }}>
+              {selectedData.bedrooms && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                  }}
+                >
+                  <MdBed size={30} />
+                  <Typography
+                    sx={{ fontSize: "14px", color: "#bdbdbd" }}
+                  >
+                    {selectedData.bedrooms} bed rooms
+                  </Typography>
+                </Box>
+              )}
+              {selectedData.bathrooms && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px"
+                  }}>
+                  <Image
+                    style={{ marginTop: "-12px" }}
+                    src={bathroom}
+                    alt="icon"
+                    size={8}
+                  />
+                  <Typography sx={{ fontSize: "14px", color: "#bdbdbd" }} >
+                    {selectedData.bathrooms} bath rooms
+                  </Typography>
+                </Box>
+              )}
+              {selectedData.landExtent && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    gap: "10px",
+                  }}
+                >
+                  <Image src={squareFeet} alt="icon" size={12} />
+                  <Typography sx={{ fontSize: "14px", color: "#bdbdbd" }}>
+                    {selectedData.landExtent.acres} acres {selectedData.landExtent.perches} perches
+                  </Typography>
+                </Box>
+              )}
+              {selectedData.propertyTypes && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Typography sx={{ color: "#bdbdbd", fontWeight: "700", fontSize: "16px" }}>
+                    Property Type : {selectedData.propertyTypes}
+                  </Typography>
+                </Box>
+              )}
+            </Box>
+            {selectedData.size && (
+              <Box
                 sx={{
                   display: "flex",
                   justifyContent: "center",
+                  alignItems: "center",
                   gap: "10px",
-                  fontSize: "14px",
-                  color: "#bdbdbd",
                 }}
               >
-                {selectedData.bedrooms} bed rooms .{" "}
-              </Typography>
-
-              <Box sx={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <Image
-                  style={{ marginTop: "-12px" }}
-                  src={bathroom}
-                  alt="icon"
-                  size={12}
-                />
-                <Typography
-                  sx={{ gap: "10px", fontSize: "14px", color: "#bdbdbd" }}
-                >
-                  {selectedData.bathrooms} beth rooms
+                <Image src={squareFeet} alt="icon" size={12} />
+                <Typography sx={{ fontSize: "14px", color: "#bdbdbd" }}>
+                  {selectedData.size} sq. ft
                 </Typography>
               </Box>
-            </Box>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                gap: "10px",
-              }}
-            >
-              <Image src={squareFeet} alt="icon" size={12} />
-              <Typography sx={{ fontSize: "14px", color: "#bdbdbd" }}>
-                {" "}
-                {selectedData.size} sq. ft{" "}
-              </Typography>
-            </Box>
+            )}
           </Box>
 
           <Box
             sx={{
               padding: "20px 0px 20px",
-              color: "#FF6DD6",
-              fontWeight: "600",
-              fontSize: "30px",
             }}
           >
-            <Typography>RS {selectedData.price}</Typography>
+            <Typography
+              sx={{
+                color: "#FF6DD6",
+                fontWeight: "700",
+                fontSize: "18px",
+              }}
+            >
+              RS {(propertyType === "ForSale") ? selectedData.price : selectedData.rent}
+            </Typography>
           </Box>
           <Typography
             sx={{
@@ -253,7 +291,7 @@ function View() {
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
-              margin: "50px 0px",
+              margin: "40px 0px",
             }}
           >
             <Typography>Contact : 0711234567</Typography>
@@ -261,14 +299,20 @@ function View() {
               <Button
                 sx={{
                   backgroundColor: "#8C1C40",
-                  padding: "5px 10px",
+                  padding: "7px 15px",
                   color: "#fff",
                   gap: "10px",
                 }}
               >
-                <SlCallEnd size={20} />
-
-                <Typography sx={{ fontSize: "13px" }}>Call</Typography>
+                <SlCallEnd size={15} />
+                <Typography
+                  sx={{ fontSize: "15px", cursor: "pointer" }}
+                  onClick={() => {
+                    window.location.href = "tel:0711234567";
+                  }}
+                >
+                  Call
+                </Typography>
               </Button>
             </Box>
           </Box>

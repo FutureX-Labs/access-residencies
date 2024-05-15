@@ -1,5 +1,9 @@
 export const Cities = [
   {
+    label: "All",
+    value: "All"
+  },
+  {
     label: "Colombo",
     value: "Colombo",
     subheadings: [

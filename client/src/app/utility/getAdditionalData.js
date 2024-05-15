@@ -3,7 +3,7 @@ export const GetAdditionalData = (property, propertyType) => {
 
   switch (property) {
     case "House":
-    case "Appartment":
+    case "Apartment":
       additionalData = {
         size,
         bedroom,

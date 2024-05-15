@@ -31,7 +31,7 @@ import { useRouter } from "next/navigation";
 
 
 import BASE_URL from "../../../../config";
-const url = `${BASE_URL}/api/appartmentForRent/add`;
+const url = `${BASE_URL}/api/apartmentForRent/add`;
 
 function View() {
   const [postImage, setPostImage] = useState(null);
@@ -44,8 +44,6 @@ function View() {
   const [showHidden, setShowHidden] = useState(false);
   const router = useRouter();
   const { user } = useContext(AuthContext);
-
-  console.log("user", user);
 
   useEffect(() => {
     console.log("user inside the useEffect:", user);
@@ -63,105 +61,27 @@ function View() {
     setPropertyType(propertyTypeValue);
   }, []);
 
-  // useEffect(() => {
-  //   console.log("isAuthenticated inside useEffect", isAuthenticated);
-  //   if (isAuthenticated) {
-  //     if (typeof isAuthenticated === "string") {
-  //       const trimmedIsAuthenticated = isAuthenticated.trim(); // Trim the string
-  //       if (trimmedIsAuthenticated === "true") {
-  //         console.log("User is authenticated, no redirect needed");
-  //       } else {
-  //         console.log("User is not authenticated, redirecting...");
-  //       }
-  //     } else {
-  //       console.log("isAuthenticated is not a string or is undefined");
-  //       router.push("/");
-  //       // Handle this case as per your requirements
-  //     }
-  //   } else {
-  //     router.push("/");
-  //   }
-  // }, [isAuthenticated, router]);
-
-  console.log("propertyType", property);
-  console.log("showHidden", showHidden);
-
-  console.log("collectionData", collectionData);
-
-  const Fetch = async (property, propertyType) => {
-    try {
-      const response = await axios.get(
-        // Use axios.get instead of just axios
-        GetAll(property, propertyType),
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      console.log("response", response);
-      setCollectionData(response.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    Fetch(property, propertyType);
-  }, [property, propertyType]);
-
-  const FetchPropertyIDs = async () => {
-    try {
-      const propertyIDResponse = await axios.get(
-        `${BASE_URL}/api/customize/propertyid/`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      console.log("Properties response", propertyIDResponse.data[0].propertyId);
-      const propertyIds = propertyIDResponse.data[0].propertyId;
-
-      const response = await axios.post(
-        `${BASE_URL}/api/properties`,
-        {
-          propertyIds: propertyIds,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      console.log("Properties response", response.data.data);
-      setCollectionData(response.data.data);
-    } catch (error) {
-      console.log("error in fetching properties", error);
-    }
-  };
-
-  useEffect(() => {
-    FetchPropertyIDs();
-  }, []);
-
   return (
     <>
       <Navbar type={"admin"} />
       <Subheader
-        setProperty={setProperty}
-        setPropertyType={setPropertyType}
+        propertyType={propertyType}
         user={"admin"}
       />
-      <Filter
-        property={property}
-        propertyType={propertyType}
-        setCollectionData={setCollectionData}
-        collectionData={collectionData}
-        setShowHidden={setShowHidden}
-        showHidden={showHidden}
-        hideProperties={true}
-      />
+
+      {property && propertyType ? (
+        <Filter
+          property={property}
+          propertyType={propertyType}
+          setCollectionData={setCollectionData}
+          collectionData={collectionData}
+          setShowHidden={setShowHidden}
+          showHidden={showHidden}
+          hideProperties={true}
+        />
+      ) : (
+        <></>
+      )}
 
       <Box sx={{ margin: "10px 0px", textAlign: "center" }}>
         <Container>
@@ -185,7 +105,7 @@ function View() {
               mb: "30px",
             }}
           >
-            Showcase Properties
+            Fitered Properties
           </Typography>
           <Showcase
             data={collectionData}

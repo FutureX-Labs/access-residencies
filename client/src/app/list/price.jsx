@@ -1,4 +1,5 @@
 export const Prices = [
+  { label: "All", value: "All" },
   { label: "1 mn (10 lakhs)", value: 1000000 },
   { label: "2 mn (20 lakhs)", value: 2000000 },
   { label: "3 mn (30 lakhs)", value: 3000000 },
