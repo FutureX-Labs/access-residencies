@@ -5,6 +5,7 @@ import Image from "next/image";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Link from "next/link";
+import { CldImage } from 'next-cloudinary';
 
 export default function FeatureSlider({ imageData }) {
   console.log("imageData", imageData);
@@ -21,8 +22,7 @@ export default function FeatureSlider({ imageData }) {
 
   const imgStyle = {
     width: "900px",
-    maxHeight: "400px",
-    objectFit: "cover",
+    minHeight: "400px",
     overflow: "none",
   };
 
@@ -36,11 +36,15 @@ export default function FeatureSlider({ imageData }) {
       {imageData?.map((img) => (
         <div key={img.id}>
           <Link href={img.url}>
-            <img
-              src={`data:image/jpeg;base64,${img?.file}`}
-              alt=""
-              style={imgStyle}
-            />
+            <div style={imgStyle}>
+              <CldImage
+                fill
+                src={img?.file}
+                style={{ objectFit: "cover" }}
+                sizes="100vw"
+                alt="Banner Image"
+              />
+            </div>
           </Link>
         </div>
       ))}

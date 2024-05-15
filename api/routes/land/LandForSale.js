@@ -3,7 +3,10 @@ const router = express.Router();
 const landForSale = require("../../schema/LandForSale");
 const multer = require("multer");
 const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+const fs = require('fs').promises;
+const cloudinary = require("cloudinary").v2;
+
+const upload = multer({ dest: 'uploads/' });
 
 router.get("/", async (req, res) => {
   try {
@@ -37,9 +40,23 @@ router.post("/add", upload.array("myFiles"), async (req, res) => {
     const files = req.files;
     const { propertyId, title, price, description, perches, acres, city } =
       JSON.parse(req.body.additionalData);
-    const images = files.map((file) => file.buffer.toString("base64"));
-    const thumbnailImage = images[images.length - 1];
-    thumbnailImage ? images.pop() : thumbnailImage;
+
+    const uploadedImages = [];
+
+    for (let i = 0; i < files.length; i++) {
+      await cloudinary.uploader.upload(files[i].path, {
+        public_id: `image_${i}`,
+        folder: `land-sale/${propertyId}`
+      });
+
+      uploadedImages.push(`land-sale/${propertyId}/image_${i}`);
+
+      await fs.unlink(files[i].path);
+    }
+
+    const thumbnailImage = uploadedImages[0];
+    const images = uploadedImages.slice(1);
+
 
     console.log(images);
     console.log(propertyId, title, price, description, perches, acres, city);
@@ -58,7 +75,7 @@ router.post("/add", upload.array("myFiles"), async (req, res) => {
       },
 
       city,
-      isVisibale: false,
+      isVisibale: true,
     });
 
     const response = await newHouse.save();
@@ -92,9 +109,23 @@ router.put("/edit/:id", upload.array("myFiles"), async (req, res) => {
 
       return res.status(200).json(result);
     }
-    const images = files.map((file) => file.buffer.toString("base64"));
-    const thumbnailImage = images[images.length - 1];
-    thumbnailImage ? images.pop() : thumbnailImage;
+
+    const uploadedImages = [];
+
+    for (let i = 0; i < files.length; i++) {
+      await cloudinary.uploader.upload(files[i].path, {
+        public_id: `image_${i}`,
+        folder: `land-sale/${propertyId}`
+      });
+
+      uploadedImages.push(`land-sale/${propertyId}/image_${i}`);
+
+      await fs.unlink(files[i].path);
+    }
+
+    const thumbnailImage = uploadedImages[0];
+    const images = uploadedImages.slice(1);
+
     const id = req.params.id;
 
     const result = await landForSale.findByIdAndUpdate(id, {
@@ -151,25 +182,26 @@ router.delete("/delete/:id", async (req, res) => {
 router.post("/filter", async (req, res) => {
   try {
     const { city, price, perches, acres } = req.body;
-    console.log(city);
 
     const filter = {};
 
-    if (price !== undefined && price !== null) {
-      filter.price = price;
+    if (price !== NaN && price !== null && price !== "All") {
+      filter.price = { $lt: price };
     }
 
-    if (perches !== undefined && perches !== null) {
-      filter["landExtent.perches"] = perches;
+    if (perches !== "" && perches !== null && perches !== "All") {
+      filter["landExtent.perches"] = { $lt: perches };
     }
 
-    if (acres !== undefined && acres !== null) {
-      filter["landExtent.acres"] = acres;
+    if (acres !== "" && acres !== null && acres !== "All") {
+      filter["landExtent.acres"] = { $lt: acres };
     }
 
-    if (city !== undefined && city !== null) {
+    if (city !== "" && city !== null && city !== "All") {
       filter.city = { $regex: new RegExp(city, "i") };
     }
+
+    console.log(filter);
 
     let filtered = await landForSale.find(filter).exec();
 
@@ -182,28 +214,29 @@ router.post("/filter", async (req, res) => {
 router.post("/filter/main", async (req, res) => {
   try {
     const { city, price, title } = req.body;
-    console.log(city, title, price);
+
     const filter = {};
 
     // Filtering by price if provided
-    if (price !== undefined && price !== null) {
-      filter.price = price;
+    if (price !== NaN && price !== null && price !== "All") {
+      filter.price = { $lt: price };
     }
 
     // Filtering by city using a case-insensitive regex for flexible matching
-    if (city !== undefined && city !== null) {
+    if (city !== "" && city !== null && city !== "All") {
       filter.city = { $regex: new RegExp(city, "i") };
     }
 
     // Filtering by title using a case-insensitive regex for partial matches
-    if (title !== undefined && title !== null) {
+    if (title !== "" && title !== null) {
       filter.title = { $regex: new RegExp(title, "i") };
     }
+
+    console.log(filter);
 
     // Perform the search with the constructed filter
     let filtered = await landForSale.find(filter).exec();
 
-    // Sending the filtered results back to the client
     res.status(200).json(filtered);
   } catch (error) {
     console.error(error);

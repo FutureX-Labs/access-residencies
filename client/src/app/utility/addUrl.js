@@ -1,5 +1,5 @@
 import BASE_URL from "../config";
-const url = `${BASE_URL}/api/appartmentForRent/add`;
+const url = `${BASE_URL}/api/apartmentForRent/add`;
 
 export function AddUrl(propertyType, property) {
   
@@ -14,8 +14,8 @@ export function AddUrl(propertyType, property) {
         case "Commercial":
           url += "commercialforsale/add";
           break;
-        case "Appartment":
-          url += "appartmentforsale/add";
+        case "Apartment":
+          url += "apartmentforsale/add";
           break;
         case "Land":
           url += "landforsale/add";
@@ -33,8 +33,8 @@ export function AddUrl(propertyType, property) {
         case "Commercial":
           url += "commercialforrent/add";
           break;
-        case "Appartment":
-          url += "appartmentforrent/add";
+        case "Apartment":
+          url += "apartmentforrent/add";
           break;
         case "Land":
           url += "landforrent/add";

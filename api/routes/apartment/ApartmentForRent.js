@@ -1,13 +1,15 @@
 const express = require("express");
 const router = express.Router();
-const appartmentForSale = require("../../schema/AppartmentForSale");
+const apartmentForRent = require("../../schema/ApartmentForRent");
 const multer = require("multer");
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+const fs = require('fs').promises;
+const cloudinary = require("cloudinary").v2;
+
+const upload = multer({ dest: 'uploads/' });
 
 router.get("/", async (req, res) => {
   try {
-    const houses = await appartmentForSale.find();
+    const houses = await apartmentForRent.find();
     res.status(200).json(houses);
   } catch (error) {
     console.error(error);
@@ -18,16 +20,12 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-
-    // Find document by ID
-    const response = await appartmentForSale.findById(id);
+    const response = await apartmentForRent.findById(id);
 
     if (!response) {
-      // If no document found with the given ID, return 404 Not Found
       return res.status(404).json({ message: "not found" });
     }
 
-    // If document found, return it
     res.status(200).json(response);
   } catch (error) {
     console.error(error);
@@ -41,33 +39,44 @@ router.post("/add", upload.array("myFiles"), async (req, res) => {
     const {
       propertyId,
       title,
-      price,
+      rent,
       description,
       size,
       bedrooms,
       bathrooms,
-
       city,
     } = JSON.parse(req.body.additionalData);
-    const images = files.map((file) => file.buffer.toString("base64"));
-    const thumbnailImage = images[images.length - 1];
-    thumbnailImage ? images.pop() : thumbnailImage;
+    
+    const uploadedImages = [];
 
-    const result = new appartmentForSale({
+    for (let i = 0; i < files.length; i++) {
+      await cloudinary.uploader.upload(files[i].path, {
+        public_id: `image_${i}`,
+        folder: `apartment-rent/${propertyId}`
+      });
+
+      uploadedImages.push(`apartment-rent/${propertyId}/image_${i}`);
+
+      await fs.unlink(files[i].path);
+    }
+
+    const thumbnailImage = uploadedImages[0];
+    const images = uploadedImages.slice(1);
+
+    const result = new apartmentForRent({
       propertyId,
-      property: "Appartment",
-      propertyType: "ForSale",
+      property: "apartment",
+      propertyType: "ForRent",
       title,
-      price,
+      rent,
       thumbnailImage,
       images,
       description,
       size,
       bedrooms,
       bathrooms,
-
       city,
-      isVisibale: false,
+      isVisibale: true,
     });
 
     const response = await result.save();
@@ -85,7 +94,7 @@ router.put("/edit/:id", upload.array("myFiles"), async (req, res) => {
     const {
       propertyId,
       title,
-      price,
+      rent,
       description,
       size,
       bedrooms,
@@ -95,10 +104,10 @@ router.put("/edit/:id", upload.array("myFiles"), async (req, res) => {
     if (!files || files.length === 0) {
       const id = req.params.id;
 
-      const result = await appartmentForSale.findByIdAndUpdate(id, {
+      const result = await apartmentForRent.findByIdAndUpdate(id, {
         propertyId,
         title,
-        price,
+        rent,
         description,
         size,
         bedrooms,
@@ -108,15 +117,29 @@ router.put("/edit/:id", upload.array("myFiles"), async (req, res) => {
 
       return res.status(200).json(result);
     }
-    const images = files.map((file) => file.buffer.toString("base64"));
-    const thumbnailImage = images[images.length - 1];
-    thumbnailImage ? images.pop() : thumbnailImage;
+
+    const uploadedImages = [];
+
+    for (let i = 0; i < files.length; i++) {
+      await cloudinary.uploader.upload(files[i].path, {
+        public_id: `image_${i}`,
+        folder: `apartment-rent/${propertyId}`
+      });
+
+      uploadedImages.push(`apartment-rent/${propertyId}/image_${i}`);
+
+      await fs.unlink(files[i].path);
+    }
+
+    const thumbnailImage = uploadedImages[0];
+    const images = uploadedImages.slice(1);
+
     const Id = req.params.id;
 
-    const result = await appartmentForSale.findByIdAndUpdate(Id, {
+    const result = await apartmentForRent.findByIdAndUpdate(Id, {
       propertyId,
       title,
-      price,
+      rent,
       thumbnailImage,
       images,
       description,
@@ -137,10 +160,9 @@ router.post("/edit/isVisible/:id", async (req, res) => {
   try {
     const id = req.params.id;
     const { isVisibale } = req.body;
-    const result = await appartmentForSale.findByIdAndUpdate(id, {
+    const result = await apartmentForRent.findByIdAndUpdate(id, {
       isVisibale,
     });
-    s;
     res.status(200).json(result);
   } catch (error) {
     console.error(error);
@@ -153,7 +175,7 @@ router.delete("/delete/:id", async (req, res) => {
     const Id = req.params.id;
 
     // Delete house object
-    const result = await appartmentForSale.findByIdAndDelete(Id);
+    const result = await apartmentForRent.findByIdAndDelete(Id);
 
     res.status(200).json(result);
   } catch (error) {
@@ -164,31 +186,33 @@ router.delete("/delete/:id", async (req, res) => {
 
 router.post("/filter", async (req, res) => {
   try {
-    const { city, price, size, bedrooms, bathrooms } = req.body;
+    const { city, rent, size, bedrooms, bathrooms } = req.body;
 
     const filter = {};
 
-    if (price !== undefined && price !== null) {
-      filter.price = price;
+    if (rent !== NaN && rent !== null && rent !== "All") {
+      filter.rent = { $lt: rent };
     }
 
-    if (city !== undefined && city !== null) {
+    if (city !== "" && city !== null && city !== "All") {
       filter.city = { $regex: new RegExp(city, "i") };
     }
 
-    if (size !== undefined && size !== null) {
-      filter.size = size;
+    if (size !== NaN && size !== null && size !== "All") {
+      filter.size = { $lt: size };
     }
 
-    if (bedrooms !== undefined && bedrooms !== null) {
-      filter.bedrooms = bedrooms;
+    if (bedrooms !== NaN && bedrooms !== null && bedrooms !== "All") {
+      filter.bedrooms = { $lt: bedrooms };
     }
 
-    if (bathrooms !== undefined && bathrooms !== null) {
-      filter.bathrooms = bathrooms;
+    if (bathrooms !== NaN && bathrooms !== null && bathrooms !== "All") {
+      filter.bathrooms = { $lt: bathrooms };
     }
 
-    let filtered = await appartmentForSale.find(filter).exec();
+    console.log(filter);
+    
+    let filtered = await apartmentForRent.find(filter).exec();
 
     res.status(200).json(filtered);
   } catch (error) {
@@ -199,29 +223,26 @@ router.post("/filter", async (req, res) => {
 
 router.post("/filter/main", async (req, res) => {
   try {
-    const { city, price, title } = req.body;
+    const { city, rent, title } = req.body;
 
     const filter = {};
 
-    // Filtering by price if provided
-    if (price !== undefined && price !== null) {
-      filter.price = price;
+    if (rent !== NaN && rent !== null && rent !== "All") {
+      filter.rent = { $lt: rent };
     }
 
-    // Filtering by city using a case-insensitive regex for flexible matching
-    if (city !== undefined && city !== null) {
+    if (city !== "" && city !== null && city !== "All") {
       filter.city = { $regex: new RegExp(city, "i") };
     }
 
-    // Filtering by title using a case-insensitive regex for partial matches
-    if (title !== undefined && title !== null) {
+    if (title !== "" && title !== null && city !== "All") {
       filter.title = { $regex: new RegExp(title, "i") };
     }
 
-    // Perform the search with the constructed filter
-    let filtered = await appartmentForSale.find(filter).exec();
+    console.log(filter);
 
-    // Sending the filtered results back to the client
+    let filtered = await apartmentForRent.find(filter).exec();
+
     res.status(200).json(filtered);
   } catch (error) {
     console.error(error);
@@ -241,7 +262,7 @@ router.post("/filterId", async (req, res) => {
       filter.propertyId = propertyId;
     }
 
-    const filtered = await appartmentForSale.find(filter).exec();
+    const filtered = await apartmentForRent.find(filter).exec();
 
     res.status(200).json(filtered);
   } catch (error) {
@@ -249,5 +270,4 @@ router.post("/filterId", async (req, res) => {
     res.status(400).json(error);
   }
 });
-
 module.exports = router;

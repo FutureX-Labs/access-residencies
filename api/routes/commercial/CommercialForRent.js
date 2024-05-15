@@ -3,7 +3,10 @@ const router = express.Router();
 const commercialForRent = require("../../schema/CommercialForRent");
 const multer = require("multer");
 const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+const fs = require('fs').promises;
+const cloudinary = require("cloudinary").v2;
+
+const upload = multer({ dest: 'uploads/' });
 
 router.get("/", async (req, res) => {
   try {
@@ -36,11 +39,23 @@ router.post("/add", upload.array("myFiles"), async (req, res) => {
   try {
     const files = req.files;
 
-    const { propertyId, title, rent, description, size, propertyTypes, city } =
-      JSON.parse(req.body.additionalData);
-    const images = files.map((file) => file.buffer.toString("base64"));
-    const thumbnailImage = images[images.length - 1];
-    thumbnailImage ? images.pop() : thumbnailImage;
+    const { propertyId, title, rent, description, size, propertyTypes, city } = JSON.parse(req.body.additionalData);
+
+    const uploadedImages = [];
+
+    for (let i = 0; i < files.length; i++) {
+      await cloudinary.uploader.upload(files[i].path, {
+        public_id: `image_${i}`,
+        folder: `commercial-rent/${propertyId}`
+      });
+
+      uploadedImages.push(`commercial-rent/${propertyId}/image_${i}`);
+
+      await fs.unlink(files[i].path);
+    }
+
+    const thumbnailImage = uploadedImages[0];
+    const images = uploadedImages.slice(1);
 
     const result = new commercialForRent({
       propertyId,
@@ -55,7 +70,7 @@ router.post("/add", upload.array("myFiles"), async (req, res) => {
       propertyTypes,
 
       city,
-      isVisibale: false,
+      isVisibale: true,
     });
 
     const response = await result.save();
@@ -88,9 +103,23 @@ router.put("/edit/:id", upload.array("myFiles"), async (req, res) => {
 
       return res.status(200).json(result);
     }
-    const images = files.map((file) => file.buffer.toString("base64"));
-    const thumbnailImage = images[images.length - 1];
-    thumbnailImage ? images.pop() : thumbnailImage;
+    
+    const uploadedImages = [];
+
+    for (let i = 0; i < files.length; i++) {
+      await cloudinary.uploader.upload(files[i].path, {
+        public_id: `image_${i}`,
+        folder: `commercial-rent/${propertyId}`
+      });
+
+      uploadedImages.push(`commercial-rent/${propertyId}/image_${i}`);
+
+      await fs.unlink(files[i].path);
+    }
+
+    const thumbnailImage = uploadedImages[0];
+    const images = uploadedImages.slice(1);
+
     const Id = req.params.id;
 
     const result = await commercialForRent.findByIdAndUpdate(Id, {
@@ -120,7 +149,6 @@ router.post("/edit/isVisible/:id", async (req, res) => {
     const result = await commercialForRent.findByIdAndUpdate(id, {
       isVisibale,
     });
-    s;
     res.status(200).json(result);
   } catch (error) {
     console.error(error);
@@ -148,22 +176,24 @@ router.post("/filter", async (req, res) => {
 
     const filter = {};
 
-    if (rent !== undefined && rent !== null) {
-      filter.rent = rent;
+    if (rent !== NaN && rent !== null && rent !== "All") {
+      filter.rent = { $lt: rent };
     }
 
-    if (city !== undefined && city !== null) {
+    if (city !== "" && city !== null && city !== "All") {
       filter.city = { $regex: new RegExp(city, "i") };
     }
 
-    if (size !== undefined && size !== null) {
-      filter.size = size;
+    if (size !== NaN && size !== null && size !== "All") {
+      filter.size = { $lt: size };
     }
 
-    if (propertyTypes !== undefined && propertyTypes !== null) {
+    if (propertyTypes !== null && propertyTypes !== "All") {
       filter.propertyTypes = propertyTypes;
     }
 
+    console.log(filter);
+    
     let filtered = await commercialForRent.find(filter).exec();
 
     res.status(200).json(filtered);
@@ -179,25 +209,22 @@ router.post("/filter/main", async (req, res) => {
 
     const filter = {};
 
-    // Filtering by price if provided
-    if (rent !== undefined && rent !== null) {
-      filter.rent = rent;
+    if (rent !== NaN && rent !== null && rent !== "All") {
+      filter.rent = { $lt: rent };
     }
 
-    // Filtering by city using a case-insensitive regex for flexible matching
-    if (city !== undefined && city !== null) {
+    if (city !== "" && city !== null && city !== "All") {
       filter.city = { $regex: new RegExp(city, "i") };
     }
 
-    // Filtering by title using a case-insensitive regex for partial matches
-    if (title !== undefined && title !== null) {
+    if (title !== "" && title !== null && city !== "All") {
       filter.title = { $regex: new RegExp(title, "i") };
     }
 
-    // Perform the search with the constructed filter
+    console.log(filter);
+
     let filtered = await commercialForRent.find(filter).exec();
 
-    // Sending the filtered results back to the client
     res.status(200).json(filtered);
   } catch (error) {
     console.error(error);

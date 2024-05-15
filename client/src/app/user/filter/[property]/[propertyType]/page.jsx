@@ -30,7 +30,7 @@ import { useRouter } from "next/navigation";
 
 
 import BASE_URL from "../../../../config";
-const url = `${BASE_URL}/api/appartmentForRent/add`;
+const url = `${BASE_URL}/api/apartmentForRent/add`;
 
 function UserFilter() {
   const [postImage, setPostImage] = useState(null);
@@ -43,6 +43,7 @@ function UserFilter() {
   const router = useRouter();
   console.log("property", property);
   console.log("propertyType", propertyType);
+
   useEffect(() => {
     const currentUrl = window.location.href;
     const urlParts = currentUrl.split("/");
@@ -51,176 +52,142 @@ function UserFilter() {
 
     setProperty(propertyValue);
     setPropertyType(propertyTypeValue);
+
+    handleSubmit();
   }, []);
 
-  // const createPost = async () => {
-  //   try {
-  //     const additionalData = {
-  //       propertyId: "5wfdfwe",
-  //       title: "house beautifyll",
-  //       price: 4324,
-  //       description: "dsfsdfdsfsdfsd",
-  //       size: 2,
-  //       bedrooms: 4,
-  //       bathrooms: 5,
-  //       city: "dfgfdgd",
-  //     };
-  //     formData.append("additionalData", JSON.stringify(additionalData));
-  //     const response = await axios.post(url, formData, {
-  //       headers: {
-  //         "Content-Type": "multipart/form-data",
-  //       },
-  //     });
-  //     console.log(response);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
 
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-  //   createPost();
-  //   if (postImage) {
-  //     //   formData.append("myFile", postImage);
-  //   } else {
-  //     console.log("No image selected");
-  //   }
-  // };
-
-  // const handleFileUpload = (e) => {
-  //   const file = e.target.files[0];
-  //   setPostImage(file);
-  // };
-  // console.log(postImage);
-  // const handleMultipleFileUpload = (e) => {
-  //   const files = e.target.files;
-  //   console.log("before Files", files);
-
-  //   // Convert postImage to an array if it's not already
-  //   const postImagesArray = postImage ? [postImage] : [];
-  //   console.log("postImagesArray", postImagesArray);
-  //   // Concatenate postImage with files
-  //   const allFiles = [...files, ...postImagesArray];
-
-  //   for (let i = 0; i < allFiles.length; i++) {
-  //     formData.append("myFiles", allFiles[i]);
-  //   }
-  //   console.log("files", allFiles);
-  // };
-  console.log("Banners", Banners);
-  console.log("features", features);
-
-  const FetchBanners = async () => {
+  const handleSubmit = async (e) => {
+    e && e.preventDefault();
     try {
-      const response = await axios.get(
-        // Use axios.get instead of just axios
-        `${BASE_URL}/api/customize/banners`,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      setBanners(response?.data[0]);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  useEffect(() => {
-    FetchBanners();
-  }, []);
-  const FetchFeatures = async () => {
-    try {
-      const response = await axios.get(
-        // Use axios.get instead of just axios
-        `${BASE_URL}/api/customize/features`,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      setFeatures(response?.data[0].features);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+      let additionalData = {
+        city: city,
+      };
 
-  useEffect(() => {
-    FetchFeatures();
-  }, []);
-  console.log("collectionData", collectionData);
-  const Fetch = async (property, propertyType) => {
-    try {
-      const response = await axios.get(
-        // Use axios.get instead of just axios
-        GetAll(property, propertyType),
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      console.log("response", response);
-      setCollectionData(response.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+      if (propertyType === "ForSale") {
+        additionalData.price = parseInt(price);
+      } else if (propertyType === "ForRent") {
+        additionalData.rent = parseInt(rent);
+      }
 
-  useEffect(() => {
-    Fetch(property, propertyType);
-  }, [property, propertyType]);
+      if (property === "House" || property === "Apartment") {
+        additionalData = {
+          ...additionalData,
+          size: size,
+          bedrooms: bedrooms,
+          bathrooms: bathrooms,
+        };
+      } else if (property === "Commercial") {
+        additionalData = {
+          ...additionalData,
+          size: parseInt(size),
+          propertyTypes: propertyTypes,
+        };
+      } else if (property === "Land") {
+        additionalData = {
+          ...additionalData,
+          perches: parseInt(perches),
+          acres: parseInt(acres),
+        };
+      }
 
-  const FetchPropertyIDs = async () => {
-    try {
-      const propertyIDResponse = await axios.get(
-        `${BASE_URL}/api/customize/propertyid/`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      console.log("Properties response", propertyIDResponse.data[0].propertyId);
-      const propertyIds = propertyIDResponse.data[0].propertyId;
+      console.log("additionalData", additionalData);
+      console.log("propertyType", propertyType);
+      console.log("property", property);
 
       const response = await axios.post(
-        `${BASE_URL}/api/properties`,
-        {
-          propertyIds: propertyIds,
-        },
+        FilterUrl(propertyType, property),
+        additionalData,
         {
           headers: {
             "Content-Type": "application/json",
           },
         }
       );
-      console.log("Properties response", response.data.data);
-      setCollectionData(response.data.data);
+      setCollectionData(response.data);
+
+      if (response.data && additionalData) {
+        const filteredBy = Object.entries(additionalData).map(
+          ([key, value]) => {
+            if (!value) return null;
+            console.log("filterd by values", key, ":", value);
+
+            if (typeof value === "object") {
+              console.log("Object found:", key, value);
+              return `${key}: ${JSON.stringify(value)}`;
+            }
+
+            switch (key) {
+              case "city":
+                return value;
+              case "bedrooms":
+                return `${value} bedrooms`;
+              case "bathrooms":
+                return `${value} bathrooms`;
+              case "size":
+                return `${value} sq`;
+              case "perches":
+                return `${value} perches`;
+              case "acres":
+                return `${value} acres`;
+            }
+          }
+        );
+
+        const filteredWithoutNull = filteredBy.filter((value) => value !== null);
+        const filteredArray = filteredWithoutNull.filter(Boolean);
+
+        console.log("filteredByCleaned", filteredArray);
+
+        setFilteredBy(filteredArray);
+
+        const transformedCities = Cities.map((city) => ({
+          label: city.label,
+          subheadings: city.subheadings.map((subheading) => subheading.value),
+        }));
+
+        console.log("transformedCities", transformedCities);
+        let topCities = [];
+
+        transformedCities?.forEach((transformedCity) => {
+
+          if (additionalData?.city == transformedCity.label) {
+            topCities = transformedCity.subheadings;
+            // No need to break out of the loop here since we want to check all items
+          }
+        });
+
+        // After the loop, check if topCities is still an empty array
+        if (topCities.length === 0) {
+          // If no match was found, assign [city] to topCities
+          topCities = [city];
+        }
+
+        setTopCities(topCities);
+      }
     } catch (error) {
-      console.log("error in fetching properties", error);
+      console.debug(error);
     }
   };
 
-  useEffect(() => {
-    FetchPropertyIDs();
-  }, []);
 
   return (
     <>
       <Navbar type={"user"} />
       <Subheader
-        setProperty={setProperty}
-        setPropertyType={setPropertyType}
+        propertyType={propertyType}
         user="user"
       />
-      <Filter
-        property={property}
-        propertyType={propertyType}
-        setCollectionData={setCollectionData}
-        collectionData={collectionData}
-      />
+      {property && propertyType ? (
+        <Filter
+          property={property}
+          propertyType={propertyType}
+          setCollectionData={setCollectionData}
+          collectionData={collectionData}
+        />
+      ) : (
+        <></>
+      )}
 
       <Box sx={{ margin: "10px 0px", textAlign: "center" }}>
         <Container>
@@ -244,7 +211,7 @@ function UserFilter() {
               mb: "30px",
             }}
           >
-            Showcase Properties
+            Fitered Properties
           </Typography>
           <Showcase
             data={collectionData}

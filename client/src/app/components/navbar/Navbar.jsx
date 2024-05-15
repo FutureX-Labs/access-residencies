@@ -37,6 +37,7 @@ function Navbar(props) {
     { title: "Customize", path: "/admin/customize" },
     { title: "Property View", path: "/admin/view/House/ForSale" },
     { title: "Property Add", path: "/admin/add" },
+    { title: user ? "Logout" : "Login", path: "/auth" },
   ];
 
   const userNavItems = [
@@ -44,7 +45,6 @@ function Navbar(props) {
     { title: "About us", path: "#about" },
     { title: "Gallery", path: "#gallery" },
     { title: "Contact Us", path: "#contact" },
-    { title: user ? "Logout" : "Login", path: "/auth" },
   ];
 
   const navItems = type === "admin" ? adminNavItems : userNavItems;
@@ -170,23 +170,22 @@ function Navbar(props) {
             sx={{ flexGrow: 1, alignItems: "center" }}
             onClick={handleLogoClick}
           >
-            <Image
-              component="div"
-              src="/logo.png"
-              alt="logo"
-              width={147}
-              height={64}
-              sx={{ flexGrow: 1 }}
-              variant="h6"
-            />
+            <Link href="/">
+              <Image
+                src="/logo.png"
+                alt="logo"
+                width={147}
+                height={64}
+                sx={{ flexGrow: 1 }}
+                variant="h6"
+              />
+            </Link>
           </Box>
           <Box sx={{ display: { xs: "none", md: "block" } }}>
             {navItems.map((item) => (
-              <>
-                <Link key={item.title} href={item.path}>
-                  <Button sx={{ color: "white" }}>{item.title}</Button>
-                </Link>
-              </>
+              <Link key={item.title} href={item.path}>
+                <Button sx={{ color: "white" }}>{item.title}</Button>
+              </Link>
             ))}
           </Box>
 

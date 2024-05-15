@@ -12,14 +12,13 @@ export function FilterUrl(propertyType, property) {
         case "Commercial":
           url += "commercialforsale/filter";
           break;
-        case "Appartment":
-          url += "appartmentforsale/filter";
+        case "Apartment":
+          url += "apartmentforsale/filter";
           break;
         case "Land":
           url += "landforsale/filter";
           break;
         default:
-          // Handle invalid property type
           break;
       }
       break;
@@ -31,19 +30,17 @@ export function FilterUrl(propertyType, property) {
         case "Commercial":
           url += "commercialforrent/filter";
           break;
-        case "Appartment":
-          url += "appartmentforrent/filter";
+        case "Apartment":
+          url += "apartmentforrent/filter";
           break;
         case "Land":
           url += "landforrent/filter";
           break;
         default:
-          // Handle invalid property type
           break;
       }
       break;
     default:
-      // Handle invalid property type
       break;
   }
 

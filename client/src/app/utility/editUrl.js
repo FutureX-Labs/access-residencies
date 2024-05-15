@@ -12,8 +12,8 @@ export function EditUrl(property, propertyType, id) {
         case "Commercial":
           url += `commercialforsale/edit/${id}`;
           break;
-        case "Appartment":
-          url += `appartmentforsale/edit/${id}`;
+        case "Apartment":
+          url += `apartmentforsale/edit/${id}`;
           break;
         case "Land":
           url += `landforsale/edit/${id}`;
@@ -31,8 +31,8 @@ export function EditUrl(property, propertyType, id) {
         case "Commercial":
           url += `commercialforrent/edit/${id}`;
           break;
-        case "Appartment":
-          url += `appartmentforrent/edit/${id}`;
+        case "Apartment":
+          url += `apartmentforrent/edit/${id}`;
           break;
         case "Land":
           url += `landforrent/edit/${id}`;
