@@ -21,7 +21,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import AuthContext from "@/app/context/AuthContext";
 
-const drawerWidth = 900;
+const drawerWidth = 240;
 
 function Navbar(props) {
   const { window, type } = props;
@@ -96,9 +96,14 @@ function Navbar(props) {
         alignItems: "center",
       }}>
         {navItems.map((item) => (
-          <ListItem key={item.title} sx={{ gap: "20px",
-          justifyContent: "center",
-          alignItems: "center", }}>
+          <ListItem
+            key={item.title}
+            sx={{
+              gap: "20px",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
             {item.title === "Logout" ? (
               <Button
                 variant="contained"
@@ -111,10 +116,6 @@ function Navbar(props) {
               </Button>
             ) : (
               <Link
-                sx={{
-                  textAlign: "left",
-                  textDecoration: "none",
-                }}
                 href={item.path}
               >
                 <ListItemText
@@ -124,7 +125,7 @@ function Navbar(props) {
                     textDecoration: "none",
                     fontFamily: "Roboto Condensed",
                     fontWeight: "800",
-                    fontSize: "24px",
+                    fontSize: "30px",
                     lineHeight: "28.13px",
                   }}
                 />
@@ -165,7 +166,7 @@ function Navbar(props) {
               />
             </Link>
           </Box>
-          <Box sx={{ display: { md: "flex", sm: "none" }, gap: "20px" }}>
+          <Box sx={{ display: { xs: "none", md: "flex" }, gap: "20px" }}>
             {navItems.map((item) => (
               item.title === "Logout" ? (
                 <Button

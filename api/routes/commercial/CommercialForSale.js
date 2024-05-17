@@ -191,7 +191,7 @@ router.post("/filter", async (req, res) => {
     }
 
     if (price !== NaN && price !== null && price !== "All") {
-      filter.price = { $lt: price };
+      filter.price = { $lte: price };
     }
 
     if (city !== "" && city !== null && city !== "All") {
@@ -199,7 +199,7 @@ router.post("/filter", async (req, res) => {
     }
 
     if (size !== NaN && size !== null && size !== "All") {
-      filter.size = { $lt: size };
+      filter.size = { $gte: size };
     }
 
     if (propertyTypes !== null && propertyTypes !== "All") {
@@ -227,7 +227,7 @@ router.post("/filter/main", async (req, res) => {
     }
 
     if (price !== NaN && price !== null && price !== "All") {
-      filter.price = { $lt: price };
+      filter.price = { $lte: price };
     }
 
     if (city !== "" && city !== null && city !== "All") {

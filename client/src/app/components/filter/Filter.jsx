@@ -33,6 +33,7 @@ import UseSessionStorage from "@/app/UseSessionStorage";
 
 const Filter = ({
   property,
+  scollToRef,
   propertyType,
   setCollectionData,
   collectionData,
@@ -68,7 +69,12 @@ const Filter = ({
   console.log("role", role);
 
   const handleSubmit = async (e) => {
-    e && e.preventDefault();
+    if (e) {
+      e.preventDefault();
+      if (scollToRef.current) {
+        scollToRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
     try {
       let additionalData = {
         city: city,
@@ -133,15 +139,19 @@ const Filter = ({
               case "city":
                 return value;
               case "bedrooms":
-                return `${value} bedrooms`;
+                return `${value} Bedrooms`;
               case "bathrooms":
-                return `${value} bathrooms`;
+                return `${value} Bathrooms`;
               case "size":
                 return `${value} sq`;
               case "perches":
-                return `${value} perches`;
+                return `${value} Perches`;
               case "acres":
-                return `${value} acres`;
+                return `${value} Acres`;
+              case "price":
+                return `Below Rs.${value}`;
+              case "rent":
+                return `Below Rs.${value}`;
             }
           }
         );
@@ -217,11 +227,12 @@ const Filter = ({
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
+                flexDirection: { xs: "column", md: "row" },
                 opacity: property && propertyType ? 1 : 0.3,
                 pointerEvents: property && propertyType ? "auto" : "none",
               }}
             >
-              <Box>
+              <Box sx={{ width: "100%" }}>
                 <Typography
                   variant="h6"
                   style={{
@@ -236,13 +247,13 @@ const Filter = ({
                 <select
                   style={{
                     height: "50px",
-                    width: "200px",
+                    width: "100%",
                     border: "1px solid grey",
-                    backgroundColor: "black",
-                    borderRadius: "10px 0px 0px 10px",
+                    borderRadius: { xs: "10px", md: "10px 0px 0px 10px" },
                     color: "white",
+                    backgroundColor: "black",
                     fontSize: "16px",
-                    paddingLeft: "10px",
+                    padding: "0 10px",
                   }}
                   value={city || 'All'}
                   onChange={(e) => {
@@ -266,7 +277,7 @@ const Filter = ({
                   ))}
                 </select>
               </Box>
-              <Box>
+              <Box sx={{ width: "100%" }}>
                 <Typography
                   variant="h6"
                   style={{
@@ -292,13 +303,12 @@ const Filter = ({
                   size="small"
                   sx={{
                     height: "50px",
-                    width: "200px",
+                    width: "100%",
                     border: "1px solid grey",
-
+                    borderRadius: { xs: "10px", md: "0px" },
                     backgroundColor: "black",
                     color: "white",
                   }}
-                  fullWidth
                 >
                   {Prices.map((priceOption, index) => (
                     <MenuItem key={index} value={priceOption.value}>
@@ -307,9 +317,45 @@ const Filter = ({
                   ))}
                 </Select>
               </Box>
-              <Box>
-                {property === "Commercial" && (
-                  <>
+              {property === "Commercial" && (
+                <Box sx={{ width: "100%" }}>
+                  <Typography
+                    variant="h6"
+                    style={{
+                      color: "white",
+                      fontWeight: 500,
+                      fontSize: "16px",
+                      marginLeft: "10px",
+                    }}
+                  >
+                    Property Types
+                  </Typography>
+                  <Select
+                    value={comPropertyS || ''}
+                    onChange={(e) => setComPropertyS(e.target.value)}
+                    inputProps={{ style: { color: "white" } }}
+                    size="small"
+                    sx={{
+                      height: "50px",
+                      width: "100%",
+                      border: "1px solid grey",
+                      borderRadius: { xs: "10px", md: "0px" },
+                      backgroundColor: "black",
+                      color: "white",
+                    }}
+                  >
+                    {comProperty.map((type, index) => (
+                      <MenuItem key={index} value={type.value}>
+                        {type.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </Box>
+              )}
+              {(property === "House" ||
+                property === "Commercial" ||
+                property === "Apartment") && (
+                  <Box sx={{ width: "100%" }}>
                     <Typography
                       variant="h6"
                       style={{
@@ -319,150 +365,102 @@ const Filter = ({
                         marginLeft: "10px",
                       }}
                     >
-                      Property Types
+                      Size
                     </Typography>
                     <Select
-                      value={comPropertyS || ''}
-                      onChange={(e) => setComPropertyS(e.target.value)}
+                      value={size || 'All'}
+                      onChange={(e) => setSize(e.target.value)}
                       inputProps={{ style: { color: "white" } }}
                       size="small"
                       sx={{
                         height: "50px",
-                        width: "200px",
+                        width: "100%",
                         border: "1px solid grey",
-
+                        borderRadius: { xs: "10px", md: "0px" },
                         backgroundColor: "black",
                         color: "white",
                       }}
-                      fullWidth
                     >
-                      {comProperty.map((type, index) => (
-                        <MenuItem key={index} value={type.value}>
-                          {type.label}
+                      {Sizes.map((sizeOption, index) => (
+                        <MenuItem key={index} value={sizeOption.value}>
+                          {sizeOption.label}
                         </MenuItem>
                       ))}
                     </Select>
-                  </>
+                  </Box>
                 )}
-              </Box>
-              <Box>
-                {(property === "House" ||
-                  property === "Commercial" ||
-                  property === "Apartment") && (
-                    <>
-                      <Typography
-                        variant="h6"
-                        style={{
-                          color: "white",
-                          fontWeight: 500,
-                          fontSize: "16px",
-                          marginLeft: "10px",
-                        }}
-                      >
-                        Size
-                      </Typography>
-                      <Select
-                        value={size || 'All'}
-                        onChange={(e) => setSize(e.target.value)}
-                        inputProps={{ style: { color: "white" } }}
-                        size="small"
-                        sx={{
-                          height: "50px",
-                          width: "200px",
-                          border: "1px solid grey",
-
-                          backgroundColor: "black",
-                          color: "white",
-                        }}
-                        fullWidth
-                      >
-                        {Sizes.map((sizeOption, index) => (
-                          <MenuItem key={index} value={sizeOption.value}>
-                            {sizeOption.label}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </>
-                  )}
-              </Box>
-              <Box>
-                {(property === "House" || property === "Apartment") && (
-                  <>
-                    <Typography
-                      variant="h6"
-                      style={{
-                        color: "white",
-                        fontWeight: 500,
-                        fontSize: "16px",
-                        marginLeft: "10px",
-                      }}
-                    >
-                      Bedrooms
-                    </Typography>
-                    <Select
-                      value={bedrooms || 'All'}
-                      onChange={(e) => setBedrooms(e.target.value)}
-                      inputProps={{ style: { color: "white" } }}
-                      size="small"
-                      sx={{
-                        height: "50px",
-                        width: "200px",
-                        border: "1px solid grey",
-
-                        backgroundColor: "black",
-                        color: "white",
-                      }}
-                      fullWidth
-                    >
-                      {Bedrooms.map((option, index) => (
-                        <MenuItem key={index} value={option.value}>
-                          {option.label}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </>
-                )}
-              </Box>
-              <Box>
-                {(property === "House" || property === "Apartment") && (
-                  <>
-                    <Typography
-                      variant="h6"
-                      style={{
-                        color: "white",
-                        fontWeight: 500,
-                        fontSize: "16px",
-                        marginLeft: "10px",
-                      }}
-                    >
-                      Bathrooms
-                    </Typography>
-                    <Select
-                      value={bathrooms || 'All'}
-                      onChange={(e) => setBathrooms(e.target.value)}
-                      inputProps={{ style: { color: "white" } }}
-                      size="small"
-                      sx={{
-                        height: "50px",
-                        width: "200px",
-                        border: "1px solid grey",
-
-                        backgroundColor: "black",
-                        color: "white",
-                      }}
-                      fullWidth
-                    >
-                      {Bedrooms.map((option, index) => (
-                        <MenuItem key={index} value={option.value}>
-                          {option.label}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </>
-                )}
-              </Box>
-              <Box>
-                {property === "Land" && (
+              {(property === "House" || property === "Apartment") && (
+                <Box sx={{ width: "100%" }}>
+                  <Typography
+                    variant="h6"
+                    style={{
+                      color: "white",
+                      fontWeight: 500,
+                      fontSize: "16px",
+                      marginLeft: "10px",
+                    }}
+                  >
+                    Bedrooms
+                  </Typography>
+                  <Select
+                    value={bedrooms || 'All'}
+                    onChange={(e) => setBedrooms(e.target.value)}
+                    inputProps={{ style: { color: "white" } }}
+                    size="small"
+                    sx={{
+                      height: "50px",
+                      width: "100%",
+                      border: "1px solid grey",
+                      borderRadius: { xs: "10px", md: "0px" },
+                      backgroundColor: "black",
+                      color: "white",
+                    }}
+                  >
+                    {Bedrooms.map((option, index) => (
+                      <MenuItem key={index} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </Box>
+              )}
+              {(property === "House" || property === "Apartment") && (
+                <Box sx={{ width: "100%" }}>
+                  <Typography
+                    variant="h6"
+                    style={{
+                      color: "white",
+                      fontWeight: 500,
+                      fontSize: "16px",
+                      marginLeft: "10px",
+                    }}
+                  >
+                    Bathrooms
+                  </Typography>
+                  <Select
+                    value={bathrooms || 'All'}
+                    onChange={(e) => setBathrooms(e.target.value)}
+                    inputProps={{ style: { color: "white" } }}
+                    size="small"
+                    sx={{
+                      height: "50px",
+                      width: "100%",
+                      border: "1px solid grey",
+                      borderRadius: { xs: "10px", md: "0px" },
+                      backgroundColor: "black",
+                      color: "white",
+                    }}
+                  >
+                    {Bedrooms.map((option, index) => (
+                      <MenuItem key={index} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </Box>
+              )}
+              {property === "Land" && (
+                <Box sx={{ width: "100%" }}>
                   <>
                     <Typography
                       variant="h6"
@@ -482,13 +480,12 @@ const Filter = ({
                       size="small"
                       sx={{
                         height: "50px",
-                        width: "200px",
+                        width: "100%",
                         border: "1px solid grey",
-
+                        borderRadius: { xs: "10px", md: "0px" },
                         backgroundColor: "black",
                         color: "white",
                       }}
-                      fullWidth
                     >
                       {Perches.map((option, index) => (
                         <MenuItem key={index} value={option.value}>
@@ -497,10 +494,10 @@ const Filter = ({
                       ))}
                     </Select>
                   </>
-                )}
-              </Box>
-              <Box>
-                {property === "Land" && (
+                </Box>
+              )}
+              {property === "Land" && (
+                <Box sx={{ width: "100%" }}>
                   <>
                     <Typography
                       variant="h6"
@@ -520,13 +517,12 @@ const Filter = ({
                       size="small"
                       sx={{
                         height: "50px",
-                        width: "200px",
+                        width: "100%",
                         border: "1px solid grey",
-
+                        borderRadius: { xs: "10px", md: "0px" },
                         backgroundColor: "black",
                         color: "white",
                       }}
-                      fullWidth
                     >
                       {Acres.map((option, index) => (
                         <MenuItem key={index} value={option.value}>
@@ -535,17 +531,17 @@ const Filter = ({
                       ))}
                     </Select>
                   </>
-                )}
-              </Box>
+                </Box>
+              )}
               <Button
                 sx={{
                   height: "50px",
-                  width: "200px",
+                  width: "80%",
                   border: "1px solid grey",
                   marginTop: "24px",
                   backgroundColor: "#8C1C40",
                   color: "white",
-                  borderRadius: "0px 10px 10px 0px",
+                  borderRadius: { xs: "20px", md: "0px 10px 10px 0px" },
                 }}
                 type="submit"
               >

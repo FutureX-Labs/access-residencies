@@ -29,6 +29,7 @@ import Swal from "sweetalert2";
 import { CldImage } from 'next-cloudinary';
 
 const Showcase = ({ data, user, property, propertyType, showHidden }) => {
+  console.log("Data:", data);
   // Sample data array
   //   const data = Array.from({ length: 100 }, (_, i) => ({
   //     id: i + 1,
@@ -170,7 +171,7 @@ const Showcase = ({ data, user, property, propertyType, showHidden }) => {
               <Typography
                 sx={{
                   fontWeight: "700",
-                  fontSize: "18px",
+                  fontSize: "17px",
                   lineHeight: "21px",
                 }}
               >
@@ -192,7 +193,7 @@ const Showcase = ({ data, user, property, propertyType, showHidden }) => {
               <Typography
                 sx={{
                   fontWeight: "700",
-                  fontSize: "18px",
+                  fontSize: "17px",
                   lineHeight: "21px",
                 }}
               >
@@ -219,7 +220,7 @@ const Showcase = ({ data, user, property, propertyType, showHidden }) => {
                 <Typography
                   sx={{
                     fontWeight: "600",
-                    fontSize: "18px",
+                    fontSize: "17px",
                     lineHeight: "21px",
                   }}
                 >
@@ -228,13 +229,35 @@ const Showcase = ({ data, user, property, propertyType, showHidden }) => {
               </Box>
             </>
           )}
+
+          {item.landExtent && (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: "10px",
+              }}
+            >
+              <Image src={squareFeet} alt="icon" size={12} />
+              <Typography
+                sx={{
+                  fontWeight: "500",
+                  fontSize: "17px",
+                  lineHeight: "21px",
+                }}
+              >
+                {item.landExtent.acres} acres {item.landExtent.perches} perches
+              </Typography>
+            </Box>
+          )}
         </Box>
         <Typography
           sx={{
             fontWeight: "800",
             fontSize: "20px",
             lineHeight: "21px",
-            margin: "10px 0px",
+            margin: "20px 0px 5px 0px",
           }}
         >
           {item.title}

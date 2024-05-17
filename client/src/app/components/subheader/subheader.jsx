@@ -25,11 +25,18 @@ const Subheader = ({ propertyType, user }) => {
 
   return (
     <Box sx={{ backgroundColor: "#8c1c40", width: "100vw" }}>
-      <Box sx={{ display: "flex", gap: "0px"}}>
+      <Box
+        sx={{
+          display: "flex",
+          gap: "0px",
+          width: { md: "25%", xs: "100%" }
+        }}
+      >
         <Button
           onClick={handleOpenMenuForSale}
           sx={{
-            padding: "20px 40px", 
+            height: "60px",
+            width: "100%",
             color: "white",
             backgroundColor: (propertyType === "ForSale") ? "#00000044" : "inherit",
             fontFamily: "Roboto Condensed",
@@ -98,7 +105,8 @@ const Subheader = ({ propertyType, user }) => {
         <Button
           onClick={handleOpenMenuForRent}
           sx={{
-            padding: "20px 40px", 
+            width: "100%",
+            height: "60px",
             color: "white",
             fontFamily: "Roboto Condensed",
             backgroundColor: (propertyType === "ForRent") ? "#00000044" : "inherit",
