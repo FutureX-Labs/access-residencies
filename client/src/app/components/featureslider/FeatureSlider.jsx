@@ -20,12 +20,6 @@ export default function FeatureSlider({ imageData }) {
     arrows: false,
   };
 
-  const imgStyle = {
-    width: "900px",
-    minHeight: "400px",
-    overflow: "none",
-  };
-
   return (
     <Slider
       {...settings}
@@ -34,17 +28,16 @@ export default function FeatureSlider({ imageData }) {
       className="slick-slider-custom"
     >
       {imageData?.map((img) => (
-        <div key={img.id}>
+        <div key={img.id} >
           <Link href={img.url}>
-            <div style={imgStyle}>
-              <CldImage
-                fill
-                src={img?.file}
-                style={{ objectFit: "cover" }}
-                sizes="100vw"
-                alt="Banner Image"
-              />
-            </div>
+            <CldImage
+              width={900}
+              height={400}
+              src={img?.file}
+              style={{ objectFit: "cover" }}
+              sizes="100vw"
+              alt="Banner Image"
+            />
           </Link>
         </div>
       ))}

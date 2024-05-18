@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Navbar from "../../components/navbar/Navbar";
+import Subheader from "../../components/subheader/subheader";
 import Image from "next/image";
 import {
   Box,
@@ -29,6 +30,7 @@ function View() {
   const [selectedData, setSelectedData] = useState("");
   const [propertyType, setPropertyType] = useState("");
   const [property, setProperty] = useState("");
+  const [canShare, setCanShare] = useState(false);
 
   const fetchData = async () => {
     const currentUrl = window.location.href;
@@ -65,13 +67,39 @@ function View() {
       }
     }
   };
+
   useEffect(() => {
     fetchData();
+    if (navigator.share) {
+      setCanShare(true);
+    }
+    console.log("canShare", canShare);
   }, []);
+
+  const handleShare = async () => {
+    console.log("handleShare");
+    try {
+      if (canShare) {
+        await navigator.share({
+          title: document.title,
+          url: window.location.href,
+        });
+      } else {
+        console.log('Web Share API not supported.');
+      }
+    } catch (error) {
+      console.error('Error sharing:', error.message);
+    }
+  };
+
 
   return (
     <>
       <Navbar type={"user"} />
+      <Subheader
+        propertyType={propertyType}
+        user="user"
+      />
       {selectedData ? (<BannerSlider imageData={[selectedData.thumbnailImage, ...selectedData.images]} />) : null}
 
       <Breadcrumbs
@@ -107,45 +135,32 @@ function View() {
         <Box
           sx={{
             display: "flex",
-            flexDirection: { md: "row", xs: "column" },
-            justifyContent: "space-between",
-            padding: "10px",
-            alignItems: "center"
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: "15px",
           }}
         >
-          <Box>
+          <Box sx={{
+            width: "100%",
+            display: "flex",
+            justifyContent: { xs: "center", md: "space-between" },
+            alignItems: "center",
+          }}>
             <Typography
               sx={{
-                textAlign: { md: "start", xs: "center" },
                 fontWeight: "500",
               }}
               variant="h5"
             >
               {selectedData.title}
             </Typography>
-            <Typography
-              sx={{
-                textAlign: { md: "start", xs: "center" },
-                color: "#FF6DD6",
-                fontWeight: "600",
-                marginTop: "15px",
-              }}
-            >
-              {selectedData.city}
-            </Typography>
-          </Box>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: { md: "end", xs: " center" },
-            }}
-          >
             <Box
               sx={{
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
+                display: { xs: "none", md: "block" },
               }}
             >
               <Button
@@ -158,16 +173,31 @@ function View() {
                 }}
               >
                 <FaShareNodes size={20} />
-                <Typography sx={{ fontSize: "13px" }}>Share</Typography>
+                <Typography onClick={handleShare} sx={{ fontSize: "13px" }}>Share</Typography>
               </Button>
             </Box>
+          </Box>
+          <Box
+            sx={{
+              width: "100%",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-end",
+            }}
+          >
+            <Typography
+              sx={{
+                color: "#FF6DD6",
+                fontWeight: "600",
+              }}
+            >
+              {selectedData.city}
+            </Typography>
             <Typography
               sx={{
                 color: "#787878",
                 fontSize: "14px",
-                textAlign: { md: "end", xs: "center" },
                 fontWeight: "600",
-                marginTop: "17px",
               }}
             >
               {selectedData.propertyId}
@@ -176,8 +206,17 @@ function View() {
         </Box>
 
         <Box sx={{ width: "85%", margin: "0 auto" }}>
-          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-            <Box sx={{ display: "flex", gap: "20px" }}>
+          <Box sx={{
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+            gap: "20px",
+            justifyContent: "space-between"
+          }}>
+            <Box sx={{
+              display: "flex",
+              flexDirection: { xs: "column", md: "row" },
+              gap: "20px",
+            }}>
               {selectedData.bedrooms && (
                 <Box
                   sx={{
@@ -245,7 +284,6 @@ function View() {
               <Box
                 sx={{
                   display: "flex",
-                  justifyContent: "center",
                   alignItems: "center",
                   gap: "10px",
                 }}
@@ -257,10 +295,9 @@ function View() {
               </Box>
             )}
           </Box>
-
           <Box
             sx={{
-              padding: "20px 0px 20px",
+              paddingTop: "20px",
             }}
           >
             <Typography
@@ -270,47 +307,72 @@ function View() {
                 fontSize: "18px",
               }}
             >
-              RS {(propertyType === "ForSale") ? selectedData.price : selectedData.rent}
+              RS. {(propertyType === "ForSale") ? selectedData.price : selectedData.rent}
             </Typography>
           </Box>
           <Typography
             sx={{
+              paddingTop: "20px",
               color: "#bdbdbd",
-              fontSize: "20px",
+              fontSize: { md: "18px", xs: "14px" },
               textAlign: "center",
-              fontWeight: "700",
+              fontWeight: "500",
               overflowY: " auto",
               maxHeight: { md: "300px", xs: "230px" },
             }}
           >
             {selectedData.description}
           </Typography>
-
           <Box
             sx={{
+              paddingTop: "20px",
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
-              margin: "40px 0px",
             }}
           >
-            <Typography>Contact : 0711234567</Typography>
+            <Typography sx={{
+              display: { xs: "none", md: "block" },
+            }}>
+              Contact : 071123456
+            </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                display: { xs: "block", md: "none" },
+              }}
+            >
+              <Button
+                sx={{
+                  backgroundColor: "#8C1C40",
+                  padding: "6px 0",
+                  color: "#fff",
+                  gap: "10px",
+                  width: "100px",
+                }}
+              >
+                <FaShareNodes size={20} />
+                <Typography onClick={handleShare} sx={{ fontSize: "13px" }}>Share</Typography>
+              </Button>
+            </Box>
             <Box>
               <Button
                 sx={{
                   backgroundColor: "#8C1C40",
-                  padding: "7px 15px",
+                  padding: "6px 0",
                   color: "#fff",
                   gap: "10px",
+                  width: "100px",
                 }}
               >
                 <SlCallEnd size={15} />
                 <Typography
-                  sx={{ fontSize: "15px", cursor: "pointer" }}
+                  sx={{ fontSize: "14px", cursor: "pointer" }}
                   onClick={() => {
                     window.location.href = "tel:0711234567";
-                  }}
-                >
+                  }}>
                   Call
                 </Typography>
               </Button>

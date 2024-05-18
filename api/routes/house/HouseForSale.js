@@ -212,7 +212,7 @@ router.post("/filter", async (req, res) => {
     }
 
     if (price !== NaN && price !== null && price !== "All") {
-      filter.price = { $lt: price };
+      filter.price = { $lte: price };
     }
 
     if (city !== "" && city !== null && city !== "All") {
@@ -220,15 +220,15 @@ router.post("/filter", async (req, res) => {
     }
 
     if (size !== NaN && size !== null && size !== "All") {
-      filter.size = { $lt: size };
+      filter.size = { $gte: size };
     }
 
     if (bedrooms !== NaN && bedrooms !== null && bedrooms !== "All") {
-      filter.bedrooms = { $lt: bedrooms };
+      filter.bedrooms = { $gte: bedrooms };
     }
 
     if (bathrooms !== NaN && bathrooms !== null && bathrooms !== "All") {
-      filter.bathrooms = { $lt: bathrooms };
+      filter.bathrooms = { $gte: bathrooms };
     }
 
     console.log(filter);
@@ -253,7 +253,7 @@ router.post("/filter/main", async (req, res) => {
     }
 
     if (price !== NaN && price !== null && price !== "All") {
-      filter.price = { $lt: price };
+      filter.price = { $lte: price };
     }
 
     if (city !== "" && city !== null && city !== "All") {

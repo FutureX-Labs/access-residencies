@@ -88,9 +88,64 @@ router.post("/add", upload.array("myFiles"), async (req, res) => {
   }
 });
 
-router.put("/edit/:id", upload.array("myFiles"), async (req, res) => {
+router.put("/edit/:id/uploadThumbnail/", upload.single("thumbnail"), async (req, res) => {
   try {
-    const files = req.files;
+    const thumbnailFile = req.file;
+    const propertyId = req.body.propertyId;
+
+    await cloudinary.uploader.upload(thumbnailFile.path, {
+      public_id: `image_0`,
+      folder: `apartment-rent/${propertyId}`
+    });
+    await fs.unlink(thumbnailFile.path);
+
+    res.sendStatus(200);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+router.put("/edit/:id/uploadImages/", upload.array("image"), async (req, res) => {
+  try {
+    const imageFiles = req.files;
+    const propertyId = req.body.propertyId;
+    const Id = req.params.id;
+
+    apartmentForRent.findById(Id, { images: 1, _id: 0 })
+      .then(details => {
+        cloudinary.api.delete_resources(details.images, { type: 'upload', resource_type: 'image' });
+      })
+
+    const uploadedImages = [];
+
+    for (let i = 0; i < imageFiles.length; i++) {
+      await cloudinary.uploader.upload(imageFiles[i].path, {
+        public_id: `image_${i + 1}`,
+        folder: `apartment-rent/${propertyId}`
+      });
+
+      uploadedImages.push(`apartment-rent/${propertyId}/image_${i + 1}`);
+
+      await fs.unlink(imageFiles[i].path);
+    }
+
+    await apartmentForRent.findByIdAndUpdate(
+      Id,
+      { $set: { images: uploadedImages } },
+      { new: true }
+    );
+
+    res.sendStatus(200);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+router.put("/edit/:id/additionalData/", async (req, res) => {
+  console.log(req);
+  try {
+    const Id = req.params.id;
+
     const {
       propertyId,
       title,
@@ -101,53 +156,21 @@ router.put("/edit/:id", upload.array("myFiles"), async (req, res) => {
       bathrooms,
       city,
     } = JSON.parse(req.body.additionalData);
-    if (!files || files.length === 0) {
-      const id = req.params.id;
 
-      const result = await apartmentForRent.findByIdAndUpdate(id, {
-        propertyId,
-        title,
-        rent,
-        description,
-        size,
-        bedrooms,
-        bathrooms,
-        city,
-      });
-
-      return res.status(200).json(result);
-    }
-
-    const uploadedImages = [];
-
-    for (let i = 0; i < files.length; i++) {
-      await cloudinary.uploader.upload(files[i].path, {
-        public_id: `image_${i}`,
-        folder: `apartment-rent/${propertyId}`
-      });
-
-      uploadedImages.push(`apartment-rent/${propertyId}/image_${i}`);
-
-      await fs.unlink(files[i].path);
-    }
-
-    const thumbnailImage = uploadedImages[0];
-    const images = uploadedImages.slice(1);
-
-    const Id = req.params.id;
+    const oldPropertyId = await apartmentForRent.findById(Id, { propertyId: 1, _id: 0 });
 
     const result = await apartmentForRent.findByIdAndUpdate(Id, {
       propertyId,
       title,
       rent,
-      thumbnailImage,
-      images,
       description,
       size,
       bedrooms,
       bathrooms,
       city,
     });
+
+    await cloudinary.uploader.rename(`apartment-rent/${oldPropertyId}`, `apartment-rent/${propertyId}`);
 
     res.status(200).json(result);
   } catch (error) {
@@ -203,7 +226,7 @@ router.post("/filter", async (req, res) => {
     }
 
     if (rent !== NaN && rent !== null && rent !== "All") {
-      filter.rent = { $lt: rent };
+      filter.rent = { $lte: rent };
     }
 
     if (city !== "" && city !== null && city !== "All") {
@@ -211,15 +234,15 @@ router.post("/filter", async (req, res) => {
     }
 
     if (size !== NaN && size !== null && size !== "All") {
-      filter.size = { $lt: size };
+      filter.size = { $gte: size };
     }
 
     if (bedrooms !== NaN && bedrooms !== null && bedrooms !== "All") {
-      filter.bedrooms = { $lt: bedrooms };
+      filter.bedrooms = { $gte: bedrooms };
     }
 
     if (bathrooms !== NaN && bathrooms !== null && bathrooms !== "All") {
-      filter.bathrooms = { $lt: bathrooms };
+      filter.bathrooms = { $gte: bathrooms };
     }
 
     console.log(filter);
@@ -244,7 +267,7 @@ router.post("/filter/main", async (req, res) => {
     }
 
     if (rent !== NaN && rent !== null && rent !== "All") {
-      filter.rent = { $lt: rent };
+      filter.rent = { $lte: rent };
     }
 
     if (city !== "" && city !== null && city !== "All") {

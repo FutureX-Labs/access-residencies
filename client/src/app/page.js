@@ -1,5 +1,5 @@
 "use client";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useRef } from "react";
 import axios from "axios";
 import Slider from "react-slick";
 import Navbar from "./components/navbar/Navbar";
@@ -21,6 +21,8 @@ import BannerSlider from "@/app/components/bannerslider/BannerSlider";
 import FeatureSlider from "./components/featureslider/FeatureSlider";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import Autocomplete from '@mui/material/Autocomplete';
 import Showcase from "./components/showcase/Showcase";
 import Subheader from "./components/subheader/subheader";
 import { GetAll } from "./utility/getAll";
@@ -36,6 +38,7 @@ import BASE_URL from "./config";
 const url = `${BASE_URL}/api/apartmentForRent/add`;
 
 function Home() {
+  const scollToRef = useRef();
   const [postImage, setPostImage] = useState(null);
   const [formData, setFormData] = useState(new FormData());
   const [Banners, setBanners] = useState([]);
@@ -47,16 +50,31 @@ function Home() {
   const [selectedPropertyType, setSelectedPropertyType] = useState("ForSale");
   const [price, setPrice] = useState("All");
   const [rent, setRent] = useState("All");
-  const [city, setCity] = useState("All");
+  const [city, setCity] = useState({ title: 'All', group: 'All' });
   const [title, setTitle] = useState(null);
+
+  const theme = createTheme({
+    components: {
+      MuiAutocomplete: {
+        styleOverrides: {
+          clearIndicator: {
+            color: 'white',
+          },
+          popupIndicator: {
+            color: 'white',
+          },
+        },
+      },
+    },
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("submit");
+
     try {
       let additionalData = {
         title: title,
-        city: city,
+        city: city.title,
       };
 
       if (selectedPropertyType === "ForSale") {
@@ -68,7 +86,7 @@ function Home() {
 
       console.log("selectedPropertyType", selectedPropertyType);
       console.log("selectedProperty", selectedProperty);
-      
+
       const initialUrl = FilterUrl(selectedPropertyType, selectedProperty);
       console.log("initialUrl", initialUrl);
 
@@ -79,22 +97,17 @@ function Home() {
           "Content-Type": "application/json",
         },
       });
+      setCollectionData(response.data);
+
+      if (scollToRef.current) {
+        scollToRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    } catch (error) {
       // Swal.fire({
-      //   title: "Received filter Data Successfully",
-      //   icon: "success",
+      //   title: "Unable to Filter Data",
+      //   icon: "error",
       //   timer: 1500,
       // });
-      setCollectionData(response.data);
-      // setTimeout(() => {
-      //   window.location.reload();
-      // }, 1000);
-      console.log(response);
-    } catch (error) {
-      Swal.fire({
-        title: "Unable to Filter Data",
-        icon: "error",
-        timer: 1500,
-      });
       // setTimeout(() => {
       //   window.location.reload();
       // }, 1000);
@@ -145,7 +158,7 @@ function Home() {
   useEffect(() => {
     FetchFeatures();
   }, []);
-  
+
   const FetchPropertyIDs = async () => {
     try {
       const propertyIDResponse = await axios.get(
@@ -181,6 +194,13 @@ function Home() {
     FetchPropertyIDs();
   }, []);
 
+  const transformedCities = Cities.flatMap(city =>
+    city.subheadings ? city.subheadings.map(subheading => ({ title: subheading.label, group: city.label })) : []
+  );
+  const allOption = { title: 'All', group: 'All' };
+  const transformedCitiesWithAll = [allOption, ...transformedCities];
+
+
   return (
     <>
       <Navbar type={UseSessionStorage("contact_user") ? "admin" : "user"} />
@@ -215,21 +235,24 @@ function Home() {
                 flexDirection: "column",
               }}
             >
-              <Box>
+              <Box sx={{
+                display: "flex",
+                flexDirection: "row",
+                gap: "10px",
+                marginTop: "10px",
+                width: { md: "30%", xs: "100%" },
+              }}>
                 <Button
                   sx={{
                     color: "white",
+                    height: "50px",
+                    width: "100%",
                     backgroundColor:
                       selectedPropertyType === "ForRent"
                         ? "transparent"
                         : "#8C1C40",
                     borderRadius: "10px",
-                    margin: "10px 0px",
-                    width: "150px",
-                    height: "60px",
-                    border: `5px solid ${selectedPropertyType === "ForRent" && "#8C1C40"
-                      }`,
-                    marginRight: "10px",
+                    border: `3px solid ${selectedPropertyType === "ForRent" && "#8C1C40"}`,
                   }}
                   onClick={(e) => {
                     e.preventDefault();
@@ -241,15 +264,14 @@ function Home() {
                 <Button
                   sx={{
                     color: "white",
+                    height: "50px",
+                    width: "100%",
                     backgroundColor:
                       selectedPropertyType === "ForSale"
                         ? "transparent"
                         : "#8C1C40",
                     borderRadius: "10px",
-                    margin: "10px 0px",
-                    width: "150px",
-                    height: "60px",
-                    border: `5px solid ${selectedPropertyType === "ForSale" && "#8C1C40"
+                    border: `3px solid ${selectedPropertyType === "ForSale" && "#8C1C40"
                       }`,
                   }}
                   onClick={(e) => {
@@ -265,7 +287,7 @@ function Home() {
                   width: "100%",
                   display: "flex",
                   justifyContent: "center",
-                  margin: "50px 0px",
+                  margin: { xs: "20px 0px", md: "50px 0px" },
                 }}
               >
                 <TextField
@@ -300,12 +322,15 @@ function Home() {
               </Box>
               <Box
                 sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  flexDirection: { md: "row", xs: "column" },
+                  display: "grid",
+                  gridTemplateAreas: {
+                    md: `"New1 New2 New3"`,
+                    xs: `"New1" "New2" "New3"`,
+                  },
+                  gap: "10px",
                 }}
               >
-                <Box>
+                <Box sx={{ gridArea: "New1" }} >
                   <Typography
                     variant="h6"
                     style={{
@@ -317,7 +342,6 @@ function Home() {
                   >
                     Property Types
                   </Typography>
-
                   <Select
                     value={selectedProperty || ''}
                     onChange={(e) => setSelectedProperty(e.target.value)}
@@ -325,11 +349,10 @@ function Home() {
                     size="small"
                     sx={{
                       border: "1px solid #8C1C40",
+                      width: "100%",
                       color: "white",
-                      width: "300px",
                       borderRadius: "5px",
                     }}
-                    fullWidth
                     required
                   >
                     {PropertyTypes.map((type, index) => (
@@ -339,7 +362,7 @@ function Home() {
                     ))}
                   </Select>
                 </Box>
-                <Box>
+                <Box sx={{ gridArea: "New2" }} >
                   <Typography
                     variant="h6"
                     style={{
@@ -351,49 +374,34 @@ function Home() {
                   >
                     City
                   </Typography>
-
-                  <select
-                    style={{
-                      width: "300px",
-                      border: "1px solid #8C1C40",
-                      height: "42px",
-                      borderRadius: "5px",
-                      backgroundColor: "transparent",
-                      color: "white",
-                      fontSize: "16px",
-                      paddingLeft: "10px",
-                    }}
-                    value={city || "All"}
-                    onChange={(e) => {
-                      const selectedCity = e.target.value;
-                      setCity(selectedCity);
-                      // setOpenCityDropDown(false);
-                    }}
-                  >
-                    {Cities.map((cityItem) => (
-                      <optgroup
-                        style={{
-                          backgroundColor: "black",
-                          padding: "5px 20px",
-                        }}
-                      >
-                        <option value={cityItem.value} key={cityItem.value}>
-                          {cityItem.label}
-                        </option>
-
-                        {cityItem.subheadings && cityItem.subheadings.map((subheading) => (
-                          <option
-                            value={subheading.value}
-                            key={subheading.value}
-                          >
-                            -- {subheading.label}
-                          </option>
-                        ))}
-                      </optgroup>
-                    ))}
-                  </select>
+                  <ThemeProvider theme={theme}>
+                    <Autocomplete
+                      value={city || allOption}
+                      onChange={(event, value) => {
+                        setCity(value || allOption);
+                      }}
+                      options={transformedCitiesWithAll}
+                      groupBy={(option) => option.group}
+                      getOptionLabel={(option) => option.title}
+                      isOptionEqualToValue={(option, value) => option.title === value.title}
+                      size="small"
+                      sx={{
+                        height: "42px",
+                        backgroundColor: "transparent",
+                        width: "100%",
+                        border: "1px solid #8C1C40",
+                        borderRadius: "5px",
+                        "& .MuiAutocomplete-inputRoot": {
+                          color: "white",
+                          border: 0,
+                          height: "42px",
+                        },
+                      }}
+                      renderInput={(params) => <TextField {...params} />}
+                    />
+                  </ThemeProvider>
                 </Box>
-                <Box>
+                <Box sx={{ gridArea: "New3" }} >
                   <Typography
                     variant="h6"
                     style={{
@@ -417,10 +425,9 @@ function Home() {
                     sx={{
                       border: "1px solid #8C1C40",
                       color: "white",
-                      width: "300px",
+                      width: "100%",
                       borderRadius: "5px",
                     }}
-                    fullWidth
                   >
                     {Prices.map((priceOption, index) => (
                       <MenuItem key={index} value={priceOption.value}>
@@ -436,18 +443,18 @@ function Home() {
       </Box>
 
       <Box sx={{ margin: "260px 0px 30px 0px", textAlign: "center" }}>
-        <Typography
-          sx={{
-            fontWeight: "700",
-            lineHeight: "30px",
-            fontSize: "35px",
-            color: "white",
-            textAlign: "center",
-          }}
-        >
-          Featured Projects
-        </Typography>
         <Container>
+          <Typography
+            sx={{
+              fontWeight: "700",
+              lineHeight: "30px",
+              fontSize: "35px",
+              color: "white",
+              textAlign: "center",
+            }}
+          >
+            Featured Projects
+          </Typography>
           <Box
             sx={{ margin: { md: "30px 17%", sm: "30px 15%", xs: "30px 12%" } }}
           >
@@ -464,6 +471,7 @@ function Home() {
             />
           </Box>
           <Typography
+            ref={scollToRef}
             sx={{
               fontWeight: "700",
               lineHeight: "30px",

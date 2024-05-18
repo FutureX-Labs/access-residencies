@@ -199,24 +199,44 @@ router.post("/filter", async (req, res) => {
     }
 
     if (price !== NaN && price !== null && price !== "All") {
-      filter.price = { $lt: price };
-    }
-
-    if (perches !== "" && perches !== null && perches !== "All") {
-      filter["landExtent.perches"] = { $lt: perches };
-    }
-
-    if (acres !== "" && acres !== null && acres !== "All") {
-      filter["landExtent.acres"] = { $lt: acres };
+      filter.price = { $lte: price };
     }
 
     if (city !== "" && city !== null && city !== "All") {
       filter.city = { $regex: new RegExp(city, "i") };
     }
 
-    console.log(filter);
+    const aggregationPipeline = [
+      {
+        $match: filter
+      },
+      {
+        $set: {
+          totalPerchesAndAcres: {
+            $sum: [
+              "$landExtent.perches",
+              {
+                $multiply: ["$landExtent.acres", 160],
+              },
+            ],
+          },
+        }
+      },
+      {
+        $match: {
+          "$expr": {
+            "$gte": [
+              "$totalPerchesAndAcres",
+              { "$sum": [(perches || 0), (acres || 0) * 160] }
+            ]
+          }
+        }
+      }
+    ];
 
-    let filtered = await landForSale.find(filter).exec();
+    // console.log("Aggregation Pipeline:", JSON.stringify(aggregationPipeline, null, 2));
+
+    let filtered = await landForSale.aggregate(aggregationPipeline).exec();
 
     res.status(200).json(filtered);
   } catch (error) {
@@ -236,7 +256,7 @@ router.post("/filter/main", async (req, res) => {
 
     // Filtering by price if provided
     if (price !== NaN && price !== null && price !== "All") {
-      filter.price = { $lt: price };
+      filter.price = { $lte: price };
     }
 
     // Filtering by city using a case-insensitive regex for flexible matching
@@ -266,7 +286,7 @@ router.post("/filter/main", async (req, res) => {
 router.post("/filterId", async (req, res) => {
   try {
     const { propertyId } = req.body;
-    
+
     const filter = {};
 
     if (propertyId !== undefined) {

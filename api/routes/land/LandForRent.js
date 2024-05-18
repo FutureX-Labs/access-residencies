@@ -199,24 +199,44 @@ router.post("/filter", async (req, res) => {
     }
 
     if (rent !== NaN && rent !== null && rent !== "All") {
-      filter.rent = { $lt: rent };
+      filter.rent = { $lte: rent };
     }
 
-    if (perches !== "" && perches !== null && perches !== "All") {
-      filter["landExtent.perches"] = { $lt: perches };
-    }
-
-    if (acres !== "" && acres !== null && acres !== "All") {
-      filter["landExtent.acres"] = { $lt: acres };
-    }
-    
     if (city !== "" && city !== null && city !== "All") {
       filter.city = { $regex: new RegExp(city, "i") };
     }
 
-    console.log(filter);
+    const aggregationPipeline = [
+      {
+        $match: filter
+      },
+      {
+        $set: {
+          totalPerchesAndAcres: {
+            $sum: [
+              "$landExtent.perches",
+              {
+                $multiply: ["$landExtent.acres", 160],
+              },
+            ],
+          },
+        }
+      },
+      {
+        $match: {
+          "$expr": {
+            "$gte": [
+              "$totalPerchesAndAcres",
+              { "$sum": [(perches || 0), (acres || 0) * 160] }
+            ]
+          }
+        }
+      }
+    ];
 
-    let filtered = await landForRent.find(filter).exec();
+    // console.log("Aggregation Pipeline:", JSON.stringify(aggregationPipeline, null, 2));
+
+    let filtered = await landForRent.aggregate(aggregationPipeline).exec();
 
     res.status(200).json(filtered);
   } catch (error) {
@@ -236,7 +256,7 @@ router.post("/filter/main", async (req, res) => {
     }
 
     if (rent !== NaN && rent !== null && rent !== "All") {
-      filter.rent = { $lt: rent };
+      filter.rent = { $lte: rent };
     }
 
     if (city !== "" && city !== null && city !== "All") {
