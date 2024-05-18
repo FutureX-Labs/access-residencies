@@ -31,6 +31,23 @@ import AddImage from "../../../../public/images/add.png";
 import AuthContext from "@/app/context/AuthContext";
 import { useRouter } from "next/navigation";
 import axiosInstance from "@/app/utility/axiosInstance";
+import Autocomplete from "@mui/material/Autocomplete";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+
+const theme = createTheme({
+  components: {
+    MuiAutocomplete: {
+      styleOverrides: {
+        clearIndicator: {
+          color: "white",
+        },
+        popupIndicator: {
+          color: "white",
+        },
+      },
+    },
+  },
+});
 
 const Input = ({ label, value, onChange }) => {
   return (
@@ -85,7 +102,7 @@ function Add() {
         propertyId: propertyId,
         title: title,
         description: description,
-        city: city,
+        city: city.title,
       };
 
       if (propertyType === "ForSale") {
@@ -191,6 +208,15 @@ function Add() {
     }
     console.log("files", allFiles);
   };
+
+  const transformedCities = Cities.flatMap((city) =>
+    city.subheadings
+      ? city.subheadings.map((subheading) => ({
+          title: subheading.label,
+          group: city.label,
+        }))
+      : []
+  );
 
   return (
     <>
@@ -788,45 +814,36 @@ function Add() {
                 >
                   City
                 </Typography>
-                <select
-                  required
-                  style={{
-                    padding: "15px 0px",
-                    width: "98%",
-                    border: "1px solid grey",
-                    marginLeft: "20px",
-                    borderRadius: "5px",
-                    backgroundColor: "black",
-                    color: "white",
-                    marginRight: "400px",
-                  }}
-                  value={city || ""}
-                  onChange={(e) => {
-                    const selectedCity = e.target.value;
-                    setCity(selectedCity);
-                    // setOpenCityDropDown(false);
-                  }}
-                >
-                  {Cities.map((cityItem) =>
-                    cityItem.value === "All" ? null : (
-                      <optgroup>
-                        <option value={cityItem.value} key={cityItem.value}>
-                          {cityItem.label}
-                        </option>
-
-                        {cityItem.subheadings &&
-                          cityItem.subheadings.map((subheading) => (
-                            <option
-                              value={subheading.value}
-                              key={subheading.value}
-                            >
-                              -- {subheading.label}
-                            </option>
-                          ))}
-                      </optgroup>
-                    )
-                  )}
-                </select>
+                <ThemeProvider theme={theme}>
+                  <Autocomplete
+                    value={city || transformedCities[0]}
+                    onChange={(event, value) => {
+                      setCity(value || transformedCities[0]);
+                    }}
+                    options={transformedCities}
+                    groupBy={(option) => option.group}
+                    getOptionLabel={(option) => option.title}
+                    isOptionEqualToValue={(option, value) =>
+                      option.title === value.title
+                    }
+                    size="small"
+                    sx={{
+                      height: "50px",
+                      backgroundColor: "black",
+                      marginLeft: "20px",
+                      marginRight: "0",
+                      border: "1px solid grey",
+                      borderRadius: "5px",
+                      "& .MuiAutocomplete-inputRoot": {
+                        color: "white",
+                        fontSize: "16px",
+                        border: 0,
+                        height: "50px",
+                      },
+                    }}
+                    renderInput={(params) => <TextField {...params} />}
+                  />
+                </ThemeProvider>
               </Box>
             </Grid>
 

@@ -1,9 +1,5 @@
 export const Cities = [
   {
-    label: "All",
-    value: "All"
-  },
-  {
     label: "Colombo",
     value: "Colombo",
     subheadings: [
@@ -31,7 +27,7 @@ export const Cities = [
       { label: "Kotte", value: "Kotte" },
       { label: "Malabe", value: "Malabe" },
       { label: "Meegoda", value: "Meegoda" },
-      { label: "Moraruwa", value: "Moraruwa" },
+      { label: "Moratuwa", value: "Moratuwa" },
       { label: "Mount Lavinia", value: "Mount Lavinia" },
       { label: "Nawala", value: "Nawala" },
       { label: "Padukka", value: "Padukka" },
