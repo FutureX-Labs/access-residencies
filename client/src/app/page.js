@@ -21,6 +21,8 @@ import BannerSlider from "@/app/components/bannerslider/BannerSlider";
 import FeatureSlider from "./components/featureslider/FeatureSlider";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import Autocomplete from '@mui/material/Autocomplete';
 import Showcase from "./components/showcase/Showcase";
 import Subheader from "./components/subheader/subheader";
 import { GetAll } from "./utility/getAll";
@@ -48,8 +50,23 @@ function Home() {
   const [selectedPropertyType, setSelectedPropertyType] = useState("ForSale");
   const [price, setPrice] = useState("All");
   const [rent, setRent] = useState("All");
-  const [city, setCity] = useState("All");
+  const [city, setCity] = useState({ title: 'All', group: 'All' });
   const [title, setTitle] = useState(null);
+
+  const theme = createTheme({
+    components: {
+      MuiAutocomplete: {
+        styleOverrides: {
+          clearIndicator: {
+            color: 'white',
+          },
+          popupIndicator: {
+            color: 'white',
+          },
+        },
+      },
+    },
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -57,7 +74,7 @@ function Home() {
     try {
       let additionalData = {
         title: title,
-        city: city,
+        city: city.title,
       };
 
       if (selectedPropertyType === "ForSale") {
@@ -81,7 +98,7 @@ function Home() {
         },
       });
       setCollectionData(response.data);
-      
+
       if (scollToRef.current) {
         scollToRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
       }
@@ -176,6 +193,13 @@ function Home() {
   useEffect(() => {
     FetchPropertyIDs();
   }, []);
+
+  const transformedCities = Cities.flatMap(city =>
+    city.subheadings ? city.subheadings.map(subheading => ({ title: subheading.label, group: city.label })) : []
+  );
+  const allOption = { title: 'All', group: 'All' };
+  const transformedCitiesWithAll = [allOption, ...transformedCities];
+
 
   return (
     <>
@@ -350,47 +374,32 @@ function Home() {
                   >
                     City
                   </Typography>
-
-                  <select
-                    style={{
-                      width: "100%",
-                      border: "1px solid #8C1C40",
-                      height: "42px",
-                      borderRadius: "5px",
-                      backgroundColor: "transparent",
-                      color: "white",
-                      fontSize: "16px",
-                      paddingLeft: "10px",
-                    }}
-                    value={city || "All"}
-                    onChange={(e) => {
-                      const selectedCity = e.target.value;
-                      setCity(selectedCity);
-                      // setOpenCityDropDown(false);
-                    }}
-                  >
-                    {Cities.map((cityItem) => (
-                      <optgroup
-                        style={{
-                          backgroundColor: "black",
-                          padding: "5px 20px",
-                        }}
-                      >
-                        <option value={cityItem.value} key={cityItem.value}>
-                          {cityItem.label}
-                        </option>
-
-                        {cityItem.subheadings && cityItem.subheadings.map((subheading) => (
-                          <option
-                            value={subheading.value}
-                            key={subheading.value}
-                          >
-                            -- {subheading.label}
-                          </option>
-                        ))}
-                      </optgroup>
-                    ))}
-                  </select>
+                  <ThemeProvider theme={theme}>
+                    <Autocomplete
+                      value={city || allOption}
+                      onChange={(event, value) => {
+                        setCity(value || allOption);
+                      }}
+                      options={transformedCitiesWithAll}
+                      groupBy={(option) => option.group}
+                      getOptionLabel={(option) => option.title}
+                      isOptionEqualToValue={(option, value) => option.title === value.title}
+                      size="small"
+                      sx={{
+                        height: "42px",
+                        backgroundColor: "transparent",
+                        width: "100%",
+                        border: "1px solid #8C1C40",
+                        borderRadius: "5px",
+                        "& .MuiAutocomplete-inputRoot": {
+                          color: "white",
+                          border: 0,
+                          height: "42px",
+                        },
+                      }}
+                      renderInput={(params) => <TextField {...params} />}
+                    />
+                  </ThemeProvider>
                 </Box>
                 <Box sx={{ gridArea: "New3" }} >
                   <Typography

@@ -32,8 +32,26 @@ import { PropertyTypes } from "@/app/list/propertyTypes";
 import EditImage from "../../../../public/images/edit.png";
 import AuthContext from "@/app/context/AuthContext";
 import UseSessionStorage from "@/app/UseSessionStorage";
+import { CldImage } from 'next-cloudinary';
+import Autocomplete from '@mui/material/Autocomplete';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import BASE_URL from "../../config";
+
+const theme = createTheme({
+  components: {
+    MuiAutocomplete: {
+      styleOverrides: {
+        clearIndicator: {
+          color: 'white',
+        },
+        popupIndicator: {
+          color: 'white',
+        },
+      },
+    },
+  },
+});
 
 const url = `${BASE_URL}/api/apartmentForRent/add`;
 const Input = ({ label, value, onChange }) => {
@@ -54,7 +72,6 @@ const Input = ({ label, value, onChange }) => {
 function Edit() {
   const [thumbnail, setThumbnail] = useState(null);
   const [images, setImages] = useState(null);
-  const [formData, setFormData] = useState(new FormData());
   const [propertyType, setPropertyType] = useState("ForSale");
   const [property, setProperty] = useState("House");
   const [propertyId, setPropertyId] = useState(null);
@@ -72,6 +89,7 @@ function Edit() {
   const [editFormData, setEditFormData] = useState(null);
   const router = useRouter();
   const { user } = useContext(AuthContext);
+  const [formUrl, setFormUrl] = useState(null);
   const [imageUploaded, setImageUploaded] = useState(false);
   const [thumbnailUploaded, setThumbnailUploaded] = useState(false);
 
@@ -83,7 +101,10 @@ function Edit() {
   const submitThumbnailRef = useRef(null);
   const submitMulImageRef = useRef(null);
 
-  console.log("editFormData", editFormData);
+  const additionalFormData = new FormData();
+  const thumbnailFormData = new FormData();
+  const imageFormData = new FormData();
+
   const fetchData = async () => {
     const currentUrl = window.location.href;
 
@@ -96,10 +117,6 @@ function Edit() {
     const propertyTypeValue = urlParams.get("propertyType");
     const id = urlParams.get("id");
 
-    console.log("propertyValue", propertyValue);
-    console.log("propertyTypeValue", propertyTypeValue);
-    console.log("id", id);
-
     if ((propertyValue, propertyTypeValue, id)) {
       try {
         const url = await GetOneUrl(propertyValue, propertyTypeValue, id);
@@ -111,13 +128,12 @@ function Edit() {
         setEditFormData(response.data);
         setPropertyType(response?.data?.propertyType);
         setProperty(response?.data?.property);
-        console.log("url:", url);
-        console.log("response:", response);
       } catch (error) {
         console.log(error);
       }
     }
   };
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -140,20 +156,20 @@ function Edit() {
       setPropertyTypes(editFormData?.propertyTypes);
       setThumbnail(editFormData?.thumbnailImage);
       setImages(editFormData?.images);
+
+      const url = EditUrl(property, propertyType, editFormData?._id);
+      setFormUrl(url);
     }
   }, [editFormData]);
 
-  // console.log("size", size);
-
-  console.log("property", property);
-  console.log("propertyType", propertyType);
-  const createPost = async () => {
+  const addAdditionalData = async (e) => {
+    e.preventDefault();
     try {
       let additionalData = {
         propertyId: propertyId,
         title: title,
         description: description,
-        city: city,
+        city: city.title,
       };
 
       if (propertyType === "ForSale") {
@@ -183,72 +199,57 @@ function Edit() {
         };
       }
 
-      console.log("additionalData", additionalData);
-      console.log("additionalData", propertyType);
-      console.log("additionalData", property);
+      console.log(additionalData);
+      additionalFormData.append("additionalData", JSON.stringify(additionalData));
 
-      const url = await EditUrl(property, propertyType, editFormData?._id);
-      console.log("urlEdit", url);
-      formData.append("additionalData", JSON.stringify(additionalData));
-      const response = await axios.put(url, formData, {
+      await axios.put(`${formUrl}/additionalData`, additionalFormData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
-      });
-      Swal.fire({
-        title: "Data Added Successfully",
-        icon: "success",
-        timer: 1500,
+      }).then((res) => {
+        Swal.fire({
+          title: "Data Added Successfully",
+          icon: "success",
+          timer: 1500,
+        });
       });
       // setTimeout(() => {
       //   window.location.reload();
       // }, 1000);
-      console.log(response);
     } catch (error) {
       Swal.fire({
-        title: "Unable to data",
+        title: "Unable to Add Data",
         icon: "error",
         timer: 1500,
       });
-      // setTimeout(() => {
-      //   window.location.reload();
-      // }, 1000);
       console.log(error);
     }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // if (
-    //   typeof thumbnail === "object" &&
-    //   Array.isArray(images) &&
-    //   images.every((img) => typeof img === "object")
-    // ) {
-    createPost();
-    // } else {
-    //   console.log("No image selected");
-    //   Swal.fire({
-    //     title: "Kindly select all the Images",
-    //     icon: "error",
-    //     timer: 1500,
-    //   });
-    // }
-  };
-
-  const handleFileUpload = (e) => {
+  const uploadThumbnail = async (e) => {
     const file = e.target.files[0];
     setThumbnailUploaded(true);
     setThumbnail(file);
-    console.log("thumbnail", typeof thumbnail);
+    thumbnailFormData.delete("thumbnail");
+    thumbnailFormData.append("thumbnail", file);
+
+    thumbnailFormData.append("propertyId", propertyId);
+
+    await axios.put(`${formUrl}/uploadThumbnail`, thumbnailFormData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }).then((res) => {
+      console.log(res);
+    }).catch((err) => {
+      console.error(err);
+    });
+
   };
-  console.log(thumbnail);
 
-
-  const handleMultipleFileUpload = (e) => {
+  const uploadImages = async (e) => {
     const files = e.target.files;
-    setImageUploaded(true);
-    console.log("before Files", files);
-    formData.delete("myFiles");
+    imageFormData.delete("image");
 
     if (files.length > 3) {
       Swal.fire({
@@ -261,13 +262,28 @@ function Edit() {
 
     setImages(files);
 
-    const thumbnailsArray = thumbnail ? [thumbnail] : [];
-    const allFiles = [...thumbnailsArray, ...files];
-
-    for (let i = 0; i < allFiles.length; i++) {
-      formData.append("myFiles", allFiles[i]);
+    for (let i = 0; i < files.length; i++) {
+      imageFormData.append("image", files[i]);
     }
+
+    imageFormData.append("propertyId", propertyId);
+
+    await axios.put(`${formUrl}/uploadImages`, imageFormData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }).then((res) => {
+      console.log(res);
+    }).catch((err) => {
+      console.error(err);
+    });
+
+    setImageUploaded(true);
   };
+
+  const transformedCities = Cities.flatMap(city =>
+    city.subheadings ? city.subheadings.map(subheading => ({ title: subheading.label, group: city.label })) : []
+  );
 
   return (
     <>
@@ -295,63 +311,8 @@ function Edit() {
           >
             Edit Property Details
           </Typography>
-          {/* <Typography
-            sx={{
-              fontWeight: "400",
-              fontSize: "22px",
-              lineHeight: "33.5px",
-              color: "white",
-              mt: "30px",
-            }}
-          >
-            Type
-          </Typography> */}
-          {/* <Box
-            sx={{
-              display: "flex",
-              flexDirection: { md: "row", xs: "column" },
-              ml: "20px",
-              my: "15px",
-              gap: { md: "0px", xs: "20px" },
-            }}
-          >
-            <Select
-              value={property}
-              onChange={(e) => setProperty(e.target.value)}
-              sx={{
-                minWidth: 320,
-                mr: "10px",
-                border: "1px solid grey",
-                color: "white",
-              }}
-              size="small"
-              displayEmpty
-              placeholder="Select Property"
-            >
-              <MenuItem value="House">House</MenuItem>
-              <MenuItem value="Land">Land</MenuItem>
-              <MenuItem value="Apartment">Apartment</MenuItem>
-              <MenuItem value="Commercial">Commercial</MenuItem>
-            </Select>
 
-            <Select
-              value={propertyType}
-              onChange={(e) => setPropertyType(e.target.value)}
-              sx={{
-                minWidth: 320,
-                border: "1px solid grey",
-                color: "white",
-              }}
-              size="small"
-              displayEmpty
-              placeholder="Select Property Type"
-            >
-              <MenuItem value="ForSale">For Sale</MenuItem>
-              <MenuItem value="ForRent">For Rent</MenuItem>
-            </Select>
-          </Box> */}
-
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={addAdditionalData}>
             <Grid container gap={3}>
               {/* Property ID */}
               <Typography
@@ -435,7 +396,7 @@ function Edit() {
                     name="myFile"
                     id="file-upload"
                     accept=".jpeg, .png, .jpg"
-                    onChange={(e) => handleFileUpload(e)}
+                    onChange={(e) => uploadThumbnail(e)}
                     ref={submitThumbnailRef}
                     hidden
                   />
@@ -448,7 +409,7 @@ function Edit() {
                       justifyContent: "center",
                     }}
                   >
-                    {thumbnailUploaded && thumbnail && (
+                    {thumbnail && (thumbnailUploaded ? (
                       <Image
                         src={URL.createObjectURL(thumbnail)}
                         alt="Thumbnail"
@@ -456,7 +417,16 @@ function Edit() {
                         height={150}
                         style={{ margin: "20px 10px", borderRadius: "5px", objectFit: "cover" }}
                       />
-                    )}
+                    ) : (
+                      <CldImage
+                        src={thumbnail}
+                        sizes="20vw"
+                        width={150}
+                        height={150}
+                        alt="Thumbnail"
+                        style={{ margin: "20px 10px", borderRadius: "5px", objectFit: "cover" }}
+                      />
+                    ))}
 
                     <Button
                       sx={{
@@ -489,7 +459,7 @@ function Edit() {
                     name="myFiles"
                     id="file-uploads"
                     accept=".jpeg, .png, .jpg"
-                    onChange={(e) => handleMultipleFileUpload(e)}
+                    onChange={(e) => uploadImages(e)}
                     multiple
                     ref={submitMulImageRef}
                     hidden
@@ -504,19 +474,31 @@ function Edit() {
                     }}
                   >
                     <Box sx={{ display: "flex" }}>
-
-                      {imageUploaded && images && Array.from(images).map((img, index) => {
+                      {images && Array.from(images).map((img, index) => {
                         return (
-                          <Image
-                            key={index}
-                            src={URL.createObjectURL(img)}
-                            alt="img"
-                            width={150}
-                            height={150}
-                            style={{ margin: "20px 10px", borderRadius: "5px", objectFit: "cover" }}
-                          />
+                          (imageUploaded ? (
+                            <Image
+                              key={index}
+                              src={URL.createObjectURL(img)}
+                              alt="Image"
+                              width={150}
+                              height={150}
+                              style={{ margin: "20px 10px", borderRadius: "5px", objectFit: "cover" }}
+                            />
+                          ) : (
+                            <CldImage
+                              key={index}
+                              src={img}
+                              sizes="20vw"
+                              width={150}
+                              height={150}
+                              alt="Image"
+                              style={{ margin: "20px 10px", borderRadius: "5px", objectFit: "cover" }}
+                            />
+                          ))
                         );
-                      })}
+                      }
+                      )}
 
                     </Box>
                     <Button
@@ -580,7 +562,7 @@ function Edit() {
               </Typography>
               <Select
                 required
-                value={propertyType === "ForSale" ?  (price || 'All') : (rent || 'All')}
+                value={propertyType === "ForSale" ? (price || 'All') : (rent || 'All')}
                 onChange={(e) =>
                   propertyType === "ForSale"
                     ? setPrice(e.target.value)
@@ -846,39 +828,34 @@ function Edit() {
                 >
                   City
                 </Typography>
-                <select
-                  required
-                  style={{
-                    padding: "15px 0px",
-                    width: "98%",
-                    border: "1px solid grey",
-                    marginLeft: "20px",
-                    borderRadius: "5px",
-                    backgroundColor: "black",
-                    color: "white",
-                    marginRight: "400px",
-                  }}
-                  value={city}
-                  onChange={(e) => {
-                    const selectedCity = e.target.value;
-                    setCity(selectedCity);
-                    setOpenCityDropDown(false);
-                  }}
-                >
-                  {Cities.map((cityItem) => (
-                    <optgroup>
-                      <option value={cityItem.value} key={cityItem.value}>
-                        {cityItem.label}
-                      </option>
-
-                      {cityItem.subheadings && cityItem.subheadings.map((subheading) => (
-                        <option value={subheading.value} key={subheading.value}>
-                          -- {subheading.label}
-                        </option>
-                      ))}
-                    </optgroup>
-                  ))}
-                </select>
+                <ThemeProvider theme={theme}>
+                  <Autocomplete
+                    value={city || transformedCities[0]}
+                    onChange={(event, value) => {
+                      setCity(value || transformedCities[0]);
+                    }}
+                    options={transformedCities}
+                    groupBy={(option) => option.group}
+                    getOptionLabel={(option) => option.title}
+                    isOptionEqualToValue={(option, value) => option.title === value.title}
+                    size="small"
+                    sx={{
+                      height: "50px",
+                      backgroundColor: "black",
+                      marginLeft: "20px",
+                      marginRight: "0",
+                      border: "1px solid grey",
+                      borderRadius: "5px",
+                      "& .MuiAutocomplete-inputRoot": {
+                        color: "white",
+                        fontSize: "16px",
+                        border: 0,
+                        height: "50px",
+                      },
+                    }}
+                    renderInput={(params) => <TextField {...params} />}
+                  />
+                </ThemeProvider>
               </Box>
             </Grid>
 
@@ -893,7 +870,7 @@ function Edit() {
                   }}
                   type="submit"
                 >
-                  Edit Property
+                  Save Changes
                 </Button>
               </Box>
             </Grid>

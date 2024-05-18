@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import { Label } from "@mui/icons-material";
 import { FilterUrl } from "@/app/utility/filterUrls";
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { GetAdditionalData } from "@/app/utility/getAdditionalData";
 import { Sizes } from "@/app/list/sizes";
 import { Prices } from "@/app/list/price";
@@ -26,6 +27,7 @@ import Showcase from "../showcase/Showcase";
 import axios from "axios";
 import Items from "@/app/components/items/Items";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
+import Autocomplete from '@mui/material/Autocomplete';
 import { IoIosArrowForward } from "react-icons/io";
 import { Padding } from "@mui/icons-material";
 import Link from "next/link";
@@ -51,15 +53,29 @@ const Filter = ({
   const [price, setPrice] = useState("All");
   const [rent, setRent] = useState("All");
   const [size, setSize] = useState("All");
-  const [city, setCity] = useState("All");
+  const [city, setCity] = useState({ title: 'All', group: 'All' });
   const [bedrooms, setBedrooms] = useState("All");
   const [bathrooms, setBathrooms] = useState("All");
   const [perches, setPerches] = useState("All");
   const [acres, setAcres] = useState("All");
   const [comPropertyS, setComPropertyS] = useState("All");
-  const [openCityDropDown, setOpenCityDropDown] = useState(false);
   const [filteredBy, setFilteredBy] = useState([]);
   const [topCities, setTopCities] = useState([]);
+
+  const theme = createTheme({
+    components: {
+      MuiAutocomplete: {
+        styleOverrides: {
+          clearIndicator: {
+            color: 'white',
+          },
+          popupIndicator: {
+            color: 'white',
+          },
+        },
+      },
+    },
+  });
 
   useEffect(() => {
     handleSubmit();
@@ -77,7 +93,7 @@ const Filter = ({
     }
     try {
       let additionalData = {
-        city: city,
+        city: city.title,
         role: role,
       };
       console.log("additionalData", additionalData);
@@ -164,34 +180,35 @@ const Filter = ({
 
         setFilteredBy(filteredArray);
 
-        const transformedCities = Cities.map((city) => ({
-          label: city.label,
-          subheadings: city.subheadings.map((subheading) => subheading.value),
-        }));
+        // const transformedCities = Cities.map((city) => ({
+        //   label: city.label,
+        //   subheadings: city.subheadings.map((subheading) => subheading.value),
+        // }));
 
-        console.log("transformedCities", transformedCities);
-        let topCities = [];
+        // console.log("transformedCities", transformedCities);
+        // let topCities = [];
 
-        transformedCities?.forEach((transformedCity) => {
+        // transformedCities?.forEach((transformedCity) => {
 
-          if (additionalData?.city == transformedCity.label) {
-            topCities = transformedCity.subheadings;
-            // No need to break out of the loop here since we want to check all items
-          }
-        });
+        //   if (additionalData?.city == transformedCity.label) {
+        //     topCities = transformedCity.subheadings;
+        //     // No need to break out of the loop here since we want to check all items
+        //   }
+        // });
 
-        // After the loop, check if topCities is still an empty array
-        if (topCities.length === 0) {
-          // If no match was found, assign [city] to topCities
-          topCities = [city];
-        }
+        // // After the loop, check if topCities is still an empty array
+        // if (topCities.length === 0) {
+        //   // If no match was found, assign [city] to topCities
+        //   topCities = [city];
+        // }
 
-        setTopCities(topCities);
+        // setTopCities(topCities);
       }
     } catch (error) {
       console.debug(error);
     }
   };
+
   const handleSubmitByID = async (e) => {
     e.preventDefault();
     try {
@@ -216,6 +233,12 @@ const Filter = ({
       console.debug(error);
     }
   };
+
+  const transformedCities = Cities.flatMap(city =>
+    city.subheadings ? city.subheadings.map(subheading => ({ title: subheading.label, group: city.label })) : []
+  );
+  const allOption = { title: 'All', group: 'All' };
+  const transformedCitiesWithAll = [allOption, ...transformedCities];
 
   return (
     <>
@@ -244,38 +267,33 @@ const Filter = ({
                 >
                   City
                 </Typography>
-                <select
-                  style={{
-                    height: "50px",
-                    width: "100%",
-                    border: "1px solid grey",
-                    borderRadius: { xs: "10px", md: "10px 0px 0px 10px" },
-                    color: "white",
-                    backgroundColor: "black",
-                    fontSize: "16px",
-                    padding: "0 10px",
-                  }}
-                  value={city || 'All'}
-                  onChange={(e) => {
-                    const selectedCity = e.target.value;
-                    setCity(selectedCity);
-                    setOpenCityDropDown(false);
-                  }}
-                >
-                  {Cities.map((cityItem) => (
-                    <optgroup>
-                      <option value={cityItem.value} key={cityItem}>
-                        {cityItem.label}
-                      </option>
-
-                      {cityItem.subheadings && cityItem.subheadings.map((subheading) => (
-                        <option value={subheading.value} key={subheading.value}>
-                          -- {subheading.label}
-                        </option>
-                      ))}
-                    </optgroup>
-                  ))}
-                </select>
+                <ThemeProvider theme={theme}>
+                  <Autocomplete
+                    value={city || allOption}
+                    onChange={(event, value) => {
+                      setCity(value || allOption);
+                    }}
+                    options={transformedCitiesWithAll}
+                    groupBy={(option) => option.group}
+                    getOptionLabel={(option) => option.title}
+                    isOptionEqualToValue={(option, value) => option.title === value.title}
+                    size="small"
+                    sx={{
+                      height: "50px",
+                      width: "100%",
+                      backgroundColor: "black",
+                      border: "1px solid grey",
+                      borderRadius: { xs: "10px", md: "10px 0px 0px 10px" },
+                      "& .MuiAutocomplete-inputRoot": {
+                        color: "white",
+                        fontSize: "16px",
+                        border: 0,
+                        height: "50px",
+                      },
+                    }}
+                    renderInput={(params) => <TextField {...params} />}
+                  />
+                </ThemeProvider>
               </Box>
               <Box sx={{ width: "100%" }}>
                 <Typography
@@ -290,9 +308,6 @@ const Filter = ({
                   {propertyType === "ForSale" ? "Max Price" : "Max Rent"}
                 </Typography>
                 <Select
-                  placeholder={
-                    propertyType === "ForSale" ? "Select price" : "Select rent"
-                  }
                   value={propertyType === "ForSale" ? (price || 'All') : (rent || 'All')}
                   onChange={(e) =>
                     propertyType === "ForSale"
