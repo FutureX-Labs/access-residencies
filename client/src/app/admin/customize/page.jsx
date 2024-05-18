@@ -21,6 +21,7 @@ import customizeImage from "../../../../public/images/customize.png";
 import { useRouter } from "next/navigation";
 import AuthContext from "@/app/context/AuthContext";
 import BASE_URL from "../../config";
+import axiosInstance from "@/app/utility/axiosInstance";
 
 const url = `${BASE_URL}/api/apartmentForRent/add`;
 
@@ -80,7 +81,7 @@ function Customize() {
   const handleSubmitPropertyId = async () => {
     try {
       const propertyIds = { propertyIds: allPropertyId };
-      const response = await axios.post(propertyIdUrl, propertyIds);
+      const response = await axiosInstance.post(propertyIdUrl, propertyIds);
       Swal.fire({
         title: "PropertyIds Added Successfully",
         icon: "success",
@@ -99,7 +100,7 @@ function Customize() {
 
   const handleBannerSubmit = async () => {
     try {
-      const response = await axios.post(bannerURL, bannerFormData, {
+      const response = await axiosInstance.post(bannerURL, bannerFormData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -129,7 +130,7 @@ function Customize() {
         const urlToAppend = trimmedUrl || "#home";
         featureFormData.append("urls", urlToAppend);
       });
-      const response = await axios.post(featureURL, featureFormData, {
+      const response = await axiosInstance.post(featureURL, featureFormData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -274,7 +275,11 @@ function Customize() {
                   alt="img"
                   width={150}
                   height={150}
-                  style={{ margin: "20px 10px", borderRadius: "5px", objectFit: "cover" }}
+                  style={{
+                    margin: "20px 10px",
+                    borderRadius: "5px",
+                    objectFit: "cover",
+                  }}
                 />
               );
             })}
@@ -339,7 +344,11 @@ function Customize() {
                     alt="img"
                     width={150}
                     height={150}
-                    style={{ margin: "20px 10px", borderRadius: "5px", objectFit: "cover" }}
+                    style={{
+                      margin: "20px 10px",
+                      borderRadius: "5px",
+                      objectFit: "cover",
+                    }}
                   />
                   <TextField
                     InputProps={{

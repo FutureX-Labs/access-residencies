@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const PropertyIdSchema = require("../../schema/PropertyId");
+const AuthM = require("../middleware/AuthM");
 
 router.get("/", async (req, res) => {
   try {
@@ -12,7 +13,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.post("/add", async (req, res) => {
+router.post("/add", AuthM, async (req, res) => {
   try {
     await PropertyIdSchema.deleteMany({});
     const propertyIds = req.body.propertyIds; // Access propertyIds from req.body

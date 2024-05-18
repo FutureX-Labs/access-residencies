@@ -32,7 +32,7 @@ import { PropertyTypes } from "@/app/list/propertyTypes";
 import EditImage from "../../../../public/images/edit.png";
 import AuthContext from "@/app/context/AuthContext";
 import UseSessionStorage from "@/app/UseSessionStorage";
-
+import axiosInstance from "@/app/utility/axiosInstance";
 import BASE_URL from "../../config";
 
 const url = `${BASE_URL}/api/apartmentForRent/add`;
@@ -190,7 +190,7 @@ function Edit() {
       const url = await EditUrl(property, propertyType, editFormData?._id);
       console.log("urlEdit", url);
       formData.append("additionalData", JSON.stringify(additionalData));
-      const response = await axios.put(url, formData, {
+      const response = await axiosInstance.put(url, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -242,7 +242,6 @@ function Edit() {
     console.log("thumbnail", typeof thumbnail);
   };
   console.log(thumbnail);
-
 
   const handleMultipleFileUpload = (e) => {
     const files = e.target.files;
@@ -454,7 +453,11 @@ function Edit() {
                         alt="Thumbnail"
                         width={150}
                         height={150}
-                        style={{ margin: "20px 10px", borderRadius: "5px", objectFit: "cover" }}
+                        style={{
+                          margin: "20px 10px",
+                          borderRadius: "5px",
+                          objectFit: "cover",
+                        }}
                       />
                     )}
 
@@ -504,20 +507,24 @@ function Edit() {
                     }}
                   >
                     <Box sx={{ display: "flex" }}>
-
-                      {imageUploaded && images && Array.from(images).map((img, index) => {
-                        return (
-                          <Image
-                            key={index}
-                            src={URL.createObjectURL(img)}
-                            alt="img"
-                            width={150}
-                            height={150}
-                            style={{ margin: "20px 10px", borderRadius: "5px", objectFit: "cover" }}
-                          />
-                        );
-                      })}
-
+                      {imageUploaded &&
+                        images &&
+                        Array.from(images).map((img, index) => {
+                          return (
+                            <Image
+                              key={index}
+                              src={URL.createObjectURL(img)}
+                              alt="img"
+                              width={150}
+                              height={150}
+                              style={{
+                                margin: "20px 10px",
+                                borderRadius: "5px",
+                                objectFit: "cover",
+                              }}
+                            />
+                          );
+                        })}
                     </Box>
                     <Button
                       sx={{
@@ -551,7 +558,7 @@ function Edit() {
               </Typography>
               <TextField
                 required
-                value={description || ''}
+                value={description || ""}
                 InputProps={{ style: { color: "white" } }}
                 size="small"
                 multiline
@@ -580,7 +587,9 @@ function Edit() {
               </Typography>
               <Select
                 required
-                value={propertyType === "ForSale" ?  (price || 'All') : (rent || 'All')}
+                value={
+                  propertyType === "ForSale" ? price || "All" : rent || "All"
+                }
                 onChange={(e) =>
                   propertyType === "ForSale"
                     ? setPrice(e.target.value)
@@ -617,7 +626,7 @@ function Edit() {
                   </Typography>
                   <Select
                     required
-                    value={propertyTypes || 'All'}
+                    value={propertyTypes || "All"}
                     onChange={(e) => setPropertyTypes(e.target.value)}
                     inputProps={{ style: { color: "white" } }}
                     size="small"
@@ -641,19 +650,19 @@ function Edit() {
               {(property === "House" ||
                 property === "Commercial" ||
                 property === "Apartment") && (
-                  <>
-                    <Typography
-                      variant="h6"
-                      style={{
-                        color: "white",
-                        fontWeight: 500,
-                        fontSize: "22px",
-                        marginLeft: "10px",
-                      }}
-                    >
-                      Size
-                    </Typography>
-                    {/* <TextField
+                <>
+                  <Typography
+                    variant="h6"
+                    style={{
+                      color: "white",
+                      fontWeight: 500,
+                      fontSize: "22px",
+                      marginLeft: "10px",
+                    }}
+                  >
+                    Size
+                  </Typography>
+                  {/* <TextField
                     required
                     value={size}
                     InputProps={{ style: { color: "white" } }}
@@ -669,28 +678,28 @@ function Edit() {
                     fullWidth
                   /> */}
 
-                    <Select
-                      required
-                      value={size || 'All'}
-                      onChange={(e) => setSize(e.target.value)}
-                      inputProps={{ style: { color: "white" } }}
-                      size="small"
-                      sx={{
-                        border: "1px solid grey",
-                        color: "white",
-                        marginLeft: "20px",
-                        borderRadius: "5px",
-                      }}
-                      fullWidth
-                    >
-                      {Sizes.map((sizeOption, index) => (
-                        <MenuItem key={index} value={sizeOption.value}>
-                          {sizeOption.label}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </>
-                )}
+                  <Select
+                    required
+                    value={size || "All"}
+                    onChange={(e) => setSize(e.target.value)}
+                    inputProps={{ style: { color: "white" } }}
+                    size="small"
+                    sx={{
+                      border: "1px solid grey",
+                      color: "white",
+                      marginLeft: "20px",
+                      borderRadius: "5px",
+                    }}
+                    fullWidth
+                  >
+                    {Sizes.map((sizeOption, index) => (
+                      <MenuItem key={index} value={sizeOption.value}>
+                        {sizeOption.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </>
+              )}
 
               {(property === "House" || property === "Apartment") && (
                 <>
@@ -707,7 +716,7 @@ function Edit() {
                   </Typography>
                   <Select
                     required
-                    value={bedrooms || 'All'}
+                    value={bedrooms || "All"}
                     onChange={(e) => setBedrooms(e.target.value)}
                     inputProps={{ style: { color: "white" } }}
                     size="small"
@@ -743,7 +752,7 @@ function Edit() {
                   </Typography>
                   <Select
                     required
-                    value={bathrooms || 'All'}
+                    value={bathrooms || "All"}
                     onChange={(e) => setBathrooms(e.target.value)}
                     inputProps={{ style: { color: "white" } }}
                     size="small"
@@ -779,7 +788,7 @@ function Edit() {
                   </Typography>
                   <Select
                     required
-                    value={perches || 'All'}
+                    value={perches || "All"}
                     onChange={(e) => setPerches(e.target.value)}
                     inputProps={{ style: { color: "white" } }}
                     size="small"
@@ -814,7 +823,7 @@ function Edit() {
                   </Typography>
                   <Select
                     required
-                    value={acres || 'All'}
+                    value={acres || "All"}
                     onChange={(e) => setAcres(e.target.value)}
                     inputProps={{ style: { color: "white" } }}
                     size="small"
@@ -871,11 +880,15 @@ function Edit() {
                         {cityItem.label}
                       </option>
 
-                      {cityItem.subheadings && cityItem.subheadings.map((subheading) => (
-                        <option value={subheading.value} key={subheading.value}>
-                          -- {subheading.label}
-                        </option>
-                      ))}
+                      {cityItem.subheadings &&
+                        cityItem.subheadings.map((subheading) => (
+                          <option
+                            value={subheading.value}
+                            key={subheading.value}
+                          >
+                            -- {subheading.label}
+                          </option>
+                        ))}
                     </optgroup>
                   ))}
                 </select>

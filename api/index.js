@@ -13,9 +13,8 @@ app.use(bodyParser.json());
 cloudinary.config({
   cloud_name: "dpzlg0mru",
   api_key: "444118675797768",
-  api_secret: "uymmOwa5HdAIGGDw_nmzbKct9us"
+  api_secret: "uymmOwa5HdAIGGDw_nmzbKct9us",
 });
-
 
 const apartmentForRent = require("./schema/ApartmentForRent");
 const apartmentForSale = require("./schema/ApartmentForSale");

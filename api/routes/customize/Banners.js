@@ -2,10 +2,10 @@ const express = require("express");
 const router = express.Router();
 const Banners = require("../../schema/Banners");
 const multer = require("multer");
-const fs = require('fs').promises;
+const fs = require("fs").promises;
 const cloudinary = require("cloudinary").v2;
-
-const upload = multer({ dest: 'uploads/' });
+const AuthM = require("../middleware/AuthM");
+const upload = multer({ dest: "uploads/" });
 
 router.get("/", async (req, res) => {
   try {
@@ -17,7 +17,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.post("/add", upload.array("myFiles"), async (req, res) => {
+router.post("/add", AuthM, upload.array("myFiles"), async (req, res) => {
   try {
     await Banners.deleteMany({});
 
@@ -28,7 +28,7 @@ router.post("/add", upload.array("myFiles"), async (req, res) => {
       const publicId = `banner_${i + 1}`;
       const result = await cloudinary.uploader.upload(req.files[i].path, {
         public_id: publicId,
-        folder: "banners"
+        folder: "banners",
       });
       uploadedImages.push(result.secure_url);
       publicIds.push(`banners/${publicId}`);
@@ -40,7 +40,6 @@ router.post("/add", upload.array("myFiles"), async (req, res) => {
     await newBanner.save();
 
     res.status(200).json({ success: true, images: uploadedImages });
-
   } catch (error) {
     console.error(error);
     res.status(400).json(error);

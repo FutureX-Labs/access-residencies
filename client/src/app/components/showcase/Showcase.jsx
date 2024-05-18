@@ -26,7 +26,8 @@ import { IoIosEye } from "react-icons/io";
 import axios from "axios";
 import { EditUrl } from "@/app/utility/editUrl";
 import Swal from "sweetalert2";
-import { CldImage } from 'next-cloudinary';
+import { CldImage } from "next-cloudinary";
+import axiosInstance from "@/app/utility/axiosInstance";
 
 const Showcase = ({ data, user, property, propertyType, showHidden }) => {
   console.log("Data:", data);
@@ -59,7 +60,7 @@ const Showcase = ({ data, user, property, propertyType, showHidden }) => {
       url = url.replace("edit", "delete");
       console.log("API URL:", url);
 
-      const response = await axios.delete(url, {
+      const response = await axiosInstance.delete(url, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -97,7 +98,7 @@ const Showcase = ({ data, user, property, propertyType, showHidden }) => {
       url = url.replace("edit", "edit/isVisible");
       console.log("API URL:", url);
 
-      const response = await axios.post(
+      const response = await axiosInstance.post(
         url,
         {
           isVisibale: updatedIsVisible,
@@ -132,7 +133,6 @@ const Showcase = ({ data, user, property, propertyType, showHidden }) => {
   };
 
   console.log("showHidden", showHidden);
-
 
   const childrenContent = (item) => (
     <>
@@ -204,9 +204,7 @@ const Showcase = ({ data, user, property, propertyType, showHidden }) => {
 
           {item.bathrooms && (
             <>
-              <Typography
-                sx={{ color: "#bdbdbd", fontWeight: "900" }}
-              >
+              <Typography sx={{ color: "#bdbdbd", fontWeight: "900" }}>
                 .
               </Typography>
               <Box
@@ -316,7 +314,7 @@ const Showcase = ({ data, user, property, propertyType, showHidden }) => {
             margin: "0px",
             backgroundColor: "#00000075",
             alignItems: "center",
-            zIndex: 1
+            zIndex: 1,
           }}
         >
           <Link
@@ -341,15 +339,10 @@ const Showcase = ({ data, user, property, propertyType, showHidden }) => {
             onClick={(e) => {
               e.stopPropagation();
               if (property && propertyType) {
-                handleIsVisibleEdit(
-                  e,
-                  item?._id,
-                  item?.isVisibale
-                );
+                handleIsVisibleEdit(e, item?._id, item?.isVisibale);
               } else {
                 Swal.fire({
-                  title:
-                    "Kindly select property and propertyType",
+                  title: "Kindly select property and propertyType",
                   icon: "error",
                   timer: 1500,
                 });
@@ -375,8 +368,7 @@ const Showcase = ({ data, user, property, propertyType, showHidden }) => {
                 handleDelete(e, item._id);
               } else {
                 Swal.fire({
-                  title:
-                    "Kindly select property and propertyType",
+                  title: "Kindly select property and propertyType",
                   icon: "error",
                   timer: 1500,
                 });
@@ -386,14 +378,16 @@ const Showcase = ({ data, user, property, propertyType, showHidden }) => {
             <Image src={binImage} alt="" />
           </Button>
         </Box>
-      ) : (<></>)}
+      ) : (
+        <></>
+      )}
     </>
   );
 
   return (
     <>
       <Box>
-        {(data.length <= 0) &&
+        {data.length <= 0 && (
           <Typography
             sx={{
               fontWeight: "600",
@@ -403,12 +397,13 @@ const Showcase = ({ data, user, property, propertyType, showHidden }) => {
             }}
           >
             No Record Found
-          </Typography>}
+          </Typography>
+        )}
 
         <Grid container spacing={2}>
           {data
             .slice((page - 1) * itemsPerPage, page * itemsPerPage)
-            .map((item) =>
+            .map((item) => (
               <Grid
                 item
                 key={item._id}
@@ -433,28 +428,25 @@ const Showcase = ({ data, user, property, propertyType, showHidden }) => {
                     overflow: "hidden",
                   }}
                 >
-                  {user === 'admin' ? (
-                    <>
-                      {childrenContent(item)}
-                    </>
+                  {user === "admin" ? (
+                    <>{childrenContent(item)}</>
                   ) : (
                     <Link
                       href={`/user/view?propertyValue=${item.property}&propertyType=${item.propertyType}&id=${item._id}`}
                       style={{
-                        textDecoration: 'none',
-                        color: 'inherit',
-                        display: 'block',
-                        width: '100%',
-                        height: '100%',
+                        textDecoration: "none",
+                        color: "inherit",
+                        display: "block",
+                        width: "100%",
+                        height: "100%",
                       }}
                     >
                       {childrenContent(item)}
                     </Link>
-                  )
-                  }
+                  )}
                 </Box>
               </Grid>
-            )}
+            ))}
         </Grid>
 
         {/* Pagination */}

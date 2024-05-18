@@ -27,6 +27,7 @@ const Auth = () => {
       console.log("result", result);
       if (result) {
         sessionStorage.setItem("contact_user", true);
+        sessionStorage.setItem("token", result.data.token);
         setUser(true);
         Swal.fire({
           title: "Login successful",
@@ -43,8 +44,6 @@ const Auth = () => {
       console.log(error);
     }
   };
-
-  // clear session storage it willclear storage whenever we visit to /auth so user will be logged out automatically
 
   useEffect(() => {
     sessionStorage.clear();

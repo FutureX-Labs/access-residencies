@@ -30,6 +30,7 @@ import { IoIosArrowForward } from "react-icons/io";
 import { Padding } from "@mui/icons-material";
 import Link from "next/link";
 import UseSessionStorage from "@/app/UseSessionStorage";
+import axiosInstance from "@/app/utility/axiosInstance";
 
 const Filter = ({
   property,
@@ -72,7 +73,10 @@ const Filter = ({
     if (e) {
       e.preventDefault();
       if (scollToRef.current) {
-        scollToRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+        scollToRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
       }
     }
     try {
@@ -156,8 +160,12 @@ const Filter = ({
           }
         );
 
-        const filteredWithoutNull = filteredBy.filter((value) => value !== null);
-        const filteredWithoutAll = filteredWithoutNull.filter((value) => value !== "All");
+        const filteredWithoutNull = filteredBy.filter(
+          (value) => value !== null
+        );
+        const filteredWithoutAll = filteredWithoutNull.filter(
+          (value) => value !== "All"
+        );
         const filteredArray = filteredWithoutAll.filter(Boolean);
 
         console.log("filteredByCleaned", filteredArray);
@@ -173,7 +181,6 @@ const Filter = ({
         let topCities = [];
 
         transformedCities?.forEach((transformedCity) => {
-
           if (additionalData?.city == transformedCity.label) {
             topCities = transformedCity.subheadings;
             // No need to break out of the loop here since we want to check all items
@@ -204,7 +211,7 @@ const Filter = ({
       if (additionalData) {
         let url = FilterUrl(propertyType, property);
         url += "Id";
-        const response = await axios.post(url, additionalData, {
+        const response = await axiosInstance.post(url, additionalData, {
           headers: {
             "Content-Type": "application/json",
           },
@@ -255,7 +262,7 @@ const Filter = ({
                     fontSize: "16px",
                     padding: "0 10px",
                   }}
-                  value={city || 'All'}
+                  value={city || "All"}
                   onChange={(e) => {
                     const selectedCity = e.target.value;
                     setCity(selectedCity);
@@ -268,11 +275,15 @@ const Filter = ({
                         {cityItem.label}
                       </option>
 
-                      {cityItem.subheadings && cityItem.subheadings.map((subheading) => (
-                        <option value={subheading.value} key={subheading.value}>
-                          -- {subheading.label}
-                        </option>
-                      ))}
+                      {cityItem.subheadings &&
+                        cityItem.subheadings.map((subheading) => (
+                          <option
+                            value={subheading.value}
+                            key={subheading.value}
+                          >
+                            -- {subheading.label}
+                          </option>
+                        ))}
                     </optgroup>
                   ))}
                 </select>
@@ -293,7 +304,9 @@ const Filter = ({
                   placeholder={
                     propertyType === "ForSale" ? "Select price" : "Select rent"
                   }
-                  value={propertyType === "ForSale" ? (price || 'All') : (rent || 'All')}
+                  value={
+                    propertyType === "ForSale" ? price || "All" : rent || "All"
+                  }
                   onChange={(e) =>
                     propertyType === "ForSale"
                       ? setPrice(e.target.value)
@@ -331,7 +344,7 @@ const Filter = ({
                     Property Types
                   </Typography>
                   <Select
-                    value={comPropertyS || ''}
+                    value={comPropertyS || ""}
                     onChange={(e) => setComPropertyS(e.target.value)}
                     inputProps={{ style: { color: "white" } }}
                     size="small"
@@ -355,40 +368,40 @@ const Filter = ({
               {(property === "House" ||
                 property === "Commercial" ||
                 property === "Apartment") && (
-                  <Box sx={{ width: "100%" }}>
-                    <Typography
-                      variant="h6"
-                      style={{
-                        color: "white",
-                        fontWeight: 500,
-                        fontSize: "16px",
-                        marginLeft: "10px",
-                      }}
-                    >
-                      Size
-                    </Typography>
-                    <Select
-                      value={size || 'All'}
-                      onChange={(e) => setSize(e.target.value)}
-                      inputProps={{ style: { color: "white" } }}
-                      size="small"
-                      sx={{
-                        height: "50px",
-                        width: "100%",
-                        border: "1px solid grey",
-                        borderRadius: { xs: "10px", md: "0px" },
-                        backgroundColor: "black",
-                        color: "white",
-                      }}
-                    >
-                      {Sizes.map((sizeOption, index) => (
-                        <MenuItem key={index} value={sizeOption.value}>
-                          {sizeOption.label}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </Box>
-                )}
+                <Box sx={{ width: "100%" }}>
+                  <Typography
+                    variant="h6"
+                    style={{
+                      color: "white",
+                      fontWeight: 500,
+                      fontSize: "16px",
+                      marginLeft: "10px",
+                    }}
+                  >
+                    Size
+                  </Typography>
+                  <Select
+                    value={size || "All"}
+                    onChange={(e) => setSize(e.target.value)}
+                    inputProps={{ style: { color: "white" } }}
+                    size="small"
+                    sx={{
+                      height: "50px",
+                      width: "100%",
+                      border: "1px solid grey",
+                      borderRadius: { xs: "10px", md: "0px" },
+                      backgroundColor: "black",
+                      color: "white",
+                    }}
+                  >
+                    {Sizes.map((sizeOption, index) => (
+                      <MenuItem key={index} value={sizeOption.value}>
+                        {sizeOption.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </Box>
+              )}
               {(property === "House" || property === "Apartment") && (
                 <Box sx={{ width: "100%" }}>
                   <Typography
@@ -403,7 +416,7 @@ const Filter = ({
                     Bedrooms
                   </Typography>
                   <Select
-                    value={bedrooms || 'All'}
+                    value={bedrooms || "All"}
                     onChange={(e) => setBedrooms(e.target.value)}
                     inputProps={{ style: { color: "white" } }}
                     size="small"
@@ -438,7 +451,7 @@ const Filter = ({
                     Bathrooms
                   </Typography>
                   <Select
-                    value={bathrooms || 'All'}
+                    value={bathrooms || "All"}
                     onChange={(e) => setBathrooms(e.target.value)}
                     inputProps={{ style: { color: "white" } }}
                     size="small"
@@ -474,7 +487,7 @@ const Filter = ({
                       Perches
                     </Typography>
                     <Select
-                      value={perches || 'All'}
+                      value={perches || "All"}
                       onChange={(e) => setPerches(e.target.value)}
                       inputProps={{ style: { color: "white" } }}
                       size="small"
@@ -511,7 +524,7 @@ const Filter = ({
                       Acres
                     </Typography>
                     <Select
-                      value={acres || 'All'}
+                      value={acres || "All"}
                       onChange={(e) => setAcres(e.target.value)}
                       inputProps={{ style: { color: "white" } }}
                       size="small"
