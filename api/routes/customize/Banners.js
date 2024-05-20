@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Banners = require("../../schema/Banners");
+const log = require("../../schema/Log");
 const multer = require("multer");
 const fs = require("fs").promises;
 const cloudinary = require("cloudinary").v2;
@@ -39,6 +40,8 @@ router.post("/add", AuthM, upload.array("banners"), async (req, res) => {
     const newBanner = new Banners({ banners: publicIds });
     await newBanner.save();
 
+    const newLog = new log({ activity: "Added new banners" });
+    await newLog.save();
     res.status(200).json({ success: true, images: uploadedImages });
   } catch (error) {
     console.error(error);

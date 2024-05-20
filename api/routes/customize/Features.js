@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Features = require("../../schema/Features");
+const log = require("../../schema/Log");
 const multer = require("multer");
 const fs = require("fs").promises;
 const cloudinary = require("cloudinary").v2;
@@ -42,6 +43,7 @@ router.post("/addImages", AuthM, upload.array("features"), async (req, res) => {
     const newFeature = new Features({ features: FeatureData });
     await newFeature.save();
 
+    const newLog = new log({ activity: "Added new features" });
     res.status(200).json({ success: true });
   } catch (error) {
     console.error(error);
@@ -65,6 +67,8 @@ router.post("/addUrls", AuthM, async (req, res) => {
     features.features = featureData;
     await features.save();
 
+    const newLog = new log({ activity: "Added new urls" });
+    await newLog.save();
     res.status(200).json({ success: true });
   } catch (error) {
     console.error(error);

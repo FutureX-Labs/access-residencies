@@ -466,11 +466,16 @@ const Showcase = ({ data, user, property, propertyType, showHidden }) => {
             page={page}
             onChange={handleChangePage}
             variant="outlined"
-            size="small"
+            // size="small"
+            shape="rounded"
+            showFirstButton
+            showLastButton 
             sx={{
-              backgroundColor: " #8C1C40",
-              padding: "5px 30px",
-              borderRadius: "5px",
+              backgroundColor: " #8C1C4017",
+              padding: "3px 20px",
+              "& .MuiPaginationItem-root": {
+                color: "#fff"
+              }
             }}
           />
         </Box>

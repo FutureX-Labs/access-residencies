@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const PropertyIdSchema = require("../../schema/PropertyId");
 const AuthM = require("../middleware/AuthM");
+const log = require("../../schema/Log");
 
 router.get("/", async (req, res) => {
   try {
@@ -21,6 +22,8 @@ router.post("/add", AuthM, async (req, res) => {
 
     const result = new PropertyIdSchema({ propertyId: propertyIds });
     const savedResult = await result.save();
+    const newLog = new log({ activity: "Added new propertyIds" });
+    await newLog.save();
     res.status(200).json(savedResult);
   } catch (error) {
     console.error(error);

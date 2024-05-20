@@ -6,6 +6,7 @@ const storage = multer.memoryStorage();
 const fs = require("fs").promises;
 const cloudinary = require("cloudinary").v2;
 const AuthM = require("../middleware/AuthM");
+const log = require("../../schema/Log");
 
 const upload = multer({ dest: "uploads/" });
 
@@ -80,6 +81,9 @@ router.post("/add", AuthM, upload.array("myFiles"), async (req, res) => {
 
     const response = await newLand.save();
 
+    const newLog = new log({ activity: `Land for Rent added: ${propertyId}` });
+    await newLog.save();
+
     res.status(200).json(response);
   } catch (error) {
     console.error(error);
@@ -97,6 +101,9 @@ router.put("/edit/:id/uploadThumbnail/", AuthM, upload.single("thumbnail"), asyn
       folder: `land-rent/${propertyId}`,
     });
     await fs.unlink(thumbnailFile.path);
+
+    const newLog = new log({ activity: `Land for Rent thumbnail updated: ${propertyId}` });
+    await newLog.save();
 
     res.sendStatus(200);
   } catch (error) {
@@ -136,6 +143,9 @@ router.put("/edit/:id/uploadImages/", AuthM, upload.array("image"), async (req, 
       { new: true }
     );
 
+    const newLog = new log({ activity: `Land for Rent images updated: ${propertyId}` });
+    await newLog.save();
+
     res.sendStatus(200);
   } catch (error) {
     res.status(500).send(error.message);
@@ -166,6 +176,9 @@ router.put("/edit/:id/additionalData/", AuthM, async (req, res) => {
       city,
     });
 
+    const newLog = new log({ activity: `Land for Rent additional data updated: ${Id}` });
+    await newLog.save();
+
     res.status(200).json(result);
   } catch (error) {
     console.error(error);
@@ -180,6 +193,9 @@ router.post("/edit/isVisible/:id", AuthM, async (req, res) => {
     const result = await landForRent.findByIdAndUpdate(id, {
       isVisibale,
     });
+
+    const newLog = new log({ activity: `Land for Rent visibility updated: ${id}` });
+    await newLog.save();
 
     res.status(200).json(result);
   } catch (error) {
@@ -199,6 +215,8 @@ router.delete("/delete/:id", AuthM, (req, res) => {
     })
     .then((details) => {
       fetchedDetails = details;
+      const newLog = new log({ activity: `Land for Rent deleted: ${details.propertyId}` });
+      newLog.save();
       return cloudinary.api.delete_resources(
         [details.thumbnailImage, ...details.images],
         { type: "upload", resource_type: "image" }

@@ -23,7 +23,7 @@ import AuthContext from "@/app/context/AuthContext";
 const drawerWidth = 240;
 
 function Navbar(props) {
-  const { window, type } = props;
+  const { type } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [showProperty, setShowProperty] = React.useState(false);
   const router = useRouter();
@@ -139,9 +139,6 @@ function Navbar(props) {
     </Box>
   );
 
-  const container =
-    window !== undefined ? () => window().document.body : undefined;
-
   return (
     <Box sx={{ display: "flex", height: "90px" }}>
       <CssBaseline />
@@ -178,6 +175,7 @@ function Navbar(props) {
                   }}
                   onClick={() => {
                     sessionStorage.clear();
+                    window.location.reload();
                   }}
                 >
                   {item.title}
@@ -211,7 +209,6 @@ function Navbar(props) {
       </AppBar>
       <nav>
         <Drawer
-          container={container}
           variant="temporary"
           open={mobileOpen}
           onClose={handleDrawerToggle}
