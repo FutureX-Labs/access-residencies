@@ -88,7 +88,7 @@ const Filter = ({
   const handleSubmit = async (e) => {
     if (e) {
       e.preventDefault();
-      if (scollToRef.current) {
+      if (scollToRef) {
         scollToRef.current.scrollIntoView({
           behavior: "smooth",
           block: "start",

@@ -113,7 +113,7 @@ function Navbar(props) {
                 variant="contained"
                 color="primary"
                 onClick={() => {
-                  sessionStorage.removeItem("contact_user");
+                  sessionStorage.clear();
                 }}
               >
                 {item.title}
@@ -177,7 +177,7 @@ function Navbar(props) {
                     fontFamily: "Roboto Condensed",
                   }}
                   onClick={() => {
-                    sessionStorage.removeItem("contact_user");
+                    sessionStorage.clear();
                   }}
                 >
                   {item.title}

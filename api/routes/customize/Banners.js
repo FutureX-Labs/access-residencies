@@ -17,7 +17,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.post("/add", AuthM, upload.array("myFiles"), async (req, res) => {
+router.post("/add", AuthM, upload.array("banners"), async (req, res) => {
   try {
     await Banners.deleteMany({});
 

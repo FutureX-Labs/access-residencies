@@ -87,60 +87,82 @@ router.post("/add", AuthM, upload.array("myFiles"), async (req, res) => {
   }
 });
 
-router.put("/edit/:id", AuthM, upload.array("myFiles"), async (req, res) => {
+router.put("/edit/:id/uploadThumbnail/", AuthM, upload.single("thumbnail"), async (req, res) => {
   try {
-    const files = req.files;
-    const { propertyId, title, rent, description, perches, acres, city } =
-      JSON.parse(req.body.additionalData);
+    const thumbnailFile = req.file;
+    const propertyId = req.body.propertyId;
 
-    if (!files || files.length === 0) {
-      const id = req.params.id;
+    await cloudinary.uploader.upload(thumbnailFile.path, {
+      public_id: `image_0`,
+      folder: `land-rent/${propertyId}`,
+    });
+    await fs.unlink(thumbnailFile.path);
 
-      const result = await landForRent.findByIdAndUpdate(id, {
-        propertyId,
-        title,
-        rent,
-        description,
-        landExtent: {
-          perches,
-          acres,
-        },
-        city,
+    res.sendStatus(200);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+router.put("/edit/:id/uploadImages/", AuthM, upload.array("image"), async (req, res) => {
+  try {
+    const imageFiles = req.files;
+    const propertyId = req.body.propertyId;
+    const Id = req.params.id;
+
+    landForRent.findById(Id, { images: 1, _id: 0 }).then((details) => {
+      cloudinary.api.delete_resources(details.images, {
+        type: "upload",
+        resource_type: "image",
       });
-
-      return res.status(200).json(result);
-    }
+    });
 
     const uploadedImages = [];
 
-    for (let i = 0; i < files.length; i++) {
-      await cloudinary.uploader.upload(files[i].path, {
-        public_id: `image_${i}`,
+    for (let i = 0; i < imageFiles.length; i++) {
+      await cloudinary.uploader.upload(imageFiles[i].path, {
+        public_id: `image_${i + 1}`,
         folder: `land-rent/${propertyId}`,
       });
 
-      uploadedImages.push(`land-rent/${propertyId}/image_${i}`);
+      uploadedImages.push(`land-rent/${propertyId}/image_${i + 1}`);
 
-      await fs.unlink(files[i].path);
+      await fs.unlink(imageFiles[i].path);
     }
 
-    const thumbnailImage = uploadedImages[0];
-    const images = uploadedImages.slice(1);
+    await landForRent.findByIdAndUpdate(
+      Id,
+      { $set: { images: uploadedImages } },
+      { new: true }
+    );
 
-    const houseId = req.params.id;
+    res.sendStatus(200);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
 
-    const result = await landForRent.findByIdAndUpdate(houseId, {
-      propertyId,
+router.put("/edit/:id/additionalData/", AuthM, async (req, res) => {
+  try {
+    const Id = req.params.id;
+
+    const {
       title,
       rent,
-      thumbnailImage,
-      images,
       description,
-      landExtent: {
-        perches,
-        acres,
-      },
+      size,
+      bedrooms,
+      bathrooms,
+      city,
+    } = JSON.parse(req.body.additionalData);
 
+    const result = await landForRent.findByIdAndUpdate(Id, {
+      title,
+      rent,
+      description,
+      size,
+      bedrooms,
+      bathrooms,
       city,
     });
 

@@ -88,77 +88,66 @@ router.post("/add", AuthM, upload.array("myFiles"), async (req, res) => {
   }
 });
 
-router.put(
-  "/edit/:id/uploadThumbnail/",
-  AuthM,
-  upload.single("thumbnail"),
-  async (req, res) => {
-    try {
-      const thumbnailFile = req.file;
-      const propertyId = req.body.propertyId;
+router.put("/edit/:id/uploadThumbnail/", AuthM, upload.single("thumbnail"), async (req, res) => {
+  try {
+    const thumbnailFile = req.file;
+    const propertyId = req.body.propertyId;
 
-      await cloudinary.uploader.upload(thumbnailFile.path, {
-        public_id: `image_0`,
+    await cloudinary.uploader.upload(thumbnailFile.path, {
+      public_id: `image_0`,
+      folder: `apartment-rent/${propertyId}`,
+    });
+    await fs.unlink(thumbnailFile.path);
+
+    res.sendStatus(200);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+router.put("/edit/:id/uploadImages/", AuthM, upload.array("image"), async (req, res) => {
+  try {
+    const imageFiles = req.files;
+    const propertyId = req.body.propertyId;
+    const Id = req.params.id;
+
+    apartmentForRent.findById(Id, { images: 1, _id: 0 }).then((details) => {
+      cloudinary.api.delete_resources(details.images, {
+        type: "upload",
+        resource_type: "image",
+      });
+    });
+
+    const uploadedImages = [];
+
+    for (let i = 0; i < imageFiles.length; i++) {
+      await cloudinary.uploader.upload(imageFiles[i].path, {
+        public_id: `image_${i + 1}`,
         folder: `apartment-rent/${propertyId}`,
       });
-      await fs.unlink(thumbnailFile.path);
 
-      res.sendStatus(200);
-    } catch (error) {
-      res.status(500).send(error.message);
+      uploadedImages.push(`apartment-rent/${propertyId}/image_${i + 1}`);
+
+      await fs.unlink(imageFiles[i].path);
     }
+
+    await apartmentForRent.findByIdAndUpdate(
+      Id,
+      { $set: { images: uploadedImages } },
+      { new: true }
+    );
+
+    res.sendStatus(200);
+  } catch (error) {
+    res.status(500).send(error.message);
   }
-);
+});
 
-router.put(
-  "/edit/:id/uploadImages/",
-  upload.array("image"),
-  async (req, res) => {
-    try {
-      const imageFiles = req.files;
-      const propertyId = req.body.propertyId;
-      const Id = req.params.id;
-
-      apartmentForRent.findById(Id, { images: 1, _id: 0 }).then((details) => {
-        cloudinary.api.delete_resources(details.images, {
-          type: "upload",
-          resource_type: "image",
-        });
-      });
-
-      const uploadedImages = [];
-
-      for (let i = 0; i < imageFiles.length; i++) {
-        await cloudinary.uploader.upload(imageFiles[i].path, {
-          public_id: `image_${i + 1}`,
-          folder: `apartment-rent/${propertyId}`,
-        });
-
-        uploadedImages.push(`apartment-rent/${propertyId}/image_${i + 1}`);
-
-        await fs.unlink(imageFiles[i].path);
-      }
-
-      await apartmentForRent.findByIdAndUpdate(
-        Id,
-        { $set: { images: uploadedImages } },
-        { new: true }
-      );
-
-      res.sendStatus(200);
-    } catch (error) {
-      res.status(500).send(error.message);
-    }
-  }
-);
-
-router.put("/edit/:id/additionalData/", async (req, res) => {
-  console.log(req);
+router.put("/edit/:id/additionalData/", AuthM, async (req, res) => {
   try {
     const Id = req.params.id;
 
     const {
-      propertyId,
       title,
       rent,
       description,
@@ -168,13 +157,7 @@ router.put("/edit/:id/additionalData/", async (req, res) => {
       city,
     } = JSON.parse(req.body.additionalData);
 
-    const oldPropertyId = await apartmentForRent.findById(Id, {
-      propertyId: 1,
-      _id: 0,
-    });
-
     const result = await apartmentForRent.findByIdAndUpdate(Id, {
-      propertyId,
       title,
       rent,
       description,
@@ -183,11 +166,6 @@ router.put("/edit/:id/additionalData/", async (req, res) => {
       bathrooms,
       city,
     });
-
-    await cloudinary.uploader.rename(
-      `apartment-rent/${oldPropertyId}`,
-      `apartment-rent/${propertyId}`
-    );
 
     res.status(200).json(result);
   } catch (error) {

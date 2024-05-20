@@ -102,61 +102,78 @@ router.post("/add", AuthM, upload.array("myFiles"), async (req, res) => {
   }
 });
 
-router.put("/edit/:id", AuthM, upload.array("myFiles"), async (req, res) => {
+router.put("/edit/:id/uploadThumbnail/", AuthM, upload.single("thumbnail"), async (req, res) => {
   try {
-    const files = req.files;
+    const thumbnailFile = req.file;
+    const propertyId = req.body.propertyId;
+
+    await cloudinary.uploader.upload(thumbnailFile.path, {
+      public_id: `image_0`,
+      folder: `house-rent/${propertyId}`,
+    });
+    await fs.unlink(thumbnailFile.path);
+
+    res.sendStatus(200);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+router.put("/edit/:id/uploadImages/", AuthM, upload.array("image"), async (req, res) => {
+  try {
+    const imageFiles = req.files;
+    const propertyId = req.body.propertyId;
+    const Id = req.params.id;
+
+    houseForRent.findById(Id, { images: 1, _id: 0 }).then((details) => {
+      cloudinary.api.delete_resources(details.images, {
+        type: "upload",
+        resource_type: "image",
+      });
+    });
+
+    const uploadedImages = [];
+
+    for (let i = 0; i < imageFiles.length; i++) {
+      await cloudinary.uploader.upload(imageFiles[i].path, {
+        public_id: `image_${i + 1}`,
+        folder: `house-rent/${propertyId}`,
+      });
+
+      uploadedImages.push(`house-rent/${propertyId}/image_${i + 1}`);
+
+      await fs.unlink(imageFiles[i].path);
+    }
+
+    await houseForRent.findByIdAndUpdate(
+      Id,
+      { $set: { images: uploadedImages } },
+      { new: true }
+    );
+
+    res.sendStatus(200);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+router.put("/edit/:id/additionalData/", AuthM, async (req, res) => {
+  try {
+    const Id = req.params.id;
+
     const {
-      propertyId,
       title,
       rent,
       description,
       size,
       bedrooms,
       bathrooms,
-
       city,
     } = JSON.parse(req.body.additionalData);
-    if (!files || files.length === 0) {
-      const id = req.params.id;
 
-      const result = await houseForRent.findByIdAndUpdate(id, {
-        propertyId,
-        title,
-        rent,
-        description,
-        size,
-        bedrooms,
-        bathrooms,
-        city,
-      });
-
-      return res.status(200).json(result);
-    }
-
-    const uploadedImages = [];
-
-    for (let i = 0; i < files.length; i++) {
-      await cloudinary.uploader.upload(files[i].path, {
-        public_id: `image_${i}`,
-        folder: `house-rent/${propertyId}`,
-      });
-
-      uploadedImages.push(`house-rent/${propertyId}/image_${i}`);
-
-      await fs.unlink(files[i].path);
-    }
-
-    const thumbnailImage = uploadedImages[0];
-    const images = uploadedImages.slice(1);
-
-    const houseId = req.params.id;
-
-    await houseForRent.findByIdAndUpdate(houseId, {
-      propertyId,
+    const result = await houseForRent.findByIdAndUpdate(Id, {
       title,
       rent,
-      thumbnailImage,
-      images,
       description,
       size,
       bedrooms,
@@ -164,7 +181,7 @@ router.put("/edit/:id", AuthM, upload.array("myFiles"), async (req, res) => {
       city,
     });
 
-    res.status(200).json("House edited successfully");
+    res.status(200).json(result);
   } catch (error) {
     console.error(error);
     res.status(400).json(error);
