@@ -56,7 +56,7 @@ function Home() {
 
   setTimeout(() => {
     setIsLoading(false);
-  }, 3000);
+  }, 2000);
 
   const theme = createTheme({
     components: {
