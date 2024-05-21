@@ -1,12 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const Features = require("../../schema/Features");
+const log = require("../../schema/Log");
 const multer = require("multer");
-const fs = require('fs').promises;
+const fs = require("fs").promises;
 const cloudinary = require("cloudinary").v2;
-
-const upload = multer({ dest: 'uploads/' });
-
+const AuthM = require("../middleware/AuthM");
+const upload = multer({ dest: "uploads/" });
 
 router.get("/", async (req, res) => {
   try {
@@ -18,37 +18,58 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.post("/add", upload.array("myFiles"), async (req, res) => {
+router.post("/addImages", AuthM, upload.array("features"), async (req, res) => {
   try {
-    await Features.deleteMany({});
-
-    const uploadedImages = [];
+    const files = req.files;
     const FeatureData = [];
 
-    const urlData = req.body.urls;
+    await Features.deleteMany({});
 
-    for (let i = 0; i < req.files.length; i++) {
+    for (let i = 0; i < files.length; i++) {
       const publicId = `feature_${i + 1}`;
-      const result = await cloudinary.uploader.upload(req.files[i].path, {
+      await cloudinary.uploader.upload(files[i].path, {
         public_id: publicId,
-        folder: "features"
+        folder: "features",
       });
-      uploadedImages.push(result.secure_url);
 
       FeatureData.push({
         file: `features/${publicId}`,
-        url: urlData[i] || "#home",
+        url: "#home",
       });
 
-      await fs.unlink(req.files[i].path);
+      await fs.unlink(files[i].path);
     }
-    console.log(FeatureData);
 
     const newFeature = new Features({ features: FeatureData });
     await newFeature.save();
 
-    res.status(200).json({ success: true, images: uploadedImages });
+    const newLog = new log({ activity: "Added new features" });
+    res.status(200).json({ success: true });
+  } catch (error) {
+    console.error(error);
+    res.status(400).json(error);
+  }
 
+});
+
+router.post("/addUrls", AuthM, async (req, res) => {
+  try {
+    console.log(req.body);
+    const urlData = req.body.urls;
+
+    const features = await Features.findOne();
+    const featureData = features.features;
+
+    for (let i = 0; i < featureData.length; i++) {
+      featureData[i].url = urlData[i];
+    }
+
+    features.features = featureData;
+    await features.save();
+
+    const newLog = new log({ activity: "Added new urls" });
+    await newLog.save();
+    res.status(200).json({ success: true });
   } catch (error) {
     console.error(error);
     res.status(400).json(error);

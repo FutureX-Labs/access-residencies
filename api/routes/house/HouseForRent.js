@@ -3,10 +3,12 @@ const router = express.Router();
 const houseForRent = require("../../schema/HouseForRent");
 const multer = require("multer");
 const storage = multer.memoryStorage();
-const fs = require('fs').promises;
+const fs = require("fs").promises;
 const cloudinary = require("cloudinary").v2;
+const AuthM = require("../middleware/AuthM");
+const log = require("../../schema/Log");
 
-const upload = multer({ dest: 'uploads/' });
+const upload = multer({ dest: "uploads/" });
 
 router.get("/", async (req, res) => {
   try {
@@ -35,7 +37,7 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-router.post("/add", upload.array("myFiles"), async (req, res) => {
+router.post("/add", AuthM, upload.array("myFiles"), async (req, res) => {
   try {
     const files = req.files;
     const {
@@ -48,13 +50,13 @@ router.post("/add", upload.array("myFiles"), async (req, res) => {
       bathrooms,
       city,
     } = JSON.parse(req.body.additionalData);
-    
+
     const uploadedImages = [];
 
     for (let i = 0; i < files.length; i++) {
       await cloudinary.uploader.upload(files[i].path, {
         public_id: `image_${i}`,
-        folder: `house-rent/${propertyId}`
+        folder: `house-rent/${propertyId}`,
       });
 
       uploadedImages.push(`house-rent/${propertyId}/image_${i}`);
@@ -64,7 +66,6 @@ router.post("/add", upload.array("myFiles"), async (req, res) => {
 
     const thumbnailImage = uploadedImages[0];
     const images = uploadedImages.slice(1);
-
 
     console.log(images);
     console.log(
@@ -95,6 +96,9 @@ router.post("/add", upload.array("myFiles"), async (req, res) => {
 
     const response = await newHouse.save();
 
+    const newLog = new log({ activity: `House for rent added : ${propertyId}` });
+    await newLog.save();
+
     res.status(200).json(response);
   } catch (error) {
     console.error(error);
@@ -102,82 +106,93 @@ router.post("/add", upload.array("myFiles"), async (req, res) => {
   }
 });
 
-router.put("/edit/:id", upload.array("myFiles"), async (req, res) => {
+router.put("/edit/:id/uploadThumbnail/", AuthM, upload.single("thumbnail"), async (req, res) => {
   try {
-    const files = req.files;
-    const {
-      propertyId,
-      title,
-      rent,
-      description,
-      size,
-      bedrooms,
-      bathrooms,
+    const thumbnailFile = req.file;
+    const propertyId = req.body.propertyId;
 
-      city,
-    } = JSON.parse(req.body.additionalData);
-    if (!files || files.length === 0) {
-      const id = req.params.id;
-
-      const result = await houseForRent.findByIdAndUpdate(id, {
-        propertyId,
-        title,
-        rent,
-        description,
-        size,
-        bedrooms,
-        bathrooms,
-        city,
-      });
-
-      return res.status(200).json(result);
-    }
-    
-    const uploadedImages = [];
-
-    for (let i = 0; i < files.length; i++) {
-      await cloudinary.uploader.upload(files[i].path, {
-        public_id: `image_${i}`,
-        folder: `house-rent/${propertyId}`
-      });
-
-      uploadedImages.push(`house-rent/${propertyId}/image_${i}`);
-
-      await fs.unlink(files[i].path);
-    }
-
-    const thumbnailImage = uploadedImages[0];
-    const images = uploadedImages.slice(1);
-
-    const houseId = req.params.id;
-
-    await houseForRent.findByIdAndUpdate(houseId, {
-      propertyId,
-      title,
-      rent,
-      thumbnailImage,
-      images,
-      description,
-      size,
-      bedrooms,
-      bathrooms,
-      city,
+    await cloudinary.uploader.upload(thumbnailFile.path, {
+      public_id: `image_0`,
+      folder: `house-rent/${propertyId}`,
     });
+    await fs.unlink(thumbnailFile.path);
 
-    res.status(200).json("House edited successfully");
+    const newLog = new log({ activity: `House for rent thumbnail updated : ${propertyId}` });
+    await newLog.save();
+
+    res.sendStatus(200);
   } catch (error) {
-    console.error(error);
-    res.status(400).json(error);
+    res.status(500).send(error.message);
   }
 });
 
-router.post("/edit/isVisible/:id", async (req, res) => {
+router.put("/edit/:id/uploadImages/", AuthM, upload.array("image"), async (req, res) => {
   try {
-    const id = req.params.id;
-    const { isVisibale } = req.body;
-    const result = await houseForRent.findByIdAndUpdate(id, {
-      isVisibale,
+    const imageFiles = req.files;
+    const propertyId = req.body.propertyId;
+    const Id = req.params.id;
+
+    houseForRent.findById(Id, { images: 1, _id: 0 }).then((details) => {
+      cloudinary.api.delete_resources(details.images, {
+        type: "upload",
+        resource_type: "image",
+      });
     });
+
+    const uploadedImages = [];
+
+    for (let i = 0; i < imageFiles.length; i++) {
+      await cloudinary.uploader.upload(imageFiles[i].path, {
+        public_id: `image_${i + 1}`,
+        folder: `house-rent/${propertyId}`,
+      });
+
+      uploadedImages.push(`house-rent/${propertyId}/image_${i + 1}`);
+
+      await fs.unlink(imageFiles[i].path);
+    }
+
+    await houseForRent.findByIdAndUpdate(
+      Id,
+      { $set: { images: uploadedImages } },
+      { new: true }
+    );
+
+    const newLog = new log({ activity: `House for rent images updated : ${propertyId}` });
+    await newLog.save();
+
+    res.sendStatus(200);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+router.put("/edit/:id/additionalData/", AuthM, async (req, res) => {
+  try {
+    const Id = req.params.id;
+
+    const {
+      title,
+      rent,
+      description,
+      size,
+      bedrooms,
+      bathrooms,
+      city,
+    } = JSON.parse(req.body.additionalData);
+
+    const result = await houseForRent.findByIdAndUpdate(Id, {
+      title,
+      rent,
+      description,
+      size,
+      bedrooms,
+      bathrooms,
+      city,
+    });
+
+    const newLog = new log({ activity: `House for rent details updated : ${result.propertyId}` });
+    await newLog.save();
 
     res.status(200).json(result);
   } catch (error) {
@@ -186,23 +201,54 @@ router.post("/edit/isVisible/:id", async (req, res) => {
   }
 });
 
-router.delete("/delete/:id", (req, res) => {
+router.post("/edit/isVisible/:id", AuthM, async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { isVisibale } = req.body;
+    const result = await houseForRent.findByIdAndUpdate(id, {
+      isVisibale,
+    });
+
+    const newLog = new log({ activity: `House for rent visibility updated : ${result.propertyId}` });
+    await newLog.save();
+
+    res.status(200).json(result);
+  } catch (error) {
+    console.error(error);
+    res.status(400).json(error);
+  }
+});
+
+router.delete("/delete/:id", AuthM, (req, res) => {
   let fetchedDetails;
-  houseForRent.findById(req.params.id, { propertyId: 1, images: 1, thumbnailImage: 1, _id: 0 })
-    .then(details => {
+  houseForRent
+    .findById(req.params.id, {
+      propertyId: 1,
+      images: 1,
+      thumbnailImage: 1,
+      _id: 0,
+    })
+    .then((details) => {
       fetchedDetails = details;
-      return cloudinary.api.delete_resources([details.thumbnailImage, ...details.images], { type: 'upload', resource_type: 'image' });
+      const newLog = new log({ activity: `House for rent deleted : ${details.propertyId}` });
+      newLog.save();
+      return cloudinary.api.delete_resources(
+        [details.thumbnailImage, ...details.images],
+        { type: "upload", resource_type: "image" }
+      );
     })
     .then(() => {
-      return cloudinary.api.delete_folder(`house-rent/${fetchedDetails.propertyId}`);
+      return cloudinary.api.delete_folder(
+        `house-rent/${fetchedDetails.propertyId}`
+      );
     })
     .then(() => {
       return houseForRent.findByIdAndDelete(req.params.id);
     })
-    .then(result => {
+    .then((result) => {
       res.status(200).json(result);
     })
-    .catch(error => {
+    .catch((error) => {
       console.error(error);
       res.status(400).json(error);
     });
@@ -239,7 +285,7 @@ router.post("/filter", async (req, res) => {
     }
 
     console.log(filter);
-    
+
     let filtered = await houseForRent.find(filter).exec();
 
     res.status(200).json(filtered);
@@ -284,7 +330,7 @@ router.post("/filter/main", async (req, res) => {
   }
 });
 
-router.post("/filterId", async (req, res) => {
+router.post("/filterId", AuthM, async (req, res) => {
   try {
     const { propertyId } = req.body;
 

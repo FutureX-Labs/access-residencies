@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import { Label } from "@mui/icons-material";
 import { FilterUrl } from "@/app/utility/filterUrls";
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { GetAdditionalData } from "@/app/utility/getAdditionalData";
 import { Sizes } from "@/app/list/sizes";
 import { Prices } from "@/app/list/price";
@@ -27,11 +27,12 @@ import Showcase from "../showcase/Showcase";
 import axios from "axios";
 import Items from "@/app/components/items/Items";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
-import Autocomplete from '@mui/material/Autocomplete';
+import Autocomplete from "@mui/material/Autocomplete";
 import { IoIosArrowForward } from "react-icons/io";
 import { Padding } from "@mui/icons-material";
 import Link from "next/link";
 import UseSessionStorage from "@/app/UseSessionStorage";
+import axiosInstance from "@/app/utility/axiosInstance";
 
 const Filter = ({
   property,
@@ -53,7 +54,7 @@ const Filter = ({
   const [price, setPrice] = useState("All");
   const [rent, setRent] = useState("All");
   const [size, setSize] = useState("All");
-  const [city, setCity] = useState({ title: 'All', group: 'All' });
+  const [city, setCity] = useState({ title: "All", group: "All" });
   const [bedrooms, setBedrooms] = useState("All");
   const [bathrooms, setBathrooms] = useState("All");
   const [perches, setPerches] = useState("All");
@@ -67,10 +68,10 @@ const Filter = ({
       MuiAutocomplete: {
         styleOverrides: {
           clearIndicator: {
-            color: 'white',
+            color: "white",
           },
           popupIndicator: {
-            color: 'white',
+            color: "white",
           },
         },
       },
@@ -87,8 +88,11 @@ const Filter = ({
   const handleSubmit = async (e) => {
     if (e) {
       e.preventDefault();
-      if (scollToRef.current) {
-        scollToRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (scollToRef) {
+        scollToRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
       }
     }
     try {
@@ -172,8 +176,12 @@ const Filter = ({
           }
         );
 
-        const filteredWithoutNull = filteredBy.filter((value) => value !== null);
-        const filteredWithoutAll = filteredWithoutNull.filter((value) => value !== "All");
+        const filteredWithoutNull = filteredBy.filter(
+          (value) => value !== null
+        );
+        const filteredWithoutAll = filteredWithoutNull.filter(
+          (value) => value !== "All"
+        );
         const filteredArray = filteredWithoutAll.filter(Boolean);
 
         console.log("filteredByCleaned", filteredArray);
@@ -221,7 +229,7 @@ const Filter = ({
       if (additionalData) {
         let url = FilterUrl(propertyType, property);
         url += "Id";
-        const response = await axios.post(url, additionalData, {
+        const response = await axiosInstance.post(url, additionalData, {
           headers: {
             "Content-Type": "application/json",
           },
@@ -234,10 +242,15 @@ const Filter = ({
     }
   };
 
-  const transformedCities = Cities.flatMap(city =>
-    city.subheadings ? city.subheadings.map(subheading => ({ title: subheading.label, group: city.label })) : []
+  const transformedCities = Cities.flatMap((city) =>
+    city.subheadings
+      ? city.subheadings.map((subheading) => ({
+          title: subheading.label,
+          group: city.label,
+        }))
+      : []
   );
-  const allOption = { title: 'All', group: 'All' };
+  const allOption = { title: "All", group: "All" };
   const transformedCitiesWithAll = [allOption, ...transformedCities];
 
   return (
@@ -276,7 +289,9 @@ const Filter = ({
                     options={transformedCitiesWithAll}
                     groupBy={(option) => option.group}
                     getOptionLabel={(option) => option.title}
-                    isOptionEqualToValue={(option, value) => option.title === value.title}
+                    isOptionEqualToValue={(option, value) =>
+                      option.title === value.title
+                    }
                     size="small"
                     sx={{
                       height: "50px",
@@ -308,7 +323,9 @@ const Filter = ({
                   {propertyType === "ForSale" ? "Max Price" : "Max Rent"}
                 </Typography>
                 <Select
-                  value={propertyType === "ForSale" ? (price || 'All') : (rent || 'All')}
+                  value={
+                    propertyType === "ForSale" ? price || "All" : rent || "All"
+                  }
                   onChange={(e) =>
                     propertyType === "ForSale"
                       ? setPrice(e.target.value)
@@ -346,7 +363,7 @@ const Filter = ({
                     Property Types
                   </Typography>
                   <Select
-                    value={comPropertyS || ''}
+                    value={comPropertyS || ""}
                     onChange={(e) => setComPropertyS(e.target.value)}
                     inputProps={{ style: { color: "white" } }}
                     size="small"
@@ -370,40 +387,40 @@ const Filter = ({
               {(property === "House" ||
                 property === "Commercial" ||
                 property === "Apartment") && (
-                  <Box sx={{ width: "100%" }}>
-                    <Typography
-                      variant="h6"
-                      style={{
-                        color: "white",
-                        fontWeight: 500,
-                        fontSize: "16px",
-                        marginLeft: "10px",
-                      }}
-                    >
-                      Size
-                    </Typography>
-                    <Select
-                      value={size || 'All'}
-                      onChange={(e) => setSize(e.target.value)}
-                      inputProps={{ style: { color: "white" } }}
-                      size="small"
-                      sx={{
-                        height: "50px",
-                        width: "100%",
-                        border: "1px solid grey",
-                        borderRadius: { xs: "10px", md: "0px" },
-                        backgroundColor: "black",
-                        color: "white",
-                      }}
-                    >
-                      {Sizes.map((sizeOption, index) => (
-                        <MenuItem key={index} value={sizeOption.value}>
-                          {sizeOption.label}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </Box>
-                )}
+                <Box sx={{ width: "100%" }}>
+                  <Typography
+                    variant="h6"
+                    style={{
+                      color: "white",
+                      fontWeight: 500,
+                      fontSize: "16px",
+                      marginLeft: "10px",
+                    }}
+                  >
+                    Size
+                  </Typography>
+                  <Select
+                    value={size || "All"}
+                    onChange={(e) => setSize(e.target.value)}
+                    inputProps={{ style: { color: "white" } }}
+                    size="small"
+                    sx={{
+                      height: "50px",
+                      width: "100%",
+                      border: "1px solid grey",
+                      borderRadius: { xs: "10px", md: "0px" },
+                      backgroundColor: "black",
+                      color: "white",
+                    }}
+                  >
+                    {Sizes.map((sizeOption, index) => (
+                      <MenuItem key={index} value={sizeOption.value}>
+                        {sizeOption.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </Box>
+              )}
               {(property === "House" || property === "Apartment") && (
                 <Box sx={{ width: "100%" }}>
                   <Typography
@@ -418,7 +435,7 @@ const Filter = ({
                     Bedrooms
                   </Typography>
                   <Select
-                    value={bedrooms || 'All'}
+                    value={bedrooms || "All"}
                     onChange={(e) => setBedrooms(e.target.value)}
                     inputProps={{ style: { color: "white" } }}
                     size="small"
@@ -453,7 +470,7 @@ const Filter = ({
                     Bathrooms
                   </Typography>
                   <Select
-                    value={bathrooms || 'All'}
+                    value={bathrooms || "All"}
                     onChange={(e) => setBathrooms(e.target.value)}
                     inputProps={{ style: { color: "white" } }}
                     size="small"
@@ -489,7 +506,7 @@ const Filter = ({
                       Perches
                     </Typography>
                     <Select
-                      value={perches || 'All'}
+                      value={perches || "All"}
                       onChange={(e) => setPerches(e.target.value)}
                       inputProps={{ style: { color: "white" } }}
                       size="small"
@@ -526,7 +543,7 @@ const Filter = ({
                       Acres
                     </Typography>
                     <Select
-                      value={acres || 'All'}
+                      value={acres || "All"}
                       onChange={(e) => setAcres(e.target.value)}
                       inputProps={{ style: { color: "white" } }}
                       size="small"

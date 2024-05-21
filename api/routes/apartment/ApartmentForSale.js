@@ -2,10 +2,11 @@ const express = require("express");
 const router = express.Router();
 const apartmentForSale = require("../../schema/ApartmentForSale");
 const multer = require("multer");
-const fs = require('fs').promises;
+const fs = require("fs").promises;
 const cloudinary = require("cloudinary").v2;
-
-const upload = multer({ dest: 'uploads/' });
+const AuthM = require("../middleware/AuthM");
+const upload = multer({ dest: "uploads/" });
+const log = require("../../schema/Log");
 
 router.get("/", async (req, res) => {
   try {
@@ -34,7 +35,7 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-router.post("/add", upload.array("myFiles"), async (req, res) => {
+router.post("/add", AuthM, upload.array("myFiles"), async (req, res) => {
   try {
     const files = req.files;
     const {
@@ -54,7 +55,7 @@ router.post("/add", upload.array("myFiles"), async (req, res) => {
     for (let i = 0; i < files.length; i++) {
       await cloudinary.uploader.upload(files[i].path, {
         public_id: `image_${i}`,
-        folder: `apartment-sale/${propertyId}`
+        folder: `apartment-sale/${propertyId}`,
       });
 
       uploadedImages.push(`apartment-sale/${propertyId}/image_${i}`);
@@ -82,8 +83,11 @@ router.post("/add", upload.array("myFiles"), async (req, res) => {
       isVisibale: true,
     });
 
+    
     const response = await result.save();
 
+    const newLog = new log({ activity: `Added new apartment for sale: ${propertyId}` });
+    await newLog.save();
     res.status(200).json(response);
   } catch (error) {
     console.error(error);
@@ -91,60 +95,82 @@ router.post("/add", upload.array("myFiles"), async (req, res) => {
   }
 });
 
-router.put("/edit/:id", upload.array("myFiles"), async (req, res) => {
+router.put("/edit/:id/uploadThumbnail/", AuthM, upload.single("thumbnail"), async (req, res) => {
   try {
-    const files = req.files;
+    const thumbnailFile = req.file;
+    const propertyId = req.body.propertyId;
+
+    await cloudinary.uploader.upload(thumbnailFile.path, {
+      public_id: `image_0`,
+      folder: `apartment-sale/${propertyId}`,
+    });
+    await fs.unlink(thumbnailFile.path);
+
+    const newLog = new log({ activity: `Updated thumbnail image for apartment for sale: ${propertyId}` });
+    await newLog.save();
+    res.sendStatus(200);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+router.put("/edit/:id/uploadImages/", AuthM, upload.array("image"), async (req, res) => {
+  try {
+    const imageFiles = req.files;
+    const propertyId = req.body.propertyId;
+    const Id = req.params.id;
+
+    apartmentForSale.findById(Id, { images: 1, _id: 0 }).then((details) => {
+      cloudinary.api.delete_resources(details.images, {
+        type: "upload",
+        resource_type: "image",
+      });
+    });
+
+    const uploadedImages = [];
+
+    for (let i = 0; i < imageFiles.length; i++) {
+      await cloudinary.uploader.upload(imageFiles[i].path, {
+        public_id: `image_${i + 1}`,
+        folder: `apartment-sale/${propertyId}`,
+      });
+
+      uploadedImages.push(`apartment-sale/${propertyId}/image_${i + 1}`);
+
+      await fs.unlink(imageFiles[i].path);
+    }
+
+    await apartmentForSale.findByIdAndUpdate(
+      Id,
+      { $set: { images: uploadedImages } },
+      { new: true }
+    );
+
+    const newLog = new log({ activity: `Updated images for apartment for sale: ${propertyId}` });
+    await newLog.save();
+    res.sendStatus(200);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+router.put("/edit/:id/additionalData/", AuthM, async (req, res) => {
+  try {
+    const Id = req.params.id;
+
     const {
-      propertyId,
       title,
-      price,
+      rent,
       description,
       size,
       bedrooms,
       bathrooms,
       city,
     } = JSON.parse(req.body.additionalData);
-    if (!files || files.length === 0) {
-      const id = req.params.id;
-
-      const result = await apartmentForSale.findByIdAndUpdate(id, {
-        propertyId,
-        title,
-        price,
-        description,
-        size,
-        bedrooms,
-        bathrooms,
-        city,
-      });
-
-      return res.status(200).json(result);
-    }
-
-    const uploadedImages = [];
-
-    for (let i = 0; i < files.length; i++) {
-      await cloudinary.uploader.upload(files[i].path, {
-        public_id: `image_${i}`,
-        folder: `apartment-sale/${propertyId}`
-      });
-
-      uploadedImages.push(`apartment-sale/${propertyId}/image_${i}`);
-
-      await fs.unlink(files[i].path);
-    }
-
-    const thumbnailImage = uploadedImages[0];
-    const images = uploadedImages.slice(1);
-
-    const Id = req.params.id;
 
     const result = await apartmentForSale.findByIdAndUpdate(Id, {
-      propertyId,
       title,
-      price,
-      thumbnailImage,
-      images,
+      rent,
       description,
       size,
       bedrooms,
@@ -152,6 +178,9 @@ router.put("/edit/:id", upload.array("myFiles"), async (req, res) => {
       city,
     });
 
+    const newLog = new log({ activity: `Updated additional data for apartment for sale: ${Id}` });
+    await newLog.save();
+
     res.status(200).json(result);
   } catch (error) {
     console.error(error);
@@ -159,13 +188,16 @@ router.put("/edit/:id", upload.array("myFiles"), async (req, res) => {
   }
 });
 
-router.post("/edit/isVisible/:id", async (req, res) => {
+router.post("/edit/isVisible/:id", AuthM, async (req, res) => {
   try {
     const id = req.params.id;
     const { isVisibale } = req.body;
     const result = await apartmentForSale.findByIdAndUpdate(id, {
       isVisibale,
     });
+
+    const newLog = new log({ activity: `Updated visibility for apartment for sale: ${id}` });
+    await newLog.save();
     res.status(200).json(result);
   } catch (error) {
     console.error(error);
@@ -173,23 +205,37 @@ router.post("/edit/isVisible/:id", async (req, res) => {
   }
 });
 
-router.delete("/delete/:id", (req, res) => {
+router.delete("/delete/:id", AuthM, (req, res) => {
   let fetchedDetails;
-  apartmentForSale.findById(req.params.id, { propertyId: 1, images: 1, thumbnailImage: 1, _id: 0 })
-    .then(details => {
+  apartmentForSale
+    .findById(req.params.id, {
+      propertyId: 1,
+      images: 1,
+      thumbnailImage: 1,
+      _id: 0,
+    })
+    .then((details) => {
       fetchedDetails = details;
-      return cloudinary.api.delete_resources([details.thumbnailImage, ...details.images], { type: 'upload', resource_type: 'image' });
+      const newLog = new log({ activity: `Deleted apartment for sale: ${fetchedDetails.propertyId}` });
+      newLog.save();
+
+      return cloudinary.api.delete_resources(
+        [details.thumbnailImage, ...details.images],
+        { type: "upload", resource_type: "image" }
+      );
     })
     .then(() => {
-      return cloudinary.api.delete_folder(`apartment-sale/${fetchedDetails.propertyId}`);
+      return cloudinary.api.delete_folder(
+        `apartment-sale/${fetchedDetails.propertyId}`
+      );
     })
     .then(() => {
       return apartmentForSale.findByIdAndDelete(req.params.id);
     })
-    .then(result => {
+    .then((result) => {
       res.status(200).json(result);
     })
-    .catch(error => {
+    .catch((error) => {
       console.error(error);
       res.status(400).json(error);
     });
@@ -226,7 +272,7 @@ router.post("/filter", async (req, res) => {
     }
 
     console.log(filter);
-    
+
     let filtered = await apartmentForSale.find(filter).exec();
 
     res.status(200).json(filtered);
@@ -271,7 +317,7 @@ router.post("/filter/main", async (req, res) => {
   }
 });
 
-router.post("/filterId", async (req, res) => {
+router.post("/filterId", AuthM, async (req, res) => {
   try {
     const { propertyId } = req.body;
 

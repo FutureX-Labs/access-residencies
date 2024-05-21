@@ -20,11 +20,10 @@ import { FaAngleUp } from "react-icons/fa6";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import AuthContext from "@/app/context/AuthContext";
-
 const drawerWidth = 240;
 
 function Navbar(props) {
-  const { window, type } = props;
+  const { type } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [showProperty, setShowProperty] = React.useState(false);
   const router = useRouter();
@@ -44,7 +43,10 @@ function Navbar(props) {
     { title: "Home", path: "https://accessresidencies.com/" },
     { title: "About us", path: "https://accessresidencies.com/?page_id=4099" },
     { title: "Gallery", path: "https://accessresidencies.com/?page_id=1659" },
-    { title: "Contact Us", path: "https://accessresidencies.com/?page_id=1665" },
+    {
+      title: "Contact Us",
+      path: "https://accessresidencies.com/?page_id=1665",
+    },
   ];
 
   const navItems = type === "admin" ? adminNavItems : userNavItems;
@@ -88,13 +90,15 @@ function Navbar(props) {
         </IconButton>
       </Box>
       <Divider />
-      <List sx={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "20px",
-        justifyContent: "center",
-        alignItems: "center",
-      }}>
+      <List
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "20px",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
         {navItems.map((item) => (
           <ListItem
             key={item.title}
@@ -109,15 +113,13 @@ function Navbar(props) {
                 variant="contained"
                 color="primary"
                 onClick={() => {
-                  sessionStorage.removeItem("contact_user");
+                  sessionStorage.clear();
                 }}
               >
                 {item.title}
               </Button>
             ) : (
-              <Link
-                href={item.path}
-              >
+              <Link href={item.path}>
                 <ListItemText
                   primary={item.title}
                   sx={{
@@ -137,9 +139,6 @@ function Navbar(props) {
     </Box>
   );
 
-  const container =
-    window !== undefined ? () => window().document.body : undefined;
-
   return (
     <Box sx={{ display: "flex", height: "90px" }}>
       <CssBaseline />
@@ -151,10 +150,7 @@ function Navbar(props) {
         }}
       >
         <Toolbar>
-          <Box
-            variant="h6"
-            sx={{ flexGrow: 1, alignItems: "center" }}
-          >
+          <Box variant="h6" sx={{ flexGrow: 1, alignItems: "center" }}>
             <Link href="/">
               <Image
                 src="/logo.png"
@@ -167,7 +163,7 @@ function Navbar(props) {
             </Link>
           </Box>
           <Box sx={{ display: { xs: "none", md: "flex" }, gap: "20px" }}>
-            {navItems.map((item) => (
+            {navItems.map((item) =>
               item.title === "Logout" ? (
                 <Button
                   variant="outlined"
@@ -178,24 +174,26 @@ function Navbar(props) {
                     fontFamily: "Roboto Condensed",
                   }}
                   onClick={() => {
-                    sessionStorage.removeItem("contact_user");
+                    sessionStorage.clear();
+                    window.location.reload();
                   }}
                 >
                   {item.title}
                 </Button>
               ) : (
                 <Link key={item.title} href={item.path}>
-                  <Button sx={{
-                    color: "white",
-                    fontFamily: "Roboto Condensed",
-                    fontSize: "15px",
-                  }}
+                  <Button
+                    sx={{
+                      color: "white",
+                      fontFamily: "Roboto Condensed",
+                      fontSize: "15px",
+                    }}
                   >
                     {item.title}
                   </Button>
                 </Link>
               )
-            ))}
+            )}
           </Box>
 
           <IconButton
@@ -211,7 +209,6 @@ function Navbar(props) {
       </AppBar>
       <nav>
         <Drawer
-          container={container}
           variant="temporary"
           open={mobileOpen}
           onClose={handleDrawerToggle}

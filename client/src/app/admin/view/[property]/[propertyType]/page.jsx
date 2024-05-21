@@ -29,7 +29,6 @@ import { Padding } from "@mui/icons-material";
 import AuthContext from "@/app/context/AuthContext";
 import { useRouter } from "next/navigation";
 
-
 import BASE_URL from "../../../../config";
 const url = `${BASE_URL}/api/apartmentForRent/add`;
 
@@ -64,10 +63,7 @@ function View() {
   return (
     <>
       <Navbar type={"admin"} />
-      <Subheader
-        propertyType={propertyType}
-        user={"admin"}
-      />
+      <Subheader propertyType={propertyType} user={"admin"} />
 
       {property && propertyType ? (
         <Filter

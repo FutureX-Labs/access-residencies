@@ -4,6 +4,8 @@ const auth = require("../../schema/Auth");
 const multer = require("multer");
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
+const jwt = require("jsonwebtoken");
+const log = require("../../schema/Log");
 
 router.post("/login", async (req, res) => {
   try {
@@ -11,8 +13,16 @@ router.post("/login", async (req, res) => {
     console.log("username", username);
     console.log("password", password);
     const user = await auth.findOne({ username, password });
-    if (user) { 
-      res.status(200).json(user);
+    if (user) {
+      const token = jwt.sign(
+        { isAdmin: user.isAdmin, username: user.username },
+        process.env.JWT_SECRET
+      );
+
+      const newLog = new log({ activity: `User logged in : ${username}` });
+      await newLog.save();
+
+      res.status(200).send({ token: token, user });
     } else {
       res.status(401).json({ message: "Invalid username or password" });
     }
@@ -31,6 +41,9 @@ router.post("/signup", async (req, res) => {
       password,
       isAdmin,
     });
+
+    const newLog = new log({ activity: `User signed up : ${username}` });
+    await newLog.save();
     const result = await authDetails.save();
     res.status(200).send(result.data);
   } catch (error) {

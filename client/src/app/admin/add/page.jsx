@@ -30,18 +30,19 @@ import { comProperty } from "@/app/list/comProperty";
 import AddImage from "../../../../public/images/add.png";
 import AuthContext from "@/app/context/AuthContext";
 import { useRouter } from "next/navigation";
-import Autocomplete from '@mui/material/Autocomplete';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import axiosInstance from "@/app/utility/axiosInstance";
+import Autocomplete from "@mui/material/Autocomplete";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 const theme = createTheme({
   components: {
     MuiAutocomplete: {
       styleOverrides: {
         clearIndicator: {
-          color: 'white',
+          color: "white",
         },
         popupIndicator: {
-          color: 'white',
+          color: "white",
         },
       },
     },
@@ -133,7 +134,7 @@ function Add() {
 
       console.log("additionalData", additionalData);
       formData.append("additionalData", JSON.stringify(additionalData));
-      const response = await axios.post(
+      const response = await axiosInstance.post(
         AddUrl(propertyType, property),
         formData,
         {
@@ -208,8 +209,13 @@ function Add() {
     console.log("files", allFiles);
   };
 
-  const transformedCities = Cities.flatMap(city =>
-    city.subheadings ? city.subheadings.map(subheading => ({ title: subheading.label, group: city.label })) : []
+  const transformedCities = Cities.flatMap((city) =>
+    city.subheadings
+      ? city.subheadings.map((subheading) => ({
+          title: subheading.label,
+          group: city.label,
+        }))
+      : []
   );
 
   return (
@@ -397,7 +403,11 @@ function Add() {
                         alt="Thumbnail"
                         width={150}
                         height={150}
-                        style={{ margin: "20px 10px", borderRadius: "5px", objectFit: "cover" }}
+                        style={{
+                          margin: "20px 10px",
+                          borderRadius: "5px",
+                          objectFit: "cover",
+                        }}
                       />
                     )}
 
@@ -447,20 +457,23 @@ function Add() {
                     }}
                   >
                     <Box sx={{ display: "flex" }}>
-
-                      {images && Array.from(images).map((img, index) => {
-                        return (
-                          <Image
-                            key={index}
-                            src={URL.createObjectURL(img)}
-                            alt="img"
-                            width={150}
-                            height={150}
-                            style={{ margin: "20px 10px", borderRadius: "5px", objectFit: "cover" }}
-                          />
-                        );
-                      })}
-
+                      {images &&
+                        Array.from(images).map((img, index) => {
+                          return (
+                            <Image
+                              key={index}
+                              src={URL.createObjectURL(img)}
+                              alt="img"
+                              width={150}
+                              height={150}
+                              style={{
+                                margin: "20px 10px",
+                                borderRadius: "5px",
+                                objectFit: "cover",
+                              }}
+                            />
+                          );
+                        })}
                     </Box>
                     <Button
                       sx={{
@@ -494,7 +507,7 @@ function Add() {
               </Typography>
               <TextField
                 required
-                value={description || ''}
+                value={description || ""}
                 InputProps={{ style: { color: "white" } }}
                 size="small"
                 multiline
@@ -523,7 +536,7 @@ function Add() {
               </Typography>
               <Select
                 required
-                value={propertyType === "ForSale" ? (price || '') : (rent || '')}
+                value={propertyType === "ForSale" ? price || "" : rent || ""}
                 onChange={(e) =>
                   propertyType === "ForSale"
                     ? setPrice(e.target.value)
@@ -539,12 +552,13 @@ function Add() {
                 }}
                 fullWidth
               >
-                {Prices.map((priceOption, index) => (
-                  priceOption.value === 'All' ? null :
+                {Prices.map((priceOption, index) =>
+                  priceOption.value === "All" ? null : (
                     <MenuItem key={index} value={priceOption.value}>
                       {priceOption.label}
                     </MenuItem>
-                ))}
+                  )
+                )}
               </Select>
               {property === "Commercial" && (
                 <>
@@ -561,7 +575,7 @@ function Add() {
                   </Typography>
                   <Select
                     required
-                    value={propertyTypes || ''}
+                    value={propertyTypes || ""}
                     onChange={(e) => setPropertyTypes(e.target.value)}
                     inputProps={{ style: { color: "white" } }}
                     size="small"
@@ -585,19 +599,19 @@ function Add() {
               {(property === "House" ||
                 property === "Commercial" ||
                 property === "Apartment") && (
-                  <>
-                    <Typography
-                      variant="h6"
-                      style={{
-                        color: "white",
-                        fontWeight: 500,
-                        fontSize: "22px",
-                        marginLeft: "10px",
-                      }}
-                    >
-                      Size
-                    </Typography>
-                    {/* <TextField
+                <>
+                  <Typography
+                    variant="h6"
+                    style={{
+                      color: "white",
+                      fontWeight: 500,
+                      fontSize: "22px",
+                      marginLeft: "10px",
+                    }}
+                  >
+                    Size
+                  </Typography>
+                  {/* <TextField
                     required
                     value={size}
                     InputProps={{ style: { color: "white" } }}
@@ -613,29 +627,30 @@ function Add() {
                     fullWidth
                   /> */}
 
-                    <Select
-                      required
-                      value={size || ''}
-                      onChange={(e) => setSize(e.target.value)}
-                      inputProps={{ style: { color: "white" } }}
-                      size="small"
-                      sx={{
-                        border: "1px solid grey",
-                        color: "white",
-                        marginLeft: "20px",
-                        borderRadius: "5px",
-                      }}
-                      fullWidth
-                    >
-                      {Sizes.map((sizeOption, index) => (
-                        sizeOption.value === 'All' ? null :
-                          <MenuItem key={index} value={sizeOption.value}>
-                            {sizeOption.label}
-                          </MenuItem>
-                      ))}
-                    </Select>
-                  </>
-                )}
+                  <Select
+                    required
+                    value={size || ""}
+                    onChange={(e) => setSize(e.target.value)}
+                    inputProps={{ style: { color: "white" } }}
+                    size="small"
+                    sx={{
+                      border: "1px solid grey",
+                      color: "white",
+                      marginLeft: "20px",
+                      borderRadius: "5px",
+                    }}
+                    fullWidth
+                  >
+                    {Sizes.map((sizeOption, index) =>
+                      sizeOption.value === "All" ? null : (
+                        <MenuItem key={index} value={sizeOption.value}>
+                          {sizeOption.label}
+                        </MenuItem>
+                      )
+                    )}
+                  </Select>
+                </>
+              )}
 
               {(property === "House" || property === "Apartment") && (
                 <>
@@ -652,7 +667,7 @@ function Add() {
                   </Typography>
                   <Select
                     required
-                    value={bedrooms || ''}
+                    value={bedrooms || ""}
                     onChange={(e) => setBedrooms(e.target.value)}
                     inputProps={{ style: { color: "white" } }}
                     size="small"
@@ -664,12 +679,13 @@ function Add() {
                     }}
                     fullWidth
                   >
-                    {Bedrooms.map((option, index) => (
-                      option.value === 'All' ? null :
+                    {Bedrooms.map((option, index) =>
+                      option.value === "All" ? null : (
                         <MenuItem key={index} value={option.value}>
                           {option.label}
                         </MenuItem>
-                    ))}
+                      )
+                    )}
                   </Select>
                 </>
               )}
@@ -689,7 +705,7 @@ function Add() {
                   </Typography>
                   <Select
                     required
-                    value={bathrooms || ''}
+                    value={bathrooms || ""}
                     onChange={(e) => setBathrooms(e.target.value)}
                     inputProps={{ style: { color: "white" } }}
                     size="small"
@@ -701,12 +717,13 @@ function Add() {
                     }}
                     fullWidth
                   >
-                    {Bedrooms.map((option, index) => (
-                      option.value === 'All' ? null :
+                    {Bedrooms.map((option, index) =>
+                      option.value === "All" ? null : (
                         <MenuItem key={index} value={option.value}>
                           {option.label}
                         </MenuItem>
-                    ))}
+                      )
+                    )}
                   </Select>
                 </>
               )}
@@ -726,7 +743,7 @@ function Add() {
                   </Typography>
                   <Select
                     required
-                    value={perches || ''}
+                    value={perches || ""}
                     onChange={(e) => setPerches(e.target.value)}
                     inputProps={{ style: { color: "white" } }}
                     size="small"
@@ -738,12 +755,13 @@ function Add() {
                     }}
                     fullWidth
                   >
-                    {Perches.map((option, index) => (
-                      option.value === 'All' ? null :
+                    {Perches.map((option, index) =>
+                      option.value === "All" ? null : (
                         <MenuItem key={index} value={option.value}>
                           {option.label}
                         </MenuItem>
-                    ))}
+                      )
+                    )}
                   </Select>
                 </>
               )}
@@ -762,7 +780,7 @@ function Add() {
                   </Typography>
                   <Select
                     required
-                    value={acres || ''}
+                    value={acres || ""}
                     onChange={(e) => setAcres(e.target.value)}
                     inputProps={{ style: { color: "white" } }}
                     size="small"
@@ -774,12 +792,13 @@ function Add() {
                     }}
                     fullWidth
                   >
-                    {Acres.map((option, index) => (
-                      option.value === 'All' ? null :
+                    {Acres.map((option, index) =>
+                      option.value === "All" ? null : (
                         <MenuItem key={index} value={option.value}>
                           {option.label}
                         </MenuItem>
-                    ))}
+                      )
+                    )}
                   </Select>
                 </>
               )}
@@ -804,7 +823,9 @@ function Add() {
                     options={transformedCities}
                     groupBy={(option) => option.group}
                     getOptionLabel={(option) => option.title}
-                    isOptionEqualToValue={(option, value) => option.title === value.title}
+                    isOptionEqualToValue={(option, value) =>
+                      option.title === value.title
+                    }
                     size="small"
                     sx={{
                       height: "50px",

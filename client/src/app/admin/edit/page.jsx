@@ -32,9 +32,10 @@ import { PropertyTypes } from "@/app/list/propertyTypes";
 import EditImage from "../../../../public/images/edit.png";
 import AuthContext from "@/app/context/AuthContext";
 import UseSessionStorage from "@/app/UseSessionStorage";
-import { CldImage } from 'next-cloudinary';
-import Autocomplete from '@mui/material/Autocomplete';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import axiosInstance from "@/app/utility/axiosInstance";
+import { CldImage } from "next-cloudinary";
+import Autocomplete from "@mui/material/Autocomplete";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 import BASE_URL from "../../config";
 
@@ -43,10 +44,10 @@ const theme = createTheme({
     MuiAutocomplete: {
       styleOverrides: {
         clearIndicator: {
-          color: 'white',
+          color: "white",
         },
         popupIndicator: {
-          color: 'white',
+          color: "white",
         },
       },
     },
@@ -148,7 +149,7 @@ function Edit() {
       setPrice(editFormData?.price);
       setRent(editFormData?.rent);
       setSize(editFormData?.size);
-      setCity(editFormData?.city);
+      setCity({ title: editFormData?.city, group: editFormData?.city });
       setBedrooms(editFormData?.bedrooms);
       setBathrooms(editFormData?.bathrooms);
       setPerches(editFormData?.landExtent?.perches);
@@ -200,22 +201,27 @@ function Edit() {
       }
 
       console.log(additionalData);
-      additionalFormData.append("additionalData", JSON.stringify(additionalData));
+      additionalFormData.append(
+        "additionalData",
+        JSON.stringify(additionalData)
+      );
 
-      await axios.put(`${formUrl}/additionalData`, additionalFormData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }).then((res) => {
-        Swal.fire({
-          title: "Data Added Successfully",
-          icon: "success",
-          timer: 1500,
+      await axiosInstance
+        .put(`${formUrl}/additionalData`, additionalFormData, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+        .then((res) => {
+          Swal.fire({
+            title: "Data Added Successfully",
+            icon: "success",
+            timer: 1500,
+          });
+          setTimeout(() => {
+            window.location.href = `/admin/view/${property}/${propertyType}`;
+          }, 1000);
         });
-      });
-      // setTimeout(() => {
-      //   window.location.reload();
-      // }, 1000);
     } catch (error) {
       Swal.fire({
         title: "Unable to Add Data",
@@ -235,16 +241,18 @@ function Edit() {
 
     thumbnailFormData.append("propertyId", propertyId);
 
-    await axios.put(`${formUrl}/uploadThumbnail`, thumbnailFormData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    }).then((res) => {
-      console.log(res);
-    }).catch((err) => {
-      console.error(err);
-    });
-
+    await axiosInstance
+      .put(`${formUrl}/uploadThumbnail`, thumbnailFormData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   };
 
   const uploadImages = async (e) => {
@@ -268,21 +276,29 @@ function Edit() {
 
     imageFormData.append("propertyId", propertyId);
 
-    await axios.put(`${formUrl}/uploadImages`, imageFormData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    }).then((res) => {
-      console.log(res);
-    }).catch((err) => {
-      console.error(err);
-    });
+    await axiosInstance
+      .put(`${formUrl}/uploadImages`, imageFormData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
 
     setImageUploaded(true);
   };
 
-  const transformedCities = Cities.flatMap(city =>
-    city.subheadings ? city.subheadings.map(subheading => ({ title: subheading.label, group: city.label })) : []
+  const transformedCities = Cities.flatMap((city) =>
+    city.subheadings
+      ? city.subheadings.map((subheading) => ({
+        title: subheading.label,
+        group: city.label,
+      }))
+      : []
   );
 
   return (
@@ -337,7 +353,7 @@ function Edit() {
                   borderRadius: "5px",
                 }}
                 value={propertyId}
-                onChange={(e) => setPropertyId(e.target.value)}
+                onChange={(e) => setPropertyId(propertyId)}
                 fullWidth
               />
 
@@ -409,24 +425,33 @@ function Edit() {
                       justifyContent: "center",
                     }}
                   >
-                    {thumbnail && (thumbnailUploaded ? (
-                      <Image
-                        src={URL.createObjectURL(thumbnail)}
-                        alt="Thumbnail"
-                        width={150}
-                        height={150}
-                        style={{ margin: "20px 10px", borderRadius: "5px", objectFit: "cover" }}
-                      />
-                    ) : (
-                      <CldImage
-                        src={thumbnail}
-                        sizes="20vw"
-                        width={150}
-                        height={150}
-                        alt="Thumbnail"
-                        style={{ margin: "20px 10px", borderRadius: "5px", objectFit: "cover" }}
-                      />
-                    ))}
+                    {thumbnail &&
+                      (thumbnailUploaded ? (
+                        <Image
+                          src={URL.createObjectURL(thumbnail)}
+                          alt="Thumbnail"
+                          width={150}
+                          height={150}
+                          style={{
+                            margin: "20px 10px",
+                            borderRadius: "5px",
+                            objectFit: "cover",
+                          }}
+                        />
+                      ) : (
+                        <CldImage
+                          src={thumbnail}
+                          sizes="20vw"
+                          width={150}
+                          height={150}
+                          alt="Thumbnail"
+                          style={{
+                            margin: "20px 10px",
+                            borderRadius: "5px",
+                            objectFit: "cover",
+                          }}
+                        />
+                      ))}
 
                     <Button
                       sx={{
@@ -474,16 +499,20 @@ function Edit() {
                     }}
                   >
                     <Box sx={{ display: "flex" }}>
-                      {images && Array.from(images).map((img, index) => {
-                        return (
-                          (imageUploaded ? (
+                      {images &&
+                        Array.from(images).map((img, index) => {
+                          return imageUploaded ? (
                             <Image
                               key={index}
                               src={URL.createObjectURL(img)}
                               alt="Image"
                               width={150}
                               height={150}
-                              style={{ margin: "20px 10px", borderRadius: "5px", objectFit: "cover" }}
+                              style={{
+                                margin: "20px 10px",
+                                borderRadius: "5px",
+                                objectFit: "cover",
+                              }}
                             />
                           ) : (
                             <CldImage
@@ -493,13 +522,14 @@ function Edit() {
                               width={150}
                               height={150}
                               alt="Image"
-                              style={{ margin: "20px 10px", borderRadius: "5px", objectFit: "cover" }}
+                              style={{
+                                margin: "20px 10px",
+                                borderRadius: "5px",
+                                objectFit: "cover",
+                              }}
                             />
-                          ))
-                        );
-                      }
-                      )}
-
+                          );
+                        })}
                     </Box>
                     <Button
                       sx={{
@@ -533,7 +563,7 @@ function Edit() {
               </Typography>
               <TextField
                 required
-                value={description || ''}
+                value={description || ""}
                 InputProps={{ style: { color: "white" } }}
                 size="small"
                 multiline
@@ -562,7 +592,9 @@ function Edit() {
               </Typography>
               <Select
                 required
-                value={propertyType === "ForSale" ? (price || 'All') : (rent || 'All')}
+                value={
+                  propertyType === "ForSale" ? (price || "All") : (rent || "All")
+                }
                 onChange={(e) =>
                   propertyType === "ForSale"
                     ? setPrice(e.target.value)
@@ -599,7 +631,7 @@ function Edit() {
                   </Typography>
                   <Select
                     required
-                    value={propertyTypes || 'All'}
+                    value={propertyTypes || "All"}
                     onChange={(e) => setPropertyTypes(e.target.value)}
                     inputProps={{ style: { color: "white" } }}
                     size="small"
@@ -653,7 +685,7 @@ function Edit() {
 
                     <Select
                       required
-                      value={size || 'All'}
+                      value={size || "All"}
                       onChange={(e) => setSize(e.target.value)}
                       inputProps={{ style: { color: "white" } }}
                       size="small"
@@ -689,7 +721,7 @@ function Edit() {
                   </Typography>
                   <Select
                     required
-                    value={bedrooms || 'All'}
+                    value={bedrooms || "All"}
                     onChange={(e) => setBedrooms(e.target.value)}
                     inputProps={{ style: { color: "white" } }}
                     size="small"
@@ -725,7 +757,7 @@ function Edit() {
                   </Typography>
                   <Select
                     required
-                    value={bathrooms || 'All'}
+                    value={bathrooms || "All"}
                     onChange={(e) => setBathrooms(e.target.value)}
                     inputProps={{ style: { color: "white" } }}
                     size="small"
@@ -761,7 +793,7 @@ function Edit() {
                   </Typography>
                   <Select
                     required
-                    value={perches || 'All'}
+                    value={perches || "All"}
                     onChange={(e) => setPerches(e.target.value)}
                     inputProps={{ style: { color: "white" } }}
                     size="small"
@@ -796,7 +828,7 @@ function Edit() {
                   </Typography>
                   <Select
                     required
-                    value={acres || 'All'}
+                    value={acres || "All"}
                     onChange={(e) => setAcres(e.target.value)}
                     inputProps={{ style: { color: "white" } }}
                     size="small"
@@ -837,7 +869,9 @@ function Edit() {
                     options={transformedCities}
                     groupBy={(option) => option.group}
                     getOptionLabel={(option) => option.title}
-                    isOptionEqualToValue={(option, value) => option.title === value.title}
+                    isOptionEqualToValue={(option, value) =>
+                      option.title === value.title
+                    }
                     size="small"
                     sx={{
                       height: "50px",
