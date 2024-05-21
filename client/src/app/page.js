@@ -352,6 +352,9 @@ function Home() {
                       width: "100%",
                       color: "white",
                       borderRadius: "5px",
+                      '.MuiSvgIcon-root ': {
+                        fill: "white !important",
+                      }
                     }}
                     required
                   >
@@ -378,7 +381,7 @@ function Home() {
                     <Autocomplete
                       value={city || allOption}
                       onChange={(event, value) => {
-                        setCity(value || allOption);
+                        setCity(value || '');
                       }}
                       options={transformedCitiesWithAll}
                       groupBy={(option) => option.group}
@@ -427,6 +430,9 @@ function Home() {
                       color: "white",
                       width: "100%",
                       borderRadius: "5px",
+                      '.MuiSvgIcon-root ': {
+                        fill: "white !important",
+                      }
                     }}
                   >
                     {Prices.map((priceOption, index) => (

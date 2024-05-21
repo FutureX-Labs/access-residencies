@@ -284,7 +284,7 @@ const Filter = ({
                   <Autocomplete
                     value={city || allOption}
                     onChange={(event, value) => {
-                      setCity(value || allOption);
+                      setCity(value || '');
                     }}
                     options={transformedCitiesWithAll}
                     groupBy={(option) => option.group}
@@ -340,6 +340,9 @@ const Filter = ({
                     borderRadius: { xs: "10px", md: "0px" },
                     backgroundColor: "black",
                     color: "white",
+                    '.MuiSvgIcon-root ': {
+                      fill: "white !important",
+                    }
                   }}
                 >
                   {Prices.map((priceOption, index) => (
@@ -374,6 +377,9 @@ const Filter = ({
                       borderRadius: { xs: "10px", md: "0px" },
                       backgroundColor: "black",
                       color: "white",
+                      '.MuiSvgIcon-root ': {
+                        fill: "white !important",
+                      }
                     }}
                   >
                     {comProperty.map((type, index) => (
@@ -411,6 +417,9 @@ const Filter = ({
                       borderRadius: { xs: "10px", md: "0px" },
                       backgroundColor: "black",
                       color: "white",
+                      '.MuiSvgIcon-root ': {
+                        fill: "white !important",
+                      }
                     }}
                   >
                     {Sizes.map((sizeOption, index) => (
@@ -446,6 +455,9 @@ const Filter = ({
                       borderRadius: { xs: "10px", md: "0px" },
                       backgroundColor: "black",
                       color: "white",
+                      '.MuiSvgIcon-root ': {
+                        fill: "white !important",
+                      }
                     }}
                   >
                     {Bedrooms.map((option, index) => (
@@ -481,6 +493,9 @@ const Filter = ({
                       borderRadius: { xs: "10px", md: "0px" },
                       backgroundColor: "black",
                       color: "white",
+                      '.MuiSvgIcon-root ': {
+                        fill: "white !important",
+                      }
                     }}
                   >
                     {Bedrooms.map((option, index) => (
@@ -517,6 +532,9 @@ const Filter = ({
                         borderRadius: { xs: "10px", md: "0px" },
                         backgroundColor: "black",
                         color: "white",
+                        '.MuiSvgIcon-root ': {
+                          fill: "white !important",
+                        }
                       }}
                     >
                       {Perches.map((option, index) => (
@@ -554,6 +572,9 @@ const Filter = ({
                         borderRadius: { xs: "10px", md: "0px" },
                         backgroundColor: "black",
                         color: "white",
+                        '.MuiSvgIcon-root ': {
+                          fill: "white !important",
+                        }
                       }}
                     >
                       {Acres.map((option, index) => (
