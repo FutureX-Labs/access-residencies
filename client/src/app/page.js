@@ -343,6 +343,9 @@ function Home() {
                     Property Types
                   </Typography>
                   <Select
+                    MenuProps={{
+                      disableScrollLock: true,
+                    }}
                     value={selectedProperty || ''}
                     onChange={(e) => setSelectedProperty(e.target.value)}
                     inputProps={{ style: { color: "white" } }}
@@ -417,6 +420,9 @@ function Home() {
                     {selectedPropertyType === "ForSale" ? "Max Price" : "Max Rent"}
                   </Typography>
                   <Select
+                    MenuProps={{
+                      disableScrollLock: true,
+                    }}
                     value={selectedPropertyType === "ForSale" ? (price || "All") : (rent || "All")}
                     onChange={(e) =>
                       selectedPropertyType === "ForSale"

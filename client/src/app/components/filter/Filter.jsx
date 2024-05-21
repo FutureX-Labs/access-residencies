@@ -245,9 +245,9 @@ const Filter = ({
   const transformedCities = Cities.flatMap((city) =>
     city.subheadings
       ? city.subheadings.map((subheading) => ({
-          title: subheading.label,
-          group: city.label,
-        }))
+        title: subheading.label,
+        group: city.label,
+      }))
       : []
   );
   const allOption = { title: "All", group: "All" };
@@ -323,6 +323,9 @@ const Filter = ({
                   {propertyType === "ForSale" ? "Max Price" : "Max Rent"}
                 </Typography>
                 <Select
+                  MenuProps={{
+                    disableScrollLock: true,
+                  }}
                   value={
                     propertyType === "ForSale" ? price || "All" : rent || "All"
                   }
@@ -366,6 +369,9 @@ const Filter = ({
                     Property Types
                   </Typography>
                   <Select
+                    MenuProps={{
+                      disableScrollLock: true,
+                    }}
                     value={comPropertyS || ""}
                     onChange={(e) => setComPropertyS(e.target.value)}
                     inputProps={{ style: { color: "white" } }}
@@ -393,43 +399,46 @@ const Filter = ({
               {(property === "House" ||
                 property === "Commercial" ||
                 property === "Apartment") && (
-                <Box sx={{ width: "100%" }}>
-                  <Typography
-                    variant="h6"
-                    style={{
-                      color: "white",
-                      fontWeight: 500,
-                      fontSize: "16px",
-                      marginLeft: "10px",
-                    }}
-                  >
-                    Size
-                  </Typography>
-                  <Select
-                    value={size || "All"}
-                    onChange={(e) => setSize(e.target.value)}
-                    inputProps={{ style: { color: "white" } }}
-                    size="small"
-                    sx={{
-                      height: "50px",
-                      width: "100%",
-                      border: "1px solid grey",
-                      borderRadius: { xs: "10px", md: "0px" },
-                      backgroundColor: "black",
-                      color: "white",
-                      '.MuiSvgIcon-root ': {
-                        fill: "white !important",
-                      }
-                    }}
-                  >
-                    {Sizes.map((sizeOption, index) => (
-                      <MenuItem key={index} value={sizeOption.value}>
-                        {sizeOption.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </Box>
-              )}
+                  <Box sx={{ width: "100%" }}>
+                    <Typography
+                      variant="h6"
+                      style={{
+                        color: "white",
+                        fontWeight: 500,
+                        fontSize: "16px",
+                        marginLeft: "10px",
+                      }}
+                    >
+                      Size
+                    </Typography>
+                    <Select
+                      MenuProps={{
+                        disableScrollLock: true,
+                      }}
+                      value={size || "All"}
+                      onChange={(e) => setSize(e.target.value)}
+                      inputProps={{ style: { color: "white" } }}
+                      size="small"
+                      sx={{
+                        height: "50px",
+                        width: "100%",
+                        border: "1px solid grey",
+                        borderRadius: { xs: "10px", md: "0px" },
+                        backgroundColor: "black",
+                        color: "white",
+                        '.MuiSvgIcon-root ': {
+                          fill: "white !important",
+                        }
+                      }}
+                    >
+                      {Sizes.map((sizeOption, index) => (
+                        <MenuItem key={index} value={sizeOption.value}>
+                          {sizeOption.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </Box>
+                )}
               {(property === "House" || property === "Apartment") && (
                 <Box sx={{ width: "100%" }}>
                   <Typography
@@ -444,6 +453,9 @@ const Filter = ({
                     Bedrooms
                   </Typography>
                   <Select
+                    MenuProps={{
+                      disableScrollLock: true,
+                    }}
                     value={bedrooms || "All"}
                     onChange={(e) => setBedrooms(e.target.value)}
                     inputProps={{ style: { color: "white" } }}
@@ -482,6 +494,9 @@ const Filter = ({
                     Bathrooms
                   </Typography>
                   <Select
+                    MenuProps={{
+                      disableScrollLock: true,
+                    }}
                     value={bathrooms || "All"}
                     onChange={(e) => setBathrooms(e.target.value)}
                     inputProps={{ style: { color: "white" } }}
@@ -521,6 +536,9 @@ const Filter = ({
                       Perches
                     </Typography>
                     <Select
+                      MenuProps={{
+                        disableScrollLock: true,
+                      }}
                       value={perches || "All"}
                       onChange={(e) => setPerches(e.target.value)}
                       inputProps={{ style: { color: "white" } }}
@@ -561,6 +579,9 @@ const Filter = ({
                       Acres
                     </Typography>
                     <Select
+                      MenuProps={{
+                        disableScrollLock: true,
+                      }}
                       value={acres || "All"}
                       onChange={(e) => setAcres(e.target.value)}
                       inputProps={{ style: { color: "white" } }}

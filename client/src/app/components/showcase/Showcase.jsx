@@ -140,18 +140,19 @@ const Showcase = ({ data, user, property, propertyType, showHidden }) => {
         fill
         src={item.thumbnailImage}
         style={{ objectFit: "cover" }}
-        blur={400}
+        blur={200}
         sizes="20vw"
-        opacity="50"
+        opacity="65"
         alt="Banner Image"
       />
-      <Box sx={{ ml: "20px", mt: "16px", textAlign: "start", zIndex: 1 }}>
+      <Box sx={{ ml: "20px", mt: "16px", textAlign: "start", zIndex: 1, position: "absolute" }}>
         <Typography
           sx={{
             fontWeight: "500",
             fontSize: "16px",
             lineHeight: "18px",
             margin: "5px 0px",
+            color: "white",
           }}
         >
           {item.city}
@@ -422,7 +423,6 @@ const Showcase = ({ data, user, property, propertyType, showHidden }) => {
                     height: "250px",
                     width: "270px",
                     borderRadius: "10px",
-                    color: "white",
                     display: "flex",
                     position: "relative",
                     overflow: "hidden",
@@ -433,12 +433,12 @@ const Showcase = ({ data, user, property, propertyType, showHidden }) => {
                   ) : (
                     <Link
                       href={`/user/view?propertyValue=${item.property}&propertyType=${item.propertyType}&id=${item._id}`}
+                      underline="none"
                       style={{
-                        textDecoration: "none",
-                        color: "inherit",
                         display: "block",
                         width: "100%",
                         height: "100%",
+                        color: "white",
                       }}
                     >
                       {childrenContent(item)}
@@ -469,7 +469,7 @@ const Showcase = ({ data, user, property, propertyType, showHidden }) => {
             // size="small"
             shape="rounded"
             showFirstButton
-            showLastButton 
+            showLastButton
             sx={{
               backgroundColor: " #8C1C4017",
               padding: "3px 20px",
