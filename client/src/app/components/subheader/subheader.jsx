@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Box, Menu, MenuItem, Button } from "@mui/material";
 import Link from "next/link";
+import { MenuBookSharp } from "@mui/icons-material";
 
 const Subheader = ({ propertyType, user }) => {
+  const buttonRef = useRef(null);
   console.log("Hader propertyType", propertyType);
   const [anchorElForSale, setAnchorElForSale] = useState(null);
   const [anchorElForRent, setAnchorElForRent] = useState(null);
@@ -23,17 +25,34 @@ const Subheader = ({ propertyType, user }) => {
     setAnchorElForRent(null);
   };
 
+  const handleAutoHideMenu = (setStateFn) => {
+    const handleScroll = () => {
+      const isScrolledDown = window.scrollY > 0;
+      setStateFn(isScrolledDown ? null : undefined);
+    };
+
+    useEffect(() => {
+      window.addEventListener('scroll', handleScroll);
+
+      return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+  };
+
+  handleAutoHideMenu(setAnchorElForSale);
+  handleAutoHideMenu(setAnchorElForRent);
+
   return (
     <Box sx={{ backgroundColor: "#8c1c40", width: "100vw" }}>
       <Box
         sx={{
           display: "flex",
           gap: "0px",
-          width: { md: "25%", xs: "100%" }
+          width: { md: "25%", xs: "100%" },
         }}
       >
         <Button
           onClick={handleOpenMenuForSale}
+          ref={buttonRef}
           sx={{
             height: "60px",
             width: "100%",
@@ -52,6 +71,11 @@ const Subheader = ({ propertyType, user }) => {
           anchorEl={anchorElForSale}
           open={Boolean(anchorElForSale)}
           onClose={handleCloseMenuForSale}
+          PaperProps={{
+            style: {
+              width: buttonRef.current ? `${buttonRef.current.offsetWidth}px` : undefined,
+            },
+          }}
         >
           <MenuItem>
             <Link
@@ -122,6 +146,11 @@ const Subheader = ({ propertyType, user }) => {
           anchorEl={anchorElForRent}
           open={Boolean(anchorElForRent)}
           onClose={handleCloseMenuForRent}
+          PaperProps={{
+            style: {
+              width: buttonRef.current ? `${buttonRef.current.offsetWidth}px` : undefined,
+            },
+          }}
         >
           <MenuItem>
             <Link
