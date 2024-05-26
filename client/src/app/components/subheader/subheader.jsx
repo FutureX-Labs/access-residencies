@@ -5,7 +5,7 @@ import Link from "next/link";
 const Subheader = ({ propertyType, user }) => {
   const buttonRefForSale = useRef(null);
   const buttonRefForRent = useRef(null);
-  
+
   const [anchorElForSale, setAnchorElForSale] = useState(null);
   const [anchorElForRent, setAnchorElForRent] = useState(null);
 
@@ -64,6 +64,7 @@ const Subheader = ({ propertyType, user }) => {
               "&:hover": {
                 backgroundColor: "#00000088",
               },
+              alignSelf: "center",
             }}
           >
             For Sale
@@ -220,18 +221,18 @@ const Subheader = ({ propertyType, user }) => {
           <Link
             style={{ textDecoration: "none", color: "black", width: '100%' }}
             href={user === "admin"
-            ? "/admin/view/Commercial/ForRent"
-            : "/user/filter/Commercial/ForRent"
-        }
-      >
-        Commercial
-      </Link>
-    </MenuItem>
-  </Menu>
-</Box>
-);
+              ? "/admin/view/Commercial/ForRent"
+              : "/user/filter/Commercial/ForRent"
+            }
+          >
+            Commercial
+          </Link>
+        </MenuItem>
+      </Menu>
+    </Box>
+  );
 };
 
 export default Subheader;
 
-             
+

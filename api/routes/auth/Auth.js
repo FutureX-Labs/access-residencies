@@ -46,7 +46,7 @@ router.post("/signup", async (req, res) => {
 
     const authDetails = new auth({
       username,
-      password: hashedPassword, // Store hashed password
+      password: hashedPassword,
       isAdmin,
     });
 
