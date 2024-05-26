@@ -74,7 +74,7 @@ function Navbar(props) {
             src="/logo.png"
             alt="logo"
             width={147}
-            height={64}
+            height={70}
             sx={{ flexGrow: 1 }}
             variant="h6"
           />
@@ -156,7 +156,7 @@ function Navbar(props) {
                 src="/logo.png"
                 alt="logo"
                 width={147}
-                height={64}
+                height={70}
                 sx={{ flexGrow: 1 }}
                 variant="h6"
               />
