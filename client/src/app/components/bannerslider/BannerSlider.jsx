@@ -18,6 +18,9 @@ export default function BannerSlider({ imageData }) {
     slidesToScroll: 1,
     fade: true,
     arrows: false,
+    autoplay: true,
+    autoplaySpeed: 5000,
+    pauseOnHover: true, // Stop autoplay when mouse is over the slider
   };
 
   const imgStyle = {
@@ -30,8 +33,6 @@ export default function BannerSlider({ imageData }) {
   return (
     <Slider
       {...settings}
-      autoplay
-      autoplaySpeed={5000}
       className="slick-slider-custom"
       style={{ zIndex: "10", position: "relative" }}
     >
@@ -41,7 +42,7 @@ export default function BannerSlider({ imageData }) {
             <CldImage
               fill
               src={img}
-              style={{objectFit: "cover"}}
+              style={{ objectFit: "cover" }}
               sizes="100vw"
               alt="Banner Image"
             />
