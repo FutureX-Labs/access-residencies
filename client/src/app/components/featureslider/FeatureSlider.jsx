@@ -43,7 +43,7 @@ export default function FeatureSlider({ imageData }) {
             /> */}
             <CldImage
               fill
-              src={img?.fil}
+              src={img?.file}
               quality="auto"
               alt="Image"
               style={{
