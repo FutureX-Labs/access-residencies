@@ -8,6 +8,12 @@ const nextConfig = {
                 port: '',
                 pathname: '**',
             },
+            {
+                protocol: 'https',
+                hostname: 'access-residencies.futrxlabs.com',
+                port: '',
+                pathname: '**',
+            },
         ],
         // minimumCacheTTL: 1,
     },
