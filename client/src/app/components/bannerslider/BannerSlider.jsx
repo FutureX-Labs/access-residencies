@@ -52,7 +52,8 @@ export default function BannerSlider({ imageData }) {
               }}
             /> */}
             <CldImage
-              publicId={img}
+              fill
+              src={img}
               quality="auto"
               alt="Image"
               style={{
