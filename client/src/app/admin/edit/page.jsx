@@ -441,6 +441,7 @@ function Edit() {
                       ) : (
                         <CldImage
                           src={thumbnail}
+                          version="2"
                           sizes="20vw"
                           width={150}
                           height={150}
@@ -518,6 +519,7 @@ function Edit() {
                             <CldImage
                               key={index}
                               src={img}
+                              version="2"
                               sizes="20vw"
                               width={150}
                               height={150}

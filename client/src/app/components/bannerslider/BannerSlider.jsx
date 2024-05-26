@@ -1,10 +1,12 @@
 import React from "react";
 import Slider from "react-slick";
-import { Box } from "@mui/material";
 import Image from "next/image";
-import { CldImage } from 'next-cloudinary';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+
+
+const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+
 
 export default function BannerSlider({ imageData }) {
   console.log("imageData", imageData);
@@ -38,12 +40,13 @@ export default function BannerSlider({ imageData }) {
       {imageData?.map((img) => (
         <div key={img.id}>
           <div style={imgStyle}>
-            <CldImage
+            <Image
               fill
-              src={img}
-              style={{objectFit: "cover"}}
-              sizes="100vw"
-              alt="Banner Image"
+              src={`https://res.cloudinary.com/${cloudName}/image/upload/q_100/${img}?invalidate=true`}
+              alt="Image"
+              style={{
+                objectFit: 'cover',
+              }}
             />
           </div>
         </div>

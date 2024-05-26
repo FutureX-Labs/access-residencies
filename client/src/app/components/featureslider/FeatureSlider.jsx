@@ -34,6 +34,7 @@ export default function FeatureSlider({ imageData }) {
               width={900}
               height={400}
               src={img?.file}
+              version="2"
               style={{ objectFit: "cover" }}
               sizes="100vw"
               alt="Banner Image"

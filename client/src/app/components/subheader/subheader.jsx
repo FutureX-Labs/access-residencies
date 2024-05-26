@@ -5,7 +5,7 @@ import { MenuBookSharp } from "@mui/icons-material";
 
 const Subheader = ({ propertyType, user }) => {
   const buttonRef = useRef(null);
-  console.log("Hader propertyType", propertyType);
+  
   const [anchorElForSale, setAnchorElForSale] = useState(null);
   const [anchorElForRent, setAnchorElForRent] = useState(null);
 

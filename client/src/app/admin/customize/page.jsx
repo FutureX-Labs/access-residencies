@@ -308,6 +308,7 @@ function Customize() {
                       <CldImage
                         key={index}
                         src={img}
+                        version="2"
                         sizes="20vw"
                         width={150}
                         height={150}
@@ -380,6 +381,7 @@ function Customize() {
                     ) : (
                       <CldImage
                         src={img.file}
+                        version="2"
                         sizes="20vw"
                         width={150}
                         height={150}
