@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import Navbar from "../../components/navbar/Navbar";
 import Image from "next/image";
+import { CldImage } from 'next-cloudinary';
 import { Box, Typography, Button, TextField, Container } from "@mui/material";
 import Swal from "sweetalert2";
 import Items from "@/app/components/items/Items";
@@ -294,11 +295,23 @@ function Customize() {
                         }}
                       />
                     ) : (
-                      <Image
-                        key={index}
-                        src={`https://res.cloudinary.com/${cloudName}/image/upload/q_10/${img}?t=${timeNow}`}
+                      // <Image
+                      //   key={index}
+                      //   src={`https://res.cloudinary.com/${cloudName}/image/upload/q_10/${img}?t=${timeNow}`}
+                      //   width={150}
+                      //   height={150}
+                      //   alt="Image"
+                      //   style={{
+                      //     margin: "20px 10px",
+                      //     borderRadius: "5px",
+                      //     objectFit: "cover",
+                      //   }}
+                      // />
+                      <CldImage
                         width={150}
                         height={150}
+                        src={img}
+                        quality="auto"
                         alt="Image"
                         style={{
                           margin: "20px 10px",
@@ -362,10 +375,22 @@ function Customize() {
                         }}
                       />
                     ) : (
-                      <Image
-                        src={`https://res.cloudinary.com/${cloudName}/image/upload/q_10/${img.file}?t=${timeNow}`}
+                      // <Image
+                      //   src={`https://res.cloudinary.com/${cloudName}/image/upload/q_10/${img.file}?t=${timeNow}`}
+                      //   width={150}
+                      //   height={150}
+                      //   alt="Image"
+                      //   style={{
+                      //     margin: "20px 10px",
+                      //     borderRadius: "5px",
+                      //     objectFit: "cover",
+                      //   }}
+                      // />
+                      <CldImage
                         width={150}
                         height={150}
+                        src={img.file}
+                        quality="auto"
                         alt="Image"
                         style={{
                           margin: "20px 10px",
