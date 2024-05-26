@@ -1,32 +1,24 @@
 "use client";
-import { useState, useRef, useEffect, useContext } from "react";
-import axios, { all } from "axios";
+import { useState, useRef, useEffect } from "react";
+import axios from "axios";
 import Navbar from "../../components/navbar/Navbar";
 import Image from "next/image";
-import {
-  Box,
-  Item,
-  Grid,
-  Typography,
-  Select,
-  MenuItem,
-  Button,
-  TextField,
-} from "@mui/material";
-import Container from "@mui/material/Container";
+import { Box, Typography, Button, TextField, Container } from "@mui/material";
 import Swal from "sweetalert2";
-import { ConvertToBase64 } from "../../utility/Conversion";
 import Items from "@/app/components/items/Items";
 import customizeImage from "../../../../public/images/customize.png";
 import { useRouter } from "next/navigation";
-import AuthContext from "@/app/context/AuthContext";
 import BASE_URL from "../../config";
 import axiosInstance from "@/app/utility/axiosInstance";
-import { CldImage } from 'next-cloudinary';
 import Paper from '@mui/material/Paper';
 import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
 
-const darkTheme = createTheme({ palette: { mode: 'dark' } });
+const darkTheme = createTheme({ palette: { mode: "dark" } });
+
+// const timeNow = Date.now();
+const timeNow = "new";
+
+const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
 
 const DemoPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(2),
@@ -44,7 +36,7 @@ function Customize() {
   const [bannerImages, setBannerImages] = useState(null);
   const [featureImages, setFeatureImages] = useState(null);
   const [imageUrl, setImageUrl] = useState([]);
-  const [propertyId, setPropertyId] = useState();
+  const [propertyId, setPropertyId] = useState("");
   const [allPropertyId, setAllPropertyId] = useState([]);
   const submitButtonRef = useRef(null);
   const submitFeatureButtonRef = useRef(null);
@@ -57,16 +49,13 @@ function Customize() {
     if (!isUserLoggedIn) router.push("/");
   }, []);
 
-  const FetchPropertyIDs = async () => {
+  const fetchPropertyIDs = async () => {
     try {
-      const propertyIDResponse = await axios.get(
-        `${BASE_URL}/api/customize/propertyid`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const propertyIDResponse = await axios.get(`${BASE_URL}/api/customize/propertyid`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
       const propertyIds = propertyIDResponse.data[0].propertyId;
       setAllPropertyId(propertyIds);
     } catch (error) {
@@ -76,7 +65,7 @@ function Customize() {
 
   const getBannersFeatures = async () => {
     try {
-      const [banners, features] = await all([
+      const [banners, features] = await axios.all([
         axiosInstance.get(`${BASE_URL}/api/customize/banners`),
         axiosInstance.get(`${BASE_URL}/api/customize/features`),
       ]);
@@ -90,7 +79,7 @@ function Customize() {
   };
 
   useEffect(() => {
-    FetchPropertyIDs();
+    fetchPropertyIDs();
     getBannersFeatures();
   }, []);
 
@@ -118,18 +107,21 @@ function Customize() {
     try {
       const trimmedImageUrl = imageUrl.map((url) => url.trim());
 
-      const response = await axiosInstance.post(`${featureURL}/addUrls`, { urls: trimmedImageUrl }, {
-        headers: {
-          "Content-Type": "application/json"
-        },
-      });
+      const response = await axiosInstance.post(
+        `${featureURL}/addUrls`,
+        { urls: trimmedImageUrl },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          }
+        }
+      );
       Swal.fire({
         title: "Feature URLs Added Successfully",
         icon: "success",
         timer: 1500,
       });
       console.log(response);
-
     } catch (error) {
       Swal.fire({
         title: "Unable to Add Feature URLs",
@@ -174,7 +166,6 @@ function Customize() {
         timer: 1500,
       });
       console.log(response);
-
     } catch (error) {
       Swal.fire({
         title: "Unable to Add Banners",
@@ -220,7 +211,6 @@ function Customize() {
         timer: 1500,
       });
       console.log(response);
-
     } catch (error) {
       Swal.fire({
         title: "Unable to Add Features",
@@ -243,11 +233,15 @@ function Customize() {
     );
   };
 
+  const handleAddPropertyId = () => {
+    setAllPropertyId((prev) => [...prev, propertyId]);
+    setPropertyId("");
+  };
+
   return (
     <Box className="customize">
       <Navbar type={"admin"} />
-
-      <Box style={{ width: "100vw", minheight: "550px", overflow: "hidden" }}>
+      <Box style={{ width: "100vw", minHeight: "550px", overflow: "hidden" }}>
         <Image
           src={customizeImage}
           alt="Admin Add"
@@ -265,7 +259,6 @@ function Customize() {
               <Typography
                 sx={{
                   color: "white",
-
                   fontWeight: "700",
                   fontSize: "32px",
                   lineHeight: "37px",
@@ -273,21 +266,17 @@ function Customize() {
               >
                 Change Main Banners
               </Typography>
-
-              {/* <label htmlFor="file-upload" className="custom-file-upload"></label> */}
-
               <input
                 type="file"
                 label="Image"
                 name="myFiles"
                 id="file-uploads"
                 accept=".jpeg, .png, .jpg"
-                onChange={(e) => handleBannerFileUpload(e)}
+                onChange={handleBannerFileUpload}
                 multiple
                 ref={submitButtonRef}
                 hidden
               />
-
               <Box>
                 {bannerImages &&
                   Array.from(bannerImages).map((img, index) => {
@@ -305,10 +294,9 @@ function Customize() {
                         }}
                       />
                     ) : (
-                      <CldImage
+                      <Image
                         key={index}
-                        src={img}
-                        sizes="20vw"
+                        src={`https://res.cloudinary.com/${cloudName}/image/upload/q_10/${img}?t=${timeNow}`}
                         width={150}
                         height={150}
                         alt="Image"
@@ -325,14 +313,12 @@ function Customize() {
                 sx={{
                   color: "white",
                   backgroundColor: "#8C1C40",
+                  marginTop: "20px",
                   borderRadius: "5px",
-                  margin: "10px 10px",
                 }}
-                onClick={() =>
-                  submitButtonRef.current && submitButtonRef.current.click()
-                }
+                onClick={() => submitButtonRef.current.click()}
               >
-                Choose Banners
+                Change Banners
               </Button>
             </Box>
           </DemoPaper>
@@ -341,7 +327,6 @@ function Customize() {
               <Typography
                 sx={{
                   color: "white",
-
                   fontWeight: "700",
                   fontSize: "32px",
                   lineHeight: "37px",
@@ -352,21 +337,20 @@ function Customize() {
               <input
                 type="file"
                 label="Image"
-                name="myFiles"
-                id="file-uploads"
+                name="featureFiles"
+                id="feature-file-uploads"
                 accept=".jpeg, .png, .jpg"
-                onChange={(e) => handleFeatureFileUpload(e)}
+                onChange={handleFeatureFileUpload}
                 multiple
                 ref={submitFeatureButtonRef}
                 hidden
               />
-
-              <Box sx={{ display: "flex", flexDirection: "column" }}>
-
-                {featureImages && Array.from(featureImages).map((img, index) => (
-                  <Box sx={{ display: "flex", alignItems: "center" }} key={index}>
-                    {featuresUploaded ? (
+              <Box>
+                {featureImages &&
+                  Array.from(featureImages).map((img, index) => {
+                    return featuresUploaded ? (
                       <Image
+                        key={index}
                         src={URL.createObjectURL(img)}
                         alt="Image"
                         width={150}
@@ -378,9 +362,8 @@ function Customize() {
                         }}
                       />
                     ) : (
-                      <CldImage
-                        src={img.file}
-                        sizes="20vw"
+                      <Image
+                        src={`https://res.cloudinary.com/${cloudName}/image/upload/q_10/${img.file}?t=${timeNow}`}
                         width={150}
                         height={150}
                         alt="Image"
@@ -390,50 +373,63 @@ function Customize() {
                           objectFit: "cover",
                         }}
                       />
-                    )}
-                    <TextField
-                      InputProps={{
-                        style: {
-                          color: "grey",
-                          border: "1px solid white",
-                        },
-                      }}
-                      size="small"
-                      fullWidth
-                      value={imageUrl[index] || ''}
-                      onChange={(e) => handleTextFieldChange(index, e.target.value)}
-                    />
-                  </Box>
-                ))}
-
+                    );
+                  })}
               </Box>
-              <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
-                <Button
-                  sx={{
-                    color: "white",
-                    backgroundColor: "#8C1C40",
-                    borderRadius: "5px",
-                    margin: "10px 10px",
+              <Button
+                sx={{
+                  color: "white",
+                  backgroundColor: "#8C1C40",
+                  marginTop: "20px",
+                  borderRadius: "5px",
+                }}
+                onClick={() => submitFeatureButtonRef.current.click()}
+              >
+                Change Features
+              </Button>
+            </Box>
+            <Typography
+              sx={{
+                color: "white",
+                fontWeight: "700",
+                fontSize: "32px",
+                lineHeight: "37px",
+              }}
+            >
+              Or Add Feature URLs
+            </Typography>
+            <Box>
+              {[0, 1, 2].map((index) => (
+                <TextField
+                  key={index}
+                  InputProps={{
+                    style: {
+                      color: "white",
+                      border: "1px solid white",
+                      margin: "10px 0px",
+                    },
                   }}
-                  onClick={() =>
-                    submitFeatureButtonRef.current &&
-                    submitFeatureButtonRef.current.click()
+                  size="small"
+                  placeholder={`Image ${index + 1}`}
+                  value={imageUrl[index] || ""}
+                  onChange={(e) =>
+                    handleTextFieldChange(index, e.target.value)
                   }
-                >
-                  Choose Features
-                </Button>
-                <Button
-                  sx={{
-                    color: "white",
-                    backgroundColor: "#8C1C40",
-                    borderRadius: "5px",
-                    marginX: "auto",
-                  }}
-                  onClick={handleFeatureURLSubmit}
-                >
-                  Save Feature Links
-                </Button>
-              </Box>
+                  required
+                />
+              ))}
+              <Button
+                sx={{
+                  color: "white",
+                  backgroundColor: "#8C1C40",
+                  marginLeft: "20px",
+                  marginTop: "20px",
+                  borderRadius: "5px",
+                }}
+                onClick={handleFeatureURLSubmit}
+              >
+                Add Feature URL
+              </Button>
             </Box>
           </DemoPaper>
           <DemoPaper elevation={0} variant="outlined">
@@ -486,24 +482,21 @@ function Customize() {
                       marginLeft: "20px",
                       borderRadius: "5px",
                     }}
-                    onClick={() => {
-                      setAllPropertyId((prev) => [...prev, propertyId]);
-                      setPropertyId("");
-                    }}
+                    onClick={handleAddPropertyId}
                   >
                     Add Property Ids
                   </Button>
                 </Box>
                 <Items data={allPropertyId} deleteData={handleRemovePropertyId} />
-
                 {allPropertyId.length > 0 && (
                   <Button
                     sx={{
                       color: "white",
                       backgroundColor: "#8C1C40",
                       borderRadius: "5px",
+                      marginTop: "10px",
                     }}
-                    onClick={() => handleSubmitPropertyId()}
+                    onClick={handleSubmitPropertyId}
                   >
                     Save Property Ids
                   </Button>

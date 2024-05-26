@@ -36,11 +36,11 @@ function Navbar(props) {
     { title: "Customize", path: "/admin/customize" },
     { title: "Property View", path: "/admin/view/House/ForSale" },
     { title: "Property Add", path: "/admin/add" },
-    { title: "Logout", path: "" },
+    { title: "Logout", path: "/" },
   ];
 
   const userNavItems = [
-    { title: "Home", path: "https://accessresidencies.com/" },
+    { title: "Home", path: "/" },
     { title: "About us", path: "https://accessresidencies.com/?page_id=4099" },
     { title: "Gallery", path: "https://accessresidencies.com/?page_id=1659" },
     {
@@ -69,15 +69,17 @@ function Navbar(props) {
             alignItems: "center",
           }}
         >
-          <Image
-            component="div"
-            src="/logo.png"
-            alt="logo"
-            width={147}
-            height={64}
-            sx={{ flexGrow: 1 }}
-            variant="h6"
-          />
+          <Link href="https://accessresidencies.com/">
+            <Image
+              component="div"
+              src="/logo.png"
+              alt="logo"
+              width={147}
+              height={70}
+              sx={{ flexGrow: 1 }}
+              variant="h6"
+            />
+          </Link>
         </Box>
         <IconButton
           color="inherit"
@@ -146,17 +148,17 @@ function Navbar(props) {
         component="nav"
         sx={{
           backgroundColor: "#000000",
-          p: { xs: "10px 5px", md: "10px 60px" },
+          padding: { xs: "10px 5px", md: "10px 60px" },
         }}
       >
         <Toolbar>
           <Box variant="h6" sx={{ flexGrow: 1, alignItems: "center" }}>
-            <Link href="/">
+            <Link href="https://accessresidencies.com/">
               <Image
                 src="/logo.png"
                 alt="logo"
-                width={147}
-                height={64}
+                width={132}
+                height={65}
                 sx={{ flexGrow: 1 }}
                 variant="h6"
               />

@@ -119,11 +119,17 @@ function View() {
           }}
         >
           {property && propertyType && (
-            <Box sx={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              <Typography color={"#8C1C40"}>{property}</Typography>
-              <IoIosArrowForward color={"#8C1C40"} />
-              <Typography color={"#8C1C40"}>{propertyType}</Typography>
-            </Box>
+            <Link
+              href={`/user/filter/${property}/${propertyType}`}
+              style={{ textDecoration: "none"}}
+              passHref
+            >
+              <Box component="a" sx={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <Typography color={"#8C1C40"}>{property}</Typography>
+                <IoIosArrowForward color={"#8C1C40"} />
+                <Typography color={"#8C1C40"}>{propertyType}</Typography>
+              </Box>
+            </Link>
           )}
         </Breadcrumbs>
 

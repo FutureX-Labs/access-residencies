@@ -313,7 +313,7 @@ router.post("/filter/main", async (req, res) => {
       filter.city = { $regex: new RegExp(city, "i") };
     }
 
-    if (title !== "" && title !== null && city !== "All") {
+    if (title !== "" && title !== null) {
       filter.title = { $regex: new RegExp(title, "i") };
     }
 

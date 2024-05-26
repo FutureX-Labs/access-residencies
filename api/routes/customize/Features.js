@@ -30,6 +30,8 @@ router.post("/addImages", AuthM, upload.array("features"), async (req, res) => {
       await cloudinary.uploader.upload(files[i].path, {
         public_id: publicId,
         folder: "features",
+        invalidate: true,
+        overwrite: true
       });
 
       FeatureData.push({

@@ -139,6 +139,7 @@ const Showcase = ({ data, user, property, propertyType, showHidden }) => {
       <CldImage
         fill
         src={item.thumbnailImage}
+        version="2"
         style={{ objectFit: "cover" }}
         blur={200}
         sizes="20vw"
@@ -429,11 +430,20 @@ const Showcase = ({ data, user, property, propertyType, showHidden }) => {
                   }}
                 >
                   {user === "admin" ? (
-                    <>{childrenContent(item)}</>
+                    <Box
+                      sx={{
+                        display: "block",
+                        width: "100%",
+                        height: "100%",
+                        color: "white",
+                      }}>
+                      {childrenContent(item)}
+                    </Box>
                   ) : (
                     <Link
                       href={`/user/view?propertyValue=${item.property}&propertyType=${item.propertyType}&id=${item._id}`}
-                      underline="none"
+                      target="_blank"
+                      passHref
                       style={{
                         display: "block",
                         width: "100%",
@@ -479,7 +489,7 @@ const Showcase = ({ data, user, property, propertyType, showHidden }) => {
             }}
           />
         </Box>
-      </Box>
+      </Box >
     </>
   );
 };

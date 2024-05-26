@@ -247,7 +247,7 @@ function Home() {
                   display: "flex",
                   flexDirection: "row",
                   gap: "10px",
-                  marginTop: "10px",
+                  marginTop: "20px",
                   width: { md: "30%", xs: "100%" },
                 }}>
                   <Button
@@ -263,7 +263,7 @@ function Home() {
                       border: `3px solid ${selectedPropertyType === "ForRent" && "#8C1C40"}`,
                     }}
                     onClick={(e) => {
-                      e.preventDefault();
+                      // e.preventDefault();
                       setSelectedPropertyType("ForSale");
                     }}
                   >
@@ -283,7 +283,7 @@ function Home() {
                         }`,
                     }}
                     onClick={(e) => {
-                      e.preventDefault();
+                      // e.preventDefault();
                       setSelectedPropertyType("ForRent");
                     }}
                   >
@@ -292,45 +292,8 @@ function Home() {
                 </Box>
                 <Box
                   sx={{
-                    width: "100%",
-                    display: "flex",
-                    justifyContent: "center",
-                    margin: { xs: "20px 0px", md: "50px 0px" },
-                  }}
-                >
-                  <TextField
-                    variant="outlined"
-                    placeholder="Type Anything to Search"
-                    InputProps={{ style: { color: "white" } }}
-                    type="text"
-                    size="small"
-                    sx={{
-                      border: "1px solid #8C1C40",
-                      color: "white",
-                      borderRadius: "10px 0px 0px 10px",
-                    }}
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    fullWidth
-                  />
-                  <Button
-                    sx={{
-                      borderRadius: "0px 10px 10px 0px",
-                      border: "1px solid #8C1C40",
-                      backgroundColor: "#8C1C40",
-                      color: "white",
-                      height: "42px",
-                      width: "100px",
-                    }}
-                    type="submit"
-                  // disabled={!propertyId}
-                  >
-                    Search
-                  </Button>
-                </Box>
-                <Box
-                  sx={{
                     display: "grid",
+                    margin: { xs: "20px 0px", md: "40px 0px" },
                     gridTemplateAreas: {
                       md: `"New1 New2 New3"`,
                       xs: `"New1" "New2" "New3"`,
@@ -342,9 +305,8 @@ function Home() {
                     <Typography
                       variant="h6"
                       style={{
-                        color: "#8C1C40",
-                        fontWeight: 500,
-                        fontSize: "22px",
+                        color: "#ffffffaa",
+                        fontSize: "20px",
                         marginLeft: "10px",
                       }}
                     >
@@ -380,9 +342,8 @@ function Home() {
                     <Typography
                       variant="h6"
                       style={{
-                        color: "#8C1C40",
-                        fontWeight: 500,
-                        fontSize: "22px",
+                        color: "#ffffffaa",
+                        fontSize: "20px",
                         marginLeft: "10px",
                       }}
                     >
@@ -419,9 +380,8 @@ function Home() {
                     <Typography
                       variant="h6"
                       style={{
-                        color: "#8C1C40",
-                        fontWeight: 500,
-                        fontSize: "22px",
+                        color: "#ffffffaa",
+                        fontSize: "20px",
                         marginLeft: "10px",
                       }}
                     >
@@ -456,6 +416,44 @@ function Home() {
                       ))}
                     </Select>
                   </Box>
+                </Box>
+                <Box
+                  sx={{
+                    width: "100%",
+                    margin: { xs: "30px 0px", md: "20px 0px" },
+                    display: "flex",
+                    justifyContent: "center",
+                  }}
+                >
+                  <TextField
+                    variant="outlined"
+                    placeholder="Type Anything to Search"
+                    InputProps={{ style: { color: "white" } }}
+                    type="text"
+                    size="small"
+                    sx={{
+                      border: "1px solid #8C1C40",
+                      color: "white",
+                      borderRadius: "10px 0px 0px 10px",
+                    }}
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    fullWidth
+                  />
+                  <Button
+                    sx={{
+                      borderRadius: "0px 10px 10px 0px",
+                      border: "1px solid #8C1C40",
+                      backgroundColor: "#8C1C40",
+                      color: "white",
+                      height: "42px",
+                      width: "100px",
+                    }}
+                    type="submit"
+                  // disabled={!propertyId}
+                  >
+                    Search
+                  </Button>
                 </Box>
               </Box>
             </form>

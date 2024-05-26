@@ -30,6 +30,8 @@ router.post("/add", AuthM, upload.array("banners"), async (req, res) => {
       const result = await cloudinary.uploader.upload(req.files[i].path, {
         public_id: publicId,
         folder: "banners",
+        invalidate: true,
+        overwrite: true
       });
       uploadedImages.push(result.secure_url);
       publicIds.push(`banners/${publicId}`);
