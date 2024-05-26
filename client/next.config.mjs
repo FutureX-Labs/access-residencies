@@ -9,20 +9,7 @@ const nextConfig = {
                 pathname: '**',
             },
         ],
-        minimumCacheTTL: 1,
-    },
-    async headers() {
-        return [
-            {
-                source: '/(.*)',
-                headers: [
-                    {
-                        key: 'Cache-Control',
-                        value: 'no-store',
-                    },
-                ],
-            },
-        ]
+        minimumCacheTTL: 60,
     },
 };
 
