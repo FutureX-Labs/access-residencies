@@ -7,8 +7,8 @@ import Link from "next/link";
 
 const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
 
-// const timeNow = Date.now();
-const timeNow = "new";
+const timeNow = Date.now();
+// const timeNow = "new";
 
 export default function FeatureSlider({ imageData }) {
   console.log("imageData", imageData);
