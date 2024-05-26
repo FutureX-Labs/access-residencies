@@ -1,6 +1,7 @@
 import React from "react";
 import Slider from "react-slick";
 import Image from "next/image";
+import { CldImage } from 'next-cloudinary';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
@@ -42,9 +43,17 @@ export default function BannerSlider({ imageData }) {
       {imageData?.map((img) => (
         <div key={img.id}>
           <div style={imgStyle}>
-            <Image
+            {/* <Image
               fill
               src={`https://res.cloudinary.com/${cloudName}/image/upload/q_100/${img}?t=${timeNow}`}
+              alt="Image"
+              style={{
+                objectFit: 'cover',
+              }}
+            /> */}
+            <CldImage
+              publicId={img}
+              quality="auto"
               alt="Image"
               style={{
                 objectFit: 'cover',
