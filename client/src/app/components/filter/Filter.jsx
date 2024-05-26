@@ -172,6 +172,8 @@ const Filter = ({
                 return `Below Rs.${value}`;
               case "rent":
                 return `Below Rs.${value}`;
+              case "propertyTypes":
+                return value;
             }
           }
         );
@@ -372,7 +374,7 @@ const Filter = ({
                     MenuProps={{
                       disableScrollLock: true,
                     }}
-                    value={comPropertyS || ""}
+                    value={comPropertyS || "All"}
                     onChange={(e) => setComPropertyS(e.target.value)}
                     inputProps={{ style: { color: "white" } }}
                     size="small"
