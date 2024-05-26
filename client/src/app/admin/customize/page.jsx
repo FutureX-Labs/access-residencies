@@ -22,11 +22,15 @@ import { useRouter } from "next/navigation";
 import AuthContext from "@/app/context/AuthContext";
 import BASE_URL from "../../config";
 import axiosInstance from "@/app/utility/axiosInstance";
-import { CldImage } from 'next-cloudinary';
 import Paper from '@mui/material/Paper';
 import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
 
 const darkTheme = createTheme({ palette: { mode: 'dark' } });
+
+// const timeNow = Date.now();
+const timeNow = "new";
+
+const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
 
 const DemoPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(2),
@@ -305,11 +309,9 @@ function Customize() {
                         }}
                       />
                     ) : (
-                      <CldImage
+                      <Image
                         key={index}
-                        src={img}
-                        version="2"
-                        sizes="20vw"
+                        src={`https://res.cloudinary.com/${cloudName}/image/upload/q_10/${img}?t=${timeNow}`}
                         width={150}
                         height={150}
                         alt="Image"
@@ -379,10 +381,8 @@ function Customize() {
                         }}
                       />
                     ) : (
-                      <CldImage
-                        src={img.file}
-                        version="2"
-                        sizes="20vw"
+                      <Image
+                        src={`https://res.cloudinary.com/${cloudName}/image/upload/q_10/${img.file}?t=${timeNow}`}
                         width={150}
                         height={150}
                         alt="Image"

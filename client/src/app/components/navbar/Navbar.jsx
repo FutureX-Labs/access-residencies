@@ -36,11 +36,11 @@ function Navbar(props) {
     { title: "Customize", path: "/admin/customize" },
     { title: "Property View", path: "/admin/view/House/ForSale" },
     { title: "Property Add", path: "/admin/add" },
-    { title: "Logout", path: "" },
+    { title: "Logout", path: "/" },
   ];
 
   const userNavItems = [
-    { title: "Home", path: "https://accessresidencies.com/" },
+    { title: "Home", path: "/" },
     { title: "About us", path: "https://accessresidencies.com/?page_id=4099" },
     { title: "Gallery", path: "https://accessresidencies.com/?page_id=1659" },
     {
