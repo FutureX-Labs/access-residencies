@@ -9,8 +9,21 @@ const nextConfig = {
                 pathname: '**',
             },
         ],
-        minimumCacheTTL: 60,
+        // minimumCacheTTL: 1,
     },
+    // async headers() {
+    //     return [
+    //         {
+    //             source: '/(.*)',
+    //             headers: [
+    //                 {
+    //                     key: 'Cache-Control',
+    //                     value: 'no-store',
+    //                 },
+    //             ],
+    //         },
+    //     ]
+    // },
 };
 
 export default nextConfig;

@@ -15,8 +15,8 @@ import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
 
 const darkTheme = createTheme({ palette: { mode: "dark" } });
 
-// const timeNow = Date.now();
-const timeNow = "new";
+const timeNow = Date.now();
+// const timeNow = "new";
 
 const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
 
