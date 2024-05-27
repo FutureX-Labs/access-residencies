@@ -21,31 +21,37 @@ router.get("/", async (req, res) => {
 router.post("/addImages", AuthM, upload.array("features"), async (req, res) => {
   try {
     const files = req.files;
-    const FeatureData = [];
+    const publicURLs = [];
+
+    Features.findById(Id, { features: 1, _id: 0 }).then((details) => {
+      for (let i = 0; i < details.features.length; i++) {
+        cloudinary.api.delete_resources(details.features[i].file, {
+          type: "upload",
+          resource_type: "image",
+        });
+      }
+    });
 
     await Features.deleteMany({});
 
     for (let i = 0; i < files.length; i++) {
-      const publicId = `feature_${i + 1}`;
-      await cloudinary.uploader.upload(files[i].path, {
-        public_id: publicId,
+      const result = await cloudinary.uploader.upload(files[i].path, {
         folder: "features",
-        invalidate: true,
-        overwrite: true
       });
 
-      FeatureData.push({
-        file: `features/${publicId}`,
+      publicURLs.push({
+        file: result.secure_url,
         url: "#home",
       });
 
       await fs.unlink(files[i].path);
     }
 
-    const newFeature = new Features({ features: FeatureData });
+    const newFeature = new Features({ features: publicURLs });
     await newFeature.save();
 
     const newLog = new log({ activity: "Added new features" });
+    await newLog.save();
     res.status(200).json({ success: true });
   } catch (error) {
     console.error(error);
@@ -60,13 +66,13 @@ router.post("/addUrls", AuthM, async (req, res) => {
     const urlData = req.body.urls;
 
     const features = await Features.findOne();
-    const featureData = features.features;
+    const publicURLs = features.features;
 
-    for (let i = 0; i < featureData.length; i++) {
-      featureData[i].url = urlData[i];
+    for (let i = 0; i < publicURLs.length; i++) {
+      publicURLs[i].url = urlData[i];
     }
 
-    features.features = featureData;
+    features.features = publicURLs;
     await features.save();
 
     const newLog = new log({ activity: "Added new urls" });

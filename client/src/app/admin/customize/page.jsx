@@ -26,11 +26,6 @@ import { CldImage } from 'next-cloudinary';
 import Paper from '@mui/material/Paper';
 import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
 
-const timeNow = Date.now();
-// const timeNow = "new";
-
-const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-
 const darkTheme = createTheme({ palette: { mode: 'dark' } });
 
 const DemoPaper = styled(Paper)(({ theme }) => ({
@@ -323,18 +318,6 @@ function Customize() {
                           objectFit: "cover",
                         }}
                       />
-                      // <Image
-                      //   key={index}
-                      //   src={`https://res.cloudinary.com/${cloudName}/image/upload/q_10/${img}?t=${timeNow}`}
-                      //   width={150}
-                      //   height={150}
-                      //   alt="Image"
-                      //   style={{
-                      //     margin: "20px 10px",
-                      //     borderRadius: "5px",
-                      //     objectFit: "cover",
-                      //   }}
-                      // />
                     );
                   })}
               </Box>
@@ -407,17 +390,6 @@ function Customize() {
                           objectFit: "cover",
                         }}
                       />
-                      // <Image
-                      //   src={`https://res.cloudinary.com/${cloudName}/image/upload/q_10/${img.file}?t=${timeNow}`}
-                      //   width={150}
-                      //   height={150}
-                      //   alt="Image"
-                      //   style={{
-                      //     margin: "20px 10px",
-                      //     borderRadius: "5px",
-                      //     objectFit: "cover",
-                      //   }}
-                      // />
                     )}
                     <TextField
                       InputProps={{
