@@ -39,7 +39,6 @@ router.post("/add", AuthM, upload.array("banners"), async (req, res) => {
         // invalidate: true,
         // overwrite: true
       });
-      console.log(result);
       publicIDs.push(result.public_id);
 
       await fs.unlink(req.files[i].path);
