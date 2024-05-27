@@ -29,6 +29,7 @@ import { GetAll } from "./utility/getAll";
 import { PropertyTypes } from "@/app/list/propertyTypes";
 import { Cities } from "@/app/list/city";
 import { Prices } from "@/app/list/price";
+import { Rents } from "@/app/list/priceRent";
 import { FilterUrl } from "./utility/filterUrls";
 import AuthContext from "./context/AuthContext";
 import { useRouter } from "next/navigation";
@@ -40,13 +41,12 @@ const url = `${BASE_URL}/api/apartmentForRent/add`;
 function Home() {
   const scollToRef = useRef();
   const [postImage, setPostImage] = useState(null);
-  const [formData, setFormData] = useState(new FormData());
   const [Banners, setBanners] = useState([]);
   const [features, setFeatures] = useState([]);
   const [collectionData, setCollectionData] = useState([]);
   const [property, setProperty] = useState(null);
   const [propertyType, setPropertyType] = useState(null);
-  const [selectedProperty, setSelectedProperty] = useState();
+  const [selectedProperty, setSelectedProperty] = useState("All");
   const [selectedPropertyType, setSelectedPropertyType] = useState("ForSale");
   const [price, setPrice] = useState("All");
   const [rent, setRent] = useState("All");
@@ -76,33 +76,50 @@ function Home() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const additionalData = {
+      title: title,
+      city: city.title,
+    };
+
+    if (selectedPropertyType === 'ForSale') {
+      additionalData.price = parseInt(price);
+    } else if (selectedPropertyType === 'ForRent') {
+      additionalData.rent = parseInt(rent);
+    }
+
     try {
-      let additionalData = {
-        title: title,
-        city: city.title,
-      };
 
-      if (selectedPropertyType === "ForSale") {
-        additionalData.price = parseInt(price);
-      } else if (selectedPropertyType === "ForRent") {
-        additionalData.rent = parseInt(rent);
+      if (selectedProperty === 'All') {
+        let allProperties = [];
+
+        for (const propertyName of PropertyTypes) {
+          const initialUrl = FilterUrl(selectedPropertyType, propertyName.value);
+          const url = initialUrl.replace('filter', 'filter/main');
+
+          const response = await axios.post(url, additionalData, {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+
+          allProperties = [...allProperties, ...response.data];
+        }
+
+        setCollectionData(allProperties);
+      } else {
+        const initialUrl = FilterUrl(selectedPropertyType, selectedProperty);
+        const url = initialUrl.replace('filter', 'filter/main');
+        console.log(url);
+
+
+        const response = await axios.post(url, additionalData, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        setCollectionData(response.data);
       }
-      console.log("additionalData", additionalData);
-
-      console.log("selectedPropertyType", selectedPropertyType);
-      console.log("selectedProperty", selectedProperty);
-
-      const initialUrl = FilterUrl(selectedPropertyType, selectedProperty);
-      console.log("initialUrl", initialUrl);
-
-      const url = initialUrl.replace("filter", "filter/main");
-      console.log("url", url);
-      const response = await axios.post(url, additionalData, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      setCollectionData(response.data);
 
       if (scollToRef.current) {
         scollToRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -204,6 +221,9 @@ function Home() {
   );
   const allOption = { title: 'All', group: 'All' };
   const transformedCitiesWithAll = [allOption, ...transformedCities];
+
+  const propertyTypeAll = { label: "All", value: "All" };
+  const propertyTypesWithAll = [propertyTypeAll, ...PropertyTypes];
 
 
   return (
@@ -316,7 +336,7 @@ function Home() {
                       MenuProps={{
                         disableScrollLock: true,
                       }}
-                      value={selectedProperty || ''}
+                      value={selectedProperty || 'All'}
                       onChange={(e) => setSelectedProperty(e.target.value)}
                       inputProps={{ style: { color: "white" } }}
                       size="small"
@@ -331,7 +351,7 @@ function Home() {
                       }}
                       required
                     >
-                      {PropertyTypes.map((type, index) => (
+                      {propertyTypesWithAll.map((type, index) => (
                         <MenuItem key={index} value={type.value}>
                           {type.label}
                         </MenuItem>
@@ -409,11 +429,19 @@ function Home() {
                         }
                       }}
                     >
-                      {Prices.map((priceOption, index) => (
-                        <MenuItem key={index} value={priceOption.value}>
-                          {priceOption.label}
-                        </MenuItem>
-                      ))}
+                      {selectedPropertyType === "ForSale" ? (
+                        Prices.map((priceOption, index) => (
+                          <MenuItem key={index} value={priceOption.value}>
+                            {priceOption.label}
+                          </MenuItem>
+                        ))
+                      ) : (
+                        Rents.map((priceOption, index) => (
+                          <MenuItem key={index} value={priceOption.value}>
+                            {priceOption.label}
+                          </MenuItem>
+                        ))
+                      )}
                     </Select>
                   </Box>
                 </Box>
