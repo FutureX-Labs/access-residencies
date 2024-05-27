@@ -281,8 +281,6 @@ function Customize() {
     }
   };
   
-  
-  
 
   return (
     <Box className="customize">
