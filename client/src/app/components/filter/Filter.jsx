@@ -18,6 +18,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { GetAdditionalData } from "@/app/utility/getAdditionalData";
 import { Sizes } from "@/app/list/sizes";
 import { Prices } from "@/app/list/price";
+import { Rents } from "@/app/list/priceRent";
 import { Bedrooms } from "@/app/list/bedrooms";
 import { Perches } from "@/app/list/perches";
 import { Acres } from "@/app/list/acres";
@@ -350,11 +351,19 @@ const Filter = ({
                     }
                   }}
                 >
-                  {Prices.map((priceOption, index) => (
+                {propertyType === "ForSale" ? (
+                  Prices.map((priceOption, index) => (
                     <MenuItem key={index} value={priceOption.value}>
                       {priceOption.label}
                     </MenuItem>
-                  ))}
+                  ))
+                ) : (
+                  Rents.map((priceOption, index) => (
+                    <MenuItem key={index} value={priceOption.value}>
+                      {priceOption.label}
+                    </MenuItem>
+                  ))
+                )}
                 </Select>
               </Box>
               {property === "Commercial" && (

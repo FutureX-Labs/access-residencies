@@ -234,7 +234,7 @@ router.post("/edit/isVisible/:id", AuthM, async (req, res) => {
       isVisibale,
     });
 
-    const newLog = new log({ activity: `House For Sale Visibility Updated : ${propertyId}` });
+    const newLog = new log({ activity: `House For Sale Visibility Updated : ${result.propertyId}` });
     await newLog.save();
 
     res.status(200).json(result);
