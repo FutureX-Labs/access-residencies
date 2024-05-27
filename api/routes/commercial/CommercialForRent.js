@@ -46,12 +46,11 @@ router.post("/add", AuthM, upload.array("myFiles"), async (req, res) => {
     const uploadedImages = [];
 
     for (let i = 0; i < files.length; i++) {
-      await cloudinary.uploader.upload(files[i].path, {
-        public_id: `image_${i}`,
+      const result = await cloudinary.uploader.upload(files[i].path, {
         folder: `commercial-rent/${propertyId}`,
       });
 
-      uploadedImages.push(`commercial-rent/${propertyId}/image_${i}`);
+      uploadedImages.push(result.public_id);
 
       await fs.unlink(files[i].path);
     }
@@ -92,11 +91,22 @@ router.put("/edit/:id/uploadThumbnail/", AuthM, upload.single("thumbnail"), asyn
     const thumbnailFile = req.file;
     const propertyId = req.body.propertyId;
 
-    await cloudinary.uploader.upload(thumbnailFile.path, {
-      public_id: `image_0`,
+    await commercialForRent.find({ propertyId }).then((details) => {
+      cloudinary.api.delete_resources([details[0].thumbnailImage], {
+        type: "upload",
+        resource_type: "image",
+      });
+    });
+
+    const result = await cloudinary.uploader.upload(thumbnailFile.path, {
       folder: `commercial-rent/${propertyId}`,
     });
     await fs.unlink(thumbnailFile.path);
+
+    await commercialForRent.findOneAndUpdate(
+      { propertyId: propertyId },
+      { $set: { thumbnailImage: result.public_id } }
+    );
 
     const newLog = new log({ activity: `Updated thumbnail for Commercial For Rent: ${propertyId}` });
     await newLog.save();
@@ -111,10 +121,9 @@ router.put("/edit/:id/uploadImages/", AuthM, upload.array("image"), async (req, 
   try {
     const imageFiles = req.files;
     const propertyId = req.body.propertyId;
-    const Id = req.params.id;
-
-    commercialForRent.findById(Id, { images: 1, _id: 0 }).then((details) => {
-      cloudinary.api.delete_resources(details.images, {
+    
+    await commercialForRent.find({ propertyId }).then((details) => {
+      cloudinary.api.delete_resources(details[0].images, {
         type: "upload",
         resource_type: "image",
       });
@@ -123,20 +132,18 @@ router.put("/edit/:id/uploadImages/", AuthM, upload.array("image"), async (req, 
     const uploadedImages = [];
 
     for (let i = 0; i < imageFiles.length; i++) {
-      await cloudinary.uploader.upload(imageFiles[i].path, {
-        public_id: `image_${i + 1}`,
-        folder: `commercial-rent/${propertyId}`,
+      const result = await cloudinary.uploader.upload(imageFiles[i].path, {
+        folder: `apartment-rent/${propertyId}`,
       });
 
-      uploadedImages.push(`commercial-rent/${propertyId}/image_${i + 1}`);
+      uploadedImages.push(result.public_id);
 
       await fs.unlink(imageFiles[i].path);
     }
 
-    await commercialForRent.findByIdAndUpdate(
-      Id,
-      { $set: { images: uploadedImages } },
-      { new: true }
+    await commercialForRent.findOneAndUpdate(
+      { propertyId: propertyId },
+      { $set: { images: uploadedImages } }
     );
 
     const newLog = new log({ activity: `Updated images for Commercial For Rent: ${propertyId}` });

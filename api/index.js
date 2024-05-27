@@ -97,6 +97,51 @@ app.post("/api/properties", async (req, res) => {
   }
 });
 
+app.post("/api/properties/find", async (req, res) => {
+  const { propertyIds } = req.body;
+  console.log("Received propertyIds:", propertyIds);
+
+  if (!propertyIds || !Array.isArray(propertyIds) || propertyIds.length === 0) {
+    return res
+      .status(400)
+      .json({ message: "Invalid input: propertyIds array required." });
+  }
+
+  
+  try {
+    const models = [
+      houseForSale,
+      houseForRent,
+      landForSale,
+      landForRent,
+      commercialForSale,
+      commercialForRent,
+      apartmentForSale,
+      apartmentForRent,
+    ];
+
+    const promises = models.map((model) =>
+      model.find({ propertyId: { $in: propertyIds }, isVisibale: true })
+    );
+
+    const results = await Promise.all(promises);
+
+
+    if (results.length === 0) {
+      res
+        .status(404)
+        .json({ message: "No data found for the given property IDs" });
+    } else {
+      res.json({ data: results });
+    }
+  } catch (error) {
+    console.error("Failed to fetch data:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+
+
 mongoose
   .connect(process.env.MONGOURI)
   .then(() => {
