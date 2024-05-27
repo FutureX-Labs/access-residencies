@@ -8,3 +8,4 @@ client/package-lock.json
 
 client/.next
 api/.env
+client/src/app/config.js
