@@ -543,10 +543,8 @@ function Customize() {
                       marginLeft: "20px",
                       borderRadius: "5px",
                     }}
-                    onClick={() => {
-                      setAllPropertyId((prev) => [...prev, propertyId]);
-                      setPropertyId("");
-                    }}
+                    onClick={handleAddPropertyId}
+                    //
                   >
                     Add Property Ids
                   </Button>
