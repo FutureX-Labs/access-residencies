@@ -1,15 +1,9 @@
 import React from "react";
 import Slider from "react-slick";
-import Image from "next/image";
 import { CldImage } from 'next-cloudinary';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Link from "next/link";
-
-const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-
-const timeNow = Date.now();
-// const timeNow = "new";
 
 export default function FeatureSlider({ imageData }) {
   console.log("imageData", imageData);
@@ -33,14 +27,6 @@ export default function FeatureSlider({ imageData }) {
       {imageData?.map((img) => (
         <Link key={img.id} href={img.url}>
           <div style={{ position: 'relative', width: '100%', paddingBottom: '56.25%' }}>
-            {/* <Image
-              fill
-              src={`https://res.cloudinary.com/${cloudName}/image/upload/q_100/${img?.file}?t=${timeNow}`}
-              alt="Image"
-              style={{
-                objectFit: 'cover',
-              }}
-            /> */}
             <CldImage
               fill
               src={img?.file}
