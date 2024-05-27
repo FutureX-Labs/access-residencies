@@ -91,7 +91,7 @@ function Customize() {
   };
 
   useEffect(() => {
-    FetchPropertyIDs();
+    fetchPropertyIDs();
     getBannersFeatures();
   }, []);
 
