@@ -20,19 +20,18 @@ router.get("/", async (req, res) => {
 
 router.post("/add", AuthM, upload.array("banners"), async (req, res) => {
   try {
-    Banners.findById(Id, { banners: 1, _id: 0 }).then((details) => {
-      for (let i = 0; i < details.banners.length; i++) {
-        cloudinary.api.delete_resources(details.banners[i], {
+    await Banners.find().then((details) => {
+      if (details.length > 0) {
+        cloudinary.api.delete_resources(details[0].banners, {
           type: "upload",
           resource_type: "image",
         });
       }
-
     });
-    
+
     await Banners.deleteMany({});
 
-    const publicURLs = [];
+    const publicIDs = [];
 
     for (let i = 0; i < req.files.length; i++) {
       const result = await cloudinary.uploader.upload(req.files[i].path, {
@@ -40,17 +39,18 @@ router.post("/add", AuthM, upload.array("banners"), async (req, res) => {
         // invalidate: true,
         // overwrite: true
       });
-      publicURLs.push(result.secure_url);
+      console.log(result);
+      publicIDs.push(result.public_id);
 
       await fs.unlink(req.files[i].path);
     }
 
-    const newBanner = new Banners({ banners: publicURLs });
+    const newBanner = new Banners({ banners: publicIDs });
     await newBanner.save();
 
     const newLog = new log({ activity: "Added new banners" });
     await newLog.save();
-    res.status(200).json({ success: true, images: publicURLs });
+    res.status(200).json({ success: true, images: publicIDs });
   } catch (error) {
     console.error(error);
     res.status(400).json(error);

@@ -20,17 +20,20 @@ router.get("/", async (req, res) => {
 
 router.post("/addImages", AuthM, upload.array("features"), async (req, res) => {
   try {
-    const files = req.files;
-    const publicURLs = [];
 
-    Features.findById(Id, { features: 1, _id: 0 }).then((details) => {
-      for (let i = 0; i < details.features.length; i++) {
-        cloudinary.api.delete_resources(details.features[i].file, {
-          type: "upload",
-          resource_type: "image",
-        });
+    await Features.find().then((details) => {
+      if (details.length > 0) {
+        for (let i = 0; i < details[0].features.length; i++) {
+          cloudinary.api.delete_resources([details[0].features[i].file], {
+            type: "upload",
+            resource_type: "image",
+          });
+        }
       }
     });
+
+    const files = req.files;
+    const publicIDs = [];
 
     await Features.deleteMany({});
 
@@ -39,15 +42,15 @@ router.post("/addImages", AuthM, upload.array("features"), async (req, res) => {
         folder: "features",
       });
 
-      publicURLs.push({
-        file: result.secure_url,
+      publicIDs.push({
+        file: result.public_id,
         url: "#home",
       });
 
       await fs.unlink(files[i].path);
     }
 
-    const newFeature = new Features({ features: publicURLs });
+    const newFeature = new Features({ features: publicIDs });
     await newFeature.save();
 
     const newLog = new log({ activity: "Added new features" });
