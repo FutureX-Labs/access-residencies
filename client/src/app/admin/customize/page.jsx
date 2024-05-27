@@ -27,6 +27,7 @@ const DemoPaper = styled(Paper)(({ theme }) => ({
 const bannerURL = `${BASE_URL}/api/customize/banners/add`;
 const featureURL = `${BASE_URL}/api/customize/features/`;
 const propertyIdUrl = `${BASE_URL}/api/customize/propertyid/add`;
+const propertyIdFind = `${BASE_URL}/api/properties/find`;
 
 function Customize() {
   const [bannerImages, setBannerImages] = useState(null);
@@ -44,6 +45,8 @@ function Customize() {
     const isUserLoggedIn = sessionStorage.getItem("contact_user");
     if (!isUserLoggedIn) router.push("/");
   }, []);
+
+  
 
   const fetchPropertyIDs = async () => {
     try {
@@ -229,10 +232,57 @@ function Customize() {
     );
   };
 
-  const handleAddPropertyId = () => {
-    setAllPropertyId((prev) => [...prev, propertyId]);
-    setPropertyId("");
+  const handleAddPropertyId = async () => {
+    try {
+      console.log(propertyId);
+  
+      const response = await axios.post(
+        propertyIdFind,
+        // Send data in the request body
+        { propertyIds: [propertyId] },
+        // Set content type header to JSON
+        { headers: { 'Content-Type': 'application/json' } }
+      );
+  
+      // Check if the response status is OK (200) and at least one inner array contains data
+      if (
+        response.status === 200 &&
+        response.data &&
+        response.data.data &&
+        response.data.data.some((innerArray) => innerArray.length > 0)
+      ) {
+        // Check if the propertyId is not already included in allPropertyId
+        if (!allPropertyId.includes(propertyId)) {
+          setAllPropertyId((prevPropertyIds) => [...prevPropertyIds, propertyId]);
+          setPropertyId("");
+        } else {
+          // Display error message if propertyId is already included
+          Swal.fire({
+            title: "Property Id Already Exists",
+            icon: "error",
+            timer: 1500,
+          });
+        }
+      } else {
+        // Handle the case where no inner array contains data
+        Swal.fire({
+          title: "Invalid Property Id",
+          icon: "error",
+          timer: 1500,
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      Swal.fire({
+        title: "Error Adding Property Id",
+        icon: "error",
+        timer: 1500,
+      });
+    }
   };
+  
+  
+  
 
   return (
     <Box className="customize">
@@ -251,6 +301,8 @@ function Customize() {
       <Container maxWidth="lg" sx={{ mt: "40px" }}>
         <ThemeProvider theme={darkTheme}>
           <DemoPaper elevation={0} variant="outlined">
+
+            {/* Main Banners */}
             <Box>
               <Typography
                 sx={{
@@ -319,6 +371,8 @@ function Customize() {
               </Button>
             </Box>
           </DemoPaper>
+
+          {/* Featured Projects */}
           <DemoPaper elevation={0} variant="outlined">
             <Box>
               <Typography
@@ -431,6 +485,8 @@ function Customize() {
               </Button>
             </Box>
           </DemoPaper>
+
+          {/* Showcase Properties */}
           <DemoPaper elevation={0} variant="outlined">
             <Box>
               <Typography
@@ -486,7 +542,9 @@ function Customize() {
                     Add Property Ids
                   </Button>
                 </Box>
+
                 <Items data={allPropertyId} deleteData={handleRemovePropertyId} />
+
                 {allPropertyId.length > 0 && (
                   <Button
                     sx={{
@@ -510,3 +568,5 @@ function Customize() {
 }
 
 export default Customize;
+
+
