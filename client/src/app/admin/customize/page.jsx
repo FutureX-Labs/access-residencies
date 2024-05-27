@@ -536,6 +536,7 @@ function Customize() {
                       borderRadius: "5px",
                     }}
                     onClick={handleAddPropertyId}
+                    //
                   >
                     Add Property Ids
                   </Button>
