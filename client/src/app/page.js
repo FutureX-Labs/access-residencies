@@ -54,6 +54,35 @@ function Home() {
   const [title, setTitle] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const [selectStates, setSelectStates] = useState([false, false, false]);
+
+  const handleOpen = (index) => {
+    setSelectStates(prevSelectStates => {
+      const newArray = [...prevSelectStates];
+      newArray[index] = true;
+      return newArray;
+    });
+  };
+
+  const handleClose = (index) => {
+    setSelectStates(prevSelectStates => {
+      const newArray = [...prevSelectStates];
+      newArray[index] = false;
+      return newArray;
+    });
+  };
+
+  const handleWindowScroll = () => {
+    setSelectStates([false, false, false]);
+  };
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleWindowScroll);
+
+    return () => window.removeEventListener('scroll', handleWindowScroll);
+  }, []);
+
+
   setTimeout(() => {
     setIsLoading(false);
   }, 2000);
@@ -333,6 +362,9 @@ function Home() {
                       Property Types
                     </Typography>
                     <Select
+                      open={selectStates[0]}
+                      onClose={() => handleClose(0)}
+                      onOpen={() => handleOpen(0)}
                       MenuProps={{
                         disableScrollLock: true,
                       }}
@@ -371,6 +403,9 @@ function Home() {
                     </Typography>
                     <ThemeProvider theme={theme}>
                       <Autocomplete
+                        open={selectStates[1]}
+                        onClose={() => handleClose(1)}
+                        onOpen={() => handleOpen(1)}
                         value={city || allOption}
                         onChange={(event, value) => {
                           setCity(value || '');
@@ -408,6 +443,9 @@ function Home() {
                       {selectedPropertyType === "ForSale" ? "Max Price" : "Max Rent"}
                     </Typography>
                     <Select
+                      open={selectStates[2]}
+                      onClose={() => handleClose(2)}
+                      onOpen={() => handleOpen(2)}
                       MenuProps={{
                         disableScrollLock: true,
                       }}

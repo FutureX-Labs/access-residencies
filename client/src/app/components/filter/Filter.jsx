@@ -64,6 +64,34 @@ const Filter = ({
   const [filteredBy, setFilteredBy] = useState([]);
   const [topCities, setTopCities] = useState([]);
 
+  const [selectStates, setSelectStates] = useState([false, false, false, false, false, false, false, false]);
+
+  const handleOpen = (index) => {
+    setSelectStates(prevSelectStates => {
+      const newArray = [...prevSelectStates];
+      newArray[index] = true;
+      return newArray;
+    });
+  };
+
+  const handleClose = (index) => {
+    setSelectStates(prevSelectStates => {
+      const newArray = [...prevSelectStates];
+      newArray[index] = false;
+      return newArray;
+    });
+  };
+
+  const handleWindowScroll = () => {
+    setSelectStates([false, false, false, false, false, false, false, false]);
+  };
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleWindowScroll);
+
+    return () => window.removeEventListener('scroll', handleWindowScroll);
+  }, []);
+
   const theme = createTheme({
     components: {
       MuiAutocomplete: {
@@ -285,6 +313,9 @@ const Filter = ({
                 </Typography>
                 <ThemeProvider theme={theme}>
                   <Autocomplete
+                    open={selectStates[0]}
+                    onClose={() => handleClose(0)}
+                    onOpen={() => handleOpen(0)}
                     value={city || allOption}
                     onChange={(event, value) => {
                       setCity(value || '');
@@ -326,6 +357,9 @@ const Filter = ({
                   {propertyType === "ForSale" ? "Max Price" : "Max Rent"}
                 </Typography>
                 <Select
+                    open={selectStates[1]}
+                    onClose={() => handleClose(1)}
+                    onOpen={() => handleOpen(1)}
                   MenuProps={{
                     disableScrollLock: true,
                   }}
@@ -351,19 +385,19 @@ const Filter = ({
                     }
                   }}
                 >
-                {propertyType === "ForSale" ? (
-                  Prices.map((priceOption, index) => (
-                    <MenuItem key={index} value={priceOption.value}>
-                      {priceOption.label}
-                    </MenuItem>
-                  ))
-                ) : (
-                  Rents.map((priceOption, index) => (
-                    <MenuItem key={index} value={priceOption.value}>
-                      {priceOption.label}
-                    </MenuItem>
-                  ))
-                )}
+                  {propertyType === "ForSale" ? (
+                    Prices.map((priceOption, index) => (
+                      <MenuItem key={index} value={priceOption.value}>
+                        {priceOption.label}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    Rents.map((priceOption, index) => (
+                      <MenuItem key={index} value={priceOption.value}>
+                        {priceOption.label}
+                      </MenuItem>
+                    ))
+                  )}
                 </Select>
               </Box>
               {property === "Commercial" && (
@@ -380,6 +414,9 @@ const Filter = ({
                     Property Types
                   </Typography>
                   <Select
+                    open={selectStates[2]}
+                    onClose={() => handleClose(2)}
+                    onOpen={() => handleOpen(2)}
                     MenuProps={{
                       disableScrollLock: true,
                     }}
@@ -423,6 +460,9 @@ const Filter = ({
                       Size
                     </Typography>
                     <Select
+                    open={selectStates[3]}
+                    onClose={() => handleClose(3)}
+                    onOpen={() => handleOpen(3)}
                       MenuProps={{
                         disableScrollLock: true,
                       }}
@@ -464,6 +504,9 @@ const Filter = ({
                     Bedrooms
                   </Typography>
                   <Select
+                    open={selectStates[4]}
+                    onClose={() => handleClose(4)}
+                    onOpen={() => handleOpen(4)}
                     MenuProps={{
                       disableScrollLock: true,
                     }}
@@ -505,6 +548,9 @@ const Filter = ({
                     Bathrooms
                   </Typography>
                   <Select
+                    open={selectStates[5]}
+                    onClose={() => handleClose(5)}
+                    onOpen={() => handleOpen(5)}
                     MenuProps={{
                       disableScrollLock: true,
                     }}
@@ -547,6 +593,9 @@ const Filter = ({
                       Perches
                     </Typography>
                     <Select
+                    open={selectStates[6]}
+                    onClose={() => handleClose(6)}
+                    onOpen={() => handleOpen(6)}
                       MenuProps={{
                         disableScrollLock: true,
                       }}
@@ -590,6 +639,9 @@ const Filter = ({
                       Acres
                     </Typography>
                     <Select
+                    open={selectStates[7]}
+                    onClose={() => handleClose(7)}
+                    onOpen={() => handleOpen(7)}
                       MenuProps={{
                         disableScrollLock: true,
                       }}
