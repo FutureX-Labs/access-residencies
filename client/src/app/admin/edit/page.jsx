@@ -331,7 +331,7 @@ function Edit() {
           <form onSubmit={addAdditionalData}>
             <Grid container gap={3}>
               {/* Property ID */}
-              <Typography
+              {/* <Typography
                 style={{
                   color: "white",
                   fontWeight: 500,
@@ -355,7 +355,7 @@ function Edit() {
                 value={propertyId}
                 onChange={(e) => setPropertyId(propertyId)}
                 fullWidth
-              />
+              /> */}
 
               {/* Title */}
               <Typography

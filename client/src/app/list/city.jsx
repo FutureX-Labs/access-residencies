@@ -12,10 +12,7 @@ export const Cities = [
       { label: "Avissawella", value: "Avissawella" },
       { label: "Battaramulla", value: "Battaramulla" },
       { label: "Boralasgamuwa", value: "Boralasgamuwa" },
-      {
-        label: "Colombo 01 - 15 (Separately)",
-        value: "Colombo 01 - 15 (Separately)",
-      },
+      { label: "Colombo 01-15", value: "Colombo 01-15", },
       { label: "Godagama", value: "Godagama" },
       { label: "Hanwella", value: "Hanwella" },
       { label: "Homagama", value: "Homagama" },
