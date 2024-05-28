@@ -216,7 +216,7 @@ router.put("/edit/:id/additionalData/", AuthM, async (req, res) => {
       city,
     });
 
-    const newLog = new log({ activity: `House For Sale Details Updated : ${propertyId}` });
+    const newLog = new log({ activity: `House For Sale Details Updated : ${result.propertyId}` });
     await newLog.save();
 
     res.status(200).json(result);
