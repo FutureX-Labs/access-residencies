@@ -82,7 +82,7 @@ router.post("/add", AuthM, upload.array("myFiles"), async (req, res) => {
       isVisibale: true,
     });
 
-    
+
     const response = await result.save();
 
     const newLog = new log({ activity: `Added new apartment for sale: ${propertyId}` });
@@ -128,7 +128,7 @@ router.put("/edit/:id/uploadImages/", AuthM, upload.array("image"), async (req, 
   try {
     const imageFiles = req.files;
     const propertyId = req.body.propertyId;
-    
+
     await apartmentForSale.find({ propertyId }).then((details) => {
       cloudinary.api.delete_resources(details[0].images, {
         type: "upload",
@@ -248,15 +248,50 @@ router.delete("/delete/:id", AuthM, (req, res) => {
     });
 });
 
-router.post("/filter", async (req, res) => {
+router.post("/filter/admin", AuthM, async (req, res) => {
   try {
-    const { city, price, size, bedrooms, bathrooms, role } = req.body;
+    const { city, price, size, bedrooms, bathrooms } = req.body;
 
     const filter = {};
 
-    if (role !== "admin") {
-      filter.isVisibale = true;
+    if (price !== NaN && price !== null && price !== "All") {
+      filter.price = { $lte: price };
     }
+
+    if (city !== "" && city !== null && city !== "All") {
+      filter.city = { $regex: new RegExp(city, "i") };
+    }
+
+    if (size !== NaN && size !== null && size !== "All") {
+      filter.size = { $gte: size };
+    }
+
+    if (bedrooms !== NaN && bedrooms !== null && bedrooms !== "All") {
+      filter.bedrooms = { $gte: bedrooms };
+    }
+
+    if (bathrooms !== NaN && bathrooms !== null && bathrooms !== "All") {
+      filter.bathrooms = { $gte: bathrooms };
+    }
+
+    console.log(filter);
+
+    let filtered = await apartmentForSale.find(filter).exec();
+
+    res.status(200).json(filtered);
+  } catch (error) {
+    console.error(error);
+    res.status(400).json(error);
+  }
+});
+
+router.post("/filter", async (req, res) => {
+  try {
+    const { city, price, size, bedrooms, bathrooms } = req.body;
+
+    const filter = {};
+
+    filter.isVisibale = true;
 
     if (price !== NaN && price !== null && price !== "All") {
       filter.price = { $lte: price };
@@ -291,13 +326,11 @@ router.post("/filter", async (req, res) => {
 
 router.post("/filter/main", async (req, res) => {
   try {
-    const { city, price, title, role } = req.body;
+    const { city, price, title } = req.body;
 
     const filter = {};
 
-    if (role !== "admin") {
-      filter.isVisibale = true;
-    }
+    filter.isVisibale = true;
 
     if (price !== NaN && price !== null && price !== "All") {
       filter.price = { $lte: price };

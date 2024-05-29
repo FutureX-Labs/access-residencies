@@ -255,7 +255,7 @@ router.delete("/delete/:id", AuthM, (req, res) => {
     })
     .then((details) => {
       fetchedDetails = details;
-      const newLog = new log({ activity: `House For Sale Deleted : ${propertyId}` });
+      const newLog = new log({ activity: `House For Sale Deleted : ${details.propertyId}` });
       newLog.save();
       return cloudinary.api.delete_resources(
         [details.thumbnailImage, ...details.images],
@@ -279,15 +279,50 @@ router.delete("/delete/:id", AuthM, (req, res) => {
     });
 });
 
-router.post("/filter", async (req, res) => {
+router.post("/filter/admin", AuthM, async (req, res) => {
   try {
-    const { city, price, size, bedrooms, bathrooms, role } = req.body;
+    const { city, price, size, bedrooms, bathrooms } = req.body;
 
     const filter = {};
 
-    if (role !== "admin") {
-      filter.isVisibale = true;
+    if (price !== NaN && price !== null && price !== "All") {
+      filter.price = { $lte: price };
     }
+
+    if (city !== "" && city !== null && city !== "All") {
+      filter.city = { $regex: new RegExp(city, "i") };
+    }
+
+    if (size !== NaN && size !== null && size !== "All") {
+      filter.size = { $gte: size };
+    }
+
+    if (bedrooms !== NaN && bedrooms !== null && bedrooms !== "All") {
+      filter.bedrooms = { $gte: bedrooms };
+    }
+
+    if (bathrooms !== NaN && bathrooms !== null && bathrooms !== "All") {
+      filter.bathrooms = { $gte: bathrooms };
+    }
+
+    console.log(filter);
+
+    let filtered = await houseForSale.find(filter).exec();
+
+    res.status(200).json(filtered);
+  } catch (error) {
+    console.error(error);
+    res.status(400).json(error);
+  }
+});
+
+router.post("/filter", async (req, res) => {
+  try {
+    const { city, price, size, bedrooms, bathrooms } = req.body;
+
+    const filter = {};
+
+    filter.isVisibale = true;
 
     if (price !== NaN && price !== null && price !== "All") {
       filter.price = { $lte: price };
@@ -322,13 +357,11 @@ router.post("/filter", async (req, res) => {
 
 router.post("/filter/main", async (req, res) => {
   try {
-    const { city, price, title, role } = req.body;
+    const { city, price, title } = req.body;
 
     const filter = {};
 
-    if (role !== "admin") {
-      filter.isVisibale = true;
-    }
+    filter.isVisibale = true;
 
     if (price !== NaN && price !== null && price !== "All") {
       filter.price = { $lte: price };

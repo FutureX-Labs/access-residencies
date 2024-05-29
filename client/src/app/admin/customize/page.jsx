@@ -39,7 +39,6 @@ const DemoPaper = styled(Paper)(({ theme }) => ({
 const bannerURL = `${BASE_URL}/api/customize/banners/add`;
 const featureURL = `${BASE_URL}/api/customize/features/`;
 const propertyIdUrl = `${BASE_URL}/api/customize/propertyid/add`;
-const propertyIdFind = `${BASE_URL}/api/properties/find`;
 
 function Customize() {
   const [bannerImages, setBannerImages] = useState(null);
@@ -246,29 +245,18 @@ function Customize() {
 
   const handleAddPropertyId = async () => {
     try {
-      console.log(propertyId);
-  
-      const response = await axios.post(
-        propertyIdFind,
-        // Send data in the request body
-        { propertyIds: [propertyId] },
-        // Set content type header to JSON
-        { headers: { 'Content-Type': 'application/json' } }
-      );
-  
-      // Check if the response status is OK (200) and at least one inner array contains data
-      if (
-        response.status === 200 &&
-        response.data &&
-        response.data.data &&
-        response.data.data.some((innerArray) => innerArray.length > 0)
-      ) {
-        // Check if the propertyId is not already included in allPropertyId
+
+      const response = await axiosInstance.post(`${BASE_URL}/api/customize/propertyid/check`, { propertyId: propertyId }, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.status === 200 && response.data.available) {
         if (!allPropertyId.includes(propertyId)) {
           setAllPropertyId((prevPropertyIds) => [...prevPropertyIds, propertyId]);
           setPropertyId("");
         } else {
-          // Display error message if propertyId is already included
           Swal.fire({
             title: "Property Id Already Exists",
             icon: "error",
@@ -276,7 +264,6 @@ function Customize() {
           });
         }
       } else {
-        // Handle the case where no inner array contains data
         Swal.fire({
           title: "Invalid Property Id",
           icon: "error",
@@ -292,7 +279,7 @@ function Customize() {
       });
     }
   };
-  
+
 
   return (
     <Box className="customize">
@@ -544,7 +531,6 @@ function Customize() {
                       borderRadius: "5px",
                     }}
                     onClick={handleAddPropertyId}
-                    //
                   >
                     Add Property Ids
                   </Button>

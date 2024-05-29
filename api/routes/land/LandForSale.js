@@ -248,15 +248,11 @@ router.delete("/delete/:id", AuthM, (req, res) => {
     });
 });
 
-router.post("/filter", async (req, res) => {
+router.post("/filter/admin", AuthM, async (req, res) => {
   try {
-    const { city, price, perches, acres, role } = req.body;
+    const { city, price, perches, acres } = req.body;
 
     const filter = {};
-
-    if (role !== "admin") {
-      filter.isVisibale = true;
-    }
 
     if (price !== NaN && price !== null && price !== "All") {
       filter.price = { $lte: price };
@@ -304,15 +300,69 @@ router.post("/filter", async (req, res) => {
     res.status(400).json(error);
   }
 });
-router.post("/filter/main", async (req, res) => {
+
+router.post("/filter", async (req, res) => {
   try {
-    const { city, price, title, role } = req.body;
+    const { city, price, perches, acres } = req.body;
 
     const filter = {};
 
-    if (role !== "admin") {
-      filter.isVisibale = true;
+    filter.isVisibale = true;
+
+    if (price !== NaN && price !== null && price !== "All") {
+      filter.price = { $lte: price };
     }
+
+    if (city !== "" && city !== null && city !== "All") {
+      filter.city = { $regex: new RegExp(city, "i") };
+    }
+
+    const aggregationPipeline = [
+      {
+        $match: filter,
+      },
+      {
+        $set: {
+          totalPerchesAndAcres: {
+            $sum: [
+              "$landExtent.perches",
+              {
+                $multiply: ["$landExtent.acres", 160],
+              },
+            ],
+          },
+        },
+      },
+      {
+        $match: {
+          $expr: {
+            $gte: [
+              "$totalPerchesAndAcres",
+              { $sum: [perches || 0, (acres || 0) * 160] },
+            ],
+          },
+        },
+      },
+    ];
+
+    // console.log("Aggregation Pipeline:", JSON.stringify(aggregationPipeline, null, 2));
+
+    let filtered = await landForSale.aggregate(aggregationPipeline).exec();
+
+    res.status(200).json(filtered);
+  } catch (error) {
+    console.error(error);
+    res.status(400).json(error);
+  }
+});
+
+router.post("/filter/main", async (req, res) => {
+  try {
+    const { city, price, title } = req.body;
+
+    const filter = {};
+
+    filter.isVisibale = true;
 
     // Filtering by price if provided
     if (price !== NaN && price !== null && price !== "All") {

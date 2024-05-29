@@ -40,7 +40,7 @@ function View() {
   const [collectionData, setCollectionData] = useState([]);
   const [property, setProperty] = useState(null);
   const [propertyType, setPropertyType] = useState(null);
-  const [showHidden, setShowHidden] = useState(false);
+  const [showHidden, setShowHidden] = useState(true);
   const router = useRouter();
   const { user } = useContext(AuthContext);
 
