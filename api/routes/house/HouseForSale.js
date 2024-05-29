@@ -255,7 +255,7 @@ router.delete("/delete/:id", AuthM, (req, res) => {
     })
     .then((details) => {
       fetchedDetails = details;
-      const newLog = new log({ activity: `House For Sale Deleted : ${propertyId}` });
+      const newLog = new log({ activity: `House For Sale Deleted : ${details.propertyId}` });
       newLog.save();
       return cloudinary.api.delete_resources(
         [details.thumbnailImage, ...details.images],

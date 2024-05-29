@@ -224,7 +224,7 @@ function Home() {
       const propertyIds = propertyIDResponse.data[0].propertyId;
 
       const response = await axios.post(
-        `${BASE_URL}/api/properties`,
+        `${BASE_URL}/api/customize/propertyid/getDetails`,
         {
           propertyIds: propertyIds,
         },

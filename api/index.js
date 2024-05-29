@@ -16,15 +16,6 @@ cloudinary.config({
   api_secret: "uymmOwa5HdAIGGDw_nmzbKct9us",
 });
 
-const apartmentForRent = require("./schema/ApartmentForRent");
-const apartmentForSale = require("./schema/ApartmentForSale");
-const commercialForRent = require("./schema/CommercialForRent");
-const commercialForSale = require("./schema/CommercialForSale");
-const houseForRent = require("./schema/HouseForRent");
-const houseForSale = require("./schema/HouseForSale");
-const landForRent = require("./schema/LandForRent");
-const landForSale = require("./schema/LandForSale");
-
 const HouseForSale = require("./routes/house/HouseForSale");
 const HouseForRent = require("./routes/house/HouseForRent");
 const LandForSale = require("./routes/land/LandForSale");
@@ -40,6 +31,7 @@ const auth = require("./routes/auth/Auth");
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
+
 app.use("/api/auth", upload.none(), auth);
 
 app.use("/api/houseforsale", HouseForSale);
@@ -53,93 +45,6 @@ app.use("/api/commercialforrent", CommercialForRent);
 app.use("/api/customize/banners", Banners);
 app.use("/api/customize/features", Features);
 app.use("/api/customize/propertyid", PropertyId);
-
-app.post("/api/properties", async (req, res) => {
-  const { propertyIds } = req.body;
-  console.log("Received propertyIds:", propertyIds);
-
-  if (!propertyIds || !Array.isArray(propertyIds) || propertyIds.length === 0) {
-    return res
-      .status(400)
-      .json({ message: "Invalid input: propertyIds array required." });
-  }
-
-  try {
-    const models = [
-      houseForSale,
-      houseForRent,
-      landForSale,
-      landForRent,
-      commercialForSale,
-      commercialForRent,
-      apartmentForSale,
-      apartmentForRent,
-    ];
-
-    const promises = models.map((model) =>
-      model.find({ propertyId: { $in: propertyIds }, isVisibale: true })
-    );
-
-    const results = await Promise.all(promises);
-
-    const mergedResults = results.flat();
-
-    if (mergedResults.length === 0) {
-      res
-        .status(404)
-        .json({ message: "No data found for the given property IDs" });
-    } else {
-      res.json({ data: mergedResults });
-    }
-  } catch (error) {
-    console.error("Failed to fetch data:", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-});
-
-app.post("/api/properties/find", async (req, res) => {
-  const { propertyIds } = req.body;
-  console.log("Received propertyIds:", propertyIds);
-
-  if (!propertyIds || !Array.isArray(propertyIds) || propertyIds.length === 0) {
-    return res
-      .status(400)
-      .json({ message: "Invalid input: propertyIds array required." });
-  }
-
-  
-  try {
-    const models = [
-      houseForSale,
-      houseForRent,
-      landForSale,
-      landForRent,
-      commercialForSale,
-      commercialForRent,
-      apartmentForSale,
-      apartmentForRent,
-    ];
-
-    const promises = models.map((model) =>
-      model.find({ propertyId: { $in: propertyIds }, isVisibale: true })
-    );
-
-    const results = await Promise.all(promises);
-
-
-    if (results.length === 0) {
-      res
-        .status(404)
-        .json({ message: "No data found for the given property IDs" });
-    } else {
-      res.json({ data: results });
-    }
-  } catch (error) {
-    console.error("Failed to fetch data:", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-});
-
 
 
 mongoose

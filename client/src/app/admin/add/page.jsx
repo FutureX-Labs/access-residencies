@@ -33,6 +33,7 @@ import { useRouter } from "next/navigation";
 import axiosInstance from "@/app/utility/axiosInstance";
 import Autocomplete from "@mui/material/Autocomplete";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import BASE_URL from "../../config";
 
 const theme = createTheme({
   components: {
@@ -92,75 +93,92 @@ function Add() {
     if (!isUserLoggedIn) router.push("/");
   }, []);
 
-  // useEffect(() => {
-  //   if (!user) router.push("/");
-  // }, [user]);
-
   const createPost = async () => {
     try {
-      let additionalData = {
-        propertyId: propertyId,
-        title: title,
-        description: description,
-        city: city.title,
-      };
 
-      if (propertyType === "ForSale") {
-        additionalData.price = parseInt(price);
-      } else if (propertyType === "ForRent") {
-        additionalData.rent = parseInt(rent);
-      }
-
-      if (property === "House" || property === "Apartment") {
-        additionalData = {
-          ...additionalData,
-          size: size,
-          bedrooms: bedrooms,
-          bathrooms: bathrooms,
-        };
-      } else if (property === "Commercial") {
-        additionalData = {
-          ...additionalData,
-          size: parseInt(size),
-          propertyTypes: propertyTypes,
-        };
-      } else if (property === "Land") {
-        additionalData = {
-          ...additionalData,
-          perches: parseInt(perches),
-          acres: parseInt(acres),
-        };
-      }
-
-      console.log("additionalData", additionalData);
-      formData.append("additionalData", JSON.stringify(additionalData));
-      const response = await axiosInstance.post(
-        AddUrl(propertyType, property),
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+      const response = await axiosInstance.post(`${BASE_URL}/api/customize/propertyid/check`, { propertyId: propertyId }, {
+        headers: {
+          'Content-Type': 'application/json'
         }
-      );
-      Swal.fire({
-        title: "Data Added Successfully",
-        icon: "success",
-        timer: 1500,
       });
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
-      console.log(response);
+
+      if (response.status === 200 && response.data.available) {
+        Swal.fire({
+          title: "Property Id Already Exists",
+          icon: "error",
+          timer: 1500,
+        });
+      } else {
+
+        let additionalData = {
+          propertyId: propertyId,
+          title: title,
+          description: description,
+          city: city.title,
+        };
+
+        if (propertyType === "ForSale") {
+          additionalData.price = parseInt(price);
+        } else if (propertyType === "ForRent") {
+          additionalData.rent = parseInt(rent);
+        }
+
+        if (property === "House" || property === "Apartment") {
+          additionalData = {
+            ...additionalData,
+            size: size,
+            bedrooms: bedrooms,
+            bathrooms: bathrooms,
+          };
+        } else if (property === "Commercial") {
+          additionalData = {
+            ...additionalData,
+            size: parseInt(size),
+            propertyTypes: propertyTypes,
+          };
+        } else if (property === "Land") {
+          additionalData = {
+            ...additionalData,
+            perches: parseInt(perches),
+            acres: parseInt(acres),
+          };
+        }
+
+        console.log("additionalData", additionalData);
+        formData.append("additionalData", JSON.stringify(additionalData));
+        const response = await axiosInstance.post(
+          AddUrl(propertyType, property),
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        Swal.fire({
+          title: "Data Added Successfully",
+          icon: "success",
+          timer: 1500,
+        });
+
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      }
+
     } catch (error) {
+
       Swal.fire({
         title: "Unable to data",
         icon: "error",
         timer: 1500,
       });
+
       setTimeout(() => {
         window.location.reload();
       }, 1000);
+
       console.log(error);
     }
   };
@@ -170,7 +188,6 @@ function Add() {
     if (thumbnail && images) {
       createPost();
     } else {
-      console.log("No image selected");
       Swal.fire({
         title: "Images not selected",
         icon: "error",
@@ -212,9 +229,9 @@ function Add() {
   const transformedCities = Cities.flatMap((city) =>
     city.subheadings
       ? city.subheadings.map((subheading) => ({
-          title: subheading.label,
-          group: city.label,
-        }))
+        title: subheading.label,
+        group: city.label,
+      }))
       : []
   );
 
@@ -599,19 +616,19 @@ function Add() {
               {(property === "House" ||
                 property === "Commercial" ||
                 property === "Apartment") && (
-                <>
-                  <Typography
-                    variant="h6"
-                    style={{
-                      color: "white",
-                      fontWeight: 500,
-                      fontSize: "22px",
-                      marginLeft: "10px",
-                    }}
-                  >
-                    Size
-                  </Typography>
-                  {/* <TextField
+                  <>
+                    <Typography
+                      variant="h6"
+                      style={{
+                        color: "white",
+                        fontWeight: 500,
+                        fontSize: "22px",
+                        marginLeft: "10px",
+                      }}
+                    >
+                      Size
+                    </Typography>
+                    {/* <TextField
                     required
                     value={size}
                     InputProps={{ style: { color: "white" } }}
@@ -627,30 +644,30 @@ function Add() {
                     fullWidth
                   /> */}
 
-                  <Select
-                    required
-                    value={size || ""}
-                    onChange={(e) => setSize(e.target.value)}
-                    inputProps={{ style: { color: "white" } }}
-                    size="small"
-                    sx={{
-                      border: "1px solid grey",
-                      color: "white",
-                      marginLeft: "20px",
-                      borderRadius: "5px",
-                    }}
-                    fullWidth
-                  >
-                    {Sizes.map((sizeOption, index) =>
-                      sizeOption.value === "All" ? null : (
-                        <MenuItem key={index} value={sizeOption.value}>
-                          {sizeOption.label}
-                        </MenuItem>
-                      )
-                    )}
-                  </Select>
-                </>
-              )}
+                    <Select
+                      required
+                      value={size || ""}
+                      onChange={(e) => setSize(e.target.value)}
+                      inputProps={{ style: { color: "white" } }}
+                      size="small"
+                      sx={{
+                        border: "1px solid grey",
+                        color: "white",
+                        marginLeft: "20px",
+                        borderRadius: "5px",
+                      }}
+                      fullWidth
+                    >
+                      {Sizes.map((sizeOption, index) =>
+                        sizeOption.value === "All" ? null : (
+                          <MenuItem key={index} value={sizeOption.value}>
+                            {sizeOption.label}
+                          </MenuItem>
+                        )
+                      )}
+                    </Select>
+                  </>
+                )}
 
               {(property === "House" || property === "Apartment") && (
                 <>
