@@ -125,7 +125,7 @@ router.put("/edit/:id/uploadImages/", AuthM, upload.array("image"), async (req, 
   try {
     const imageFiles = req.files;
     const propertyId = req.body.propertyId;
-    
+
     await landForRent.find({ propertyId }).then((details) => {
       cloudinary.api.delete_resources(details[0].images, {
         type: "upload",
@@ -246,15 +246,66 @@ router.delete("/delete/:id", AuthM, (req, res) => {
     });
 });
 
-router.post("/filter", async (req, res) => {
+router.post("/filter/admin", AuthM, async (req, res) => {
   try {
-    const { city, rent, perches, acres, role } = req.body;
+    const { city, rent, perches, acres } = req.body;
 
     const filter = {};
 
-    if (role !== "admin") {
-      filter.isVisibale = true;
+    if (rent !== NaN && rent !== null && rent !== "All") {
+      filter.rent = { $lte: rent };
     }
+
+    if (city !== "" && city !== null && city !== "All") {
+      filter.city = { $regex: new RegExp(city, "i") };
+    }
+
+    const aggregationPipeline = [
+      {
+        $match: filter,
+      },
+      {
+        $set: {
+          totalPerchesAndAcres: {
+            $sum: [
+              "$landExtent.perches",
+              {
+                $multiply: ["$landExtent.acres", 160],
+              },
+            ],
+          },
+        },
+      },
+      {
+        $match: {
+          $expr: {
+            $gte: [
+              "$totalPerchesAndAcres",
+              { $sum: [perches || 0, (acres || 0) * 160] },
+            ],
+          },
+        },
+      },
+    ];
+
+    // console.log("Aggregation Pipeline:", JSON.stringify(aggregationPipeline, null, 2));
+
+    let filtered = await landForRent.aggregate(aggregationPipeline).exec();
+
+    res.status(200).json(filtered);
+  } catch (error) {
+    console.error(error);
+    res.status(400).json(error);
+  }
+});
+
+router.post("/filter", async (req, res) => {
+  try {
+    const { city, rent, perches, acres } = req.body;
+
+    const filter = {};
+
+    filter.isVisibale = true;
 
     if (rent !== NaN && rent !== null && rent !== "All") {
       filter.rent = { $lte: rent };
@@ -305,13 +356,11 @@ router.post("/filter", async (req, res) => {
 
 router.post("/filter/main", async (req, res) => {
   try {
-    const { city, rent, title, role } = req.body;
+    const { city, rent, title } = req.body;
 
     const filter = {};
 
-    if (role !== "admin") {
-      filter.isVisibale = true;
-    }
+    filter.isVisibale = true;
 
     if (rent !== NaN && rent !== null && rent !== "All") {
       filter.rent = { $lte: rent };

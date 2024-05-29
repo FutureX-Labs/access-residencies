@@ -45,13 +45,8 @@ const Filter = ({
   showHidden,
   hideProperties,
 }) => {
-  const [thumbnail, setThumbnail] = useState(null);
-  const [images, setImages] = useState(null);
-  const [formData, setFormData] = useState(new FormData());
 
   const [propertyId, setPropertyId] = useState(null);
-  const [title, setTitle] = useState(null);
-  const [description, setDescription] = useState(null);
   const [price, setPrice] = useState("All");
   const [rent, setRent] = useState("All");
   const [size, setSize] = useState("All");
@@ -62,9 +57,9 @@ const Filter = ({
   const [acres, setAcres] = useState("All");
   const [comPropertyS, setComPropertyS] = useState("All");
   const [filteredBy, setFilteredBy] = useState([]);
-  const [topCities, setTopCities] = useState([]);
+  const [tempCollectionData, setTempCollectionData] = useState([]);
 
-  const [selectStates, setSelectStates] = useState([false, false, false, false, false, false, false, false]);
+  const [selectStates, setSelectStates] = useState(Array(8).fill(false));
 
   const handleOpen = (index) => {
     setSelectStates(prevSelectStates => {
@@ -83,7 +78,7 @@ const Filter = ({
   };
 
   const handleWindowScroll = () => {
-    setSelectStates([false, false, false, false, false, false, false, false]);
+    setSelectStates(Array(8).fill(false));
   };
 
   useEffect(() => {
@@ -111,9 +106,6 @@ const Filter = ({
     handleSubmit();
   }, []);
 
-  const role = UseSessionStorage("contact_user") ? "admin" : "user";
-  console.log("role", role);
-
   const handleSubmit = async (e) => {
     if (e) {
       e.preventDefault();
@@ -127,9 +119,7 @@ const Filter = ({
     try {
       let additionalData = {
         city: city.title,
-        role: role,
       };
-      console.log("additionalData", additionalData);
 
       if (propertyType === "ForSale") {
         additionalData.price = parseInt(price);
@@ -158,29 +148,39 @@ const Filter = ({
         };
       }
 
-      console.log("additionalData", additionalData);
-      console.log("propertyType", propertyType);
-      console.log("property", property);
+      let response = null;
 
-      const response = await axios.post(
-        FilterUrl(propertyType, property),
-        additionalData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      if (sessionStorage.getItem("contact_user")) {
+        response = await axiosInstance.post(
+          `${FilterUrl(propertyType, property)}/admin`,
+          additionalData,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+      } else {
+        response = await axios.post(
+          FilterUrl(propertyType, property),
+          additionalData,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+      }
+
       setCollectionData(response.data);
+      setTempCollectionData(response.data);
 
       if (response.data && additionalData) {
         const filteredBy = Object.entries(additionalData).map(
           ([key, value]) => {
             if (!value || value === "All") return null;
-            console.log("filterd by values", key, ":", value);
 
             if (typeof value === "object") {
-              console.log("Object found:", key, value);
               return `${key}: ${JSON.stringify(value)}`;
             }
 
@@ -215,38 +215,25 @@ const Filter = ({
         );
         const filteredArray = filteredWithoutAll.filter(Boolean);
 
-        console.log("filteredByCleaned", filteredArray);
-
         setFilteredBy(filteredArray);
 
-        // const transformedCities = Cities.map((city) => ({
-        //   label: city.label,
-        //   subheadings: city.subheadings.map((subheading) => subheading.value),
-        // }));
-
-        // console.log("transformedCities", transformedCities);
-        // let topCities = [];
-
-        // transformedCities?.forEach((transformedCity) => {
-
-        //   if (additionalData?.city == transformedCity.label) {
-        //     topCities = transformedCity.subheadings;
-        //     // No need to break out of the loop here since we want to check all items
-        //   }
-        // });
-
-        // // After the loop, check if topCities is still an empty array
-        // if (topCities.length === 0) {
-        //   // If no match was found, assign [city] to topCities
-        //   topCities = [city];
-        // }
-
-        // setTopCities(topCities);
       }
     } catch (error) {
       console.debug(error);
     }
   };
+
+  const toggleHideProperties = (e) => {
+    e.preventDefault();
+    if (showHidden) {
+      const hiddenProperties = tempCollectionData.filter((data) => data.isVisibale === false);
+      setCollectionData(hiddenProperties);
+      setShowHidden(false);
+    } else {
+      setCollectionData(tempCollectionData);
+      setShowHidden(true);
+    }
+  }
 
   const handleSubmitByID = async (e) => {
     e.preventDefault();
@@ -254,8 +241,6 @@ const Filter = ({
       let additionalData = {
         propertyId,
       };
-
-      console.log("additionalData peroperty id ", additionalData);
 
       if (additionalData) {
         let url = FilterUrl(propertyType, property);
@@ -265,7 +250,6 @@ const Filter = ({
             "Content-Type": "application/json",
           },
         });
-        console.log("filter response", response);
         setCollectionData(response.data);
       }
     } catch (error) {
@@ -357,9 +341,9 @@ const Filter = ({
                   {propertyType === "ForSale" ? "Max Price" : "Max Rent"}
                 </Typography>
                 <Select
-                    open={selectStates[1]}
-                    onClose={() => handleClose(1)}
-                    onOpen={() => handleOpen(1)}
+                  open={selectStates[1]}
+                  onClose={() => handleClose(1)}
+                  onOpen={() => handleOpen(1)}
                   MenuProps={{
                     disableScrollLock: true,
                   }}
@@ -460,9 +444,9 @@ const Filter = ({
                       Size
                     </Typography>
                     <Select
-                    open={selectStates[3]}
-                    onClose={() => handleClose(3)}
-                    onOpen={() => handleOpen(3)}
+                      open={selectStates[3]}
+                      onClose={() => handleClose(3)}
+                      onOpen={() => handleOpen(3)}
                       MenuProps={{
                         disableScrollLock: true,
                       }}
@@ -593,9 +577,9 @@ const Filter = ({
                       Perches
                     </Typography>
                     <Select
-                    open={selectStates[6]}
-                    onClose={() => handleClose(6)}
-                    onOpen={() => handleOpen(6)}
+                      open={selectStates[6]}
+                      onClose={() => handleClose(6)}
+                      onOpen={() => handleOpen(6)}
                       MenuProps={{
                         disableScrollLock: true,
                       }}
@@ -639,9 +623,9 @@ const Filter = ({
                       Acres
                     </Typography>
                     <Select
-                    open={selectStates[7]}
-                    onClose={() => handleClose(7)}
-                    onOpen={() => handleOpen(7)}
+                      open={selectStates[7]}
+                      onClose={() => handleClose(7)}
+                      onOpen={() => handleOpen(7)}
                       MenuProps={{
                         disableScrollLock: true,
                       }}
@@ -700,23 +684,14 @@ const Filter = ({
               sx={{
                 borderRadius: "10px",
                 border: "1px solid grey",
-                backgroundColor: "#8C1C40",
+                backgroundColor: (showHidden ? 'transparent' : '#8C1C40'),
                 color: "white",
                 height: "42px",
                 width: "40%",
               }}
-              onClick={(e) => {
-                e.preventDefault();
-                const hiddenProperties = collectionData.filter(
-                  (data) => data.isVisibale === false
-                );
-
-                console.log("hiddenProperties", hiddenProperties);
-                setCollectionData(hiddenProperties);
-                setShowHidden(true);
-              }}
+              onClick={(e) => { toggleHideProperties(e); }}
             >
-              Show all Hidden Properties
+              Show Only Hidden Properties
             </Button>
             <Box
               sx={{
@@ -798,20 +773,6 @@ const Filter = ({
                   </Box>
                 </Box>
               )}
-              {/* {topCities.length > 0 && (
-                <Box sx={{ display: "flex", gap: "17px" }}>
-                  <Typography
-                    sx={{ color: "white", fontSize: "20px", marginTop: "2px" }}
-                  >
-                    Top Cities:
-                  </Typography>
-                  <Box>
-                    {" "}
-                    <Items data={topCities} disableDelete={true} />{" "}
-                  </Box>
-                </Box>
-              )} */}
-              {/* <Items data={city}  /> */}
             </Box>
           </Box>
         </Box>
