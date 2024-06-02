@@ -74,8 +74,8 @@ function Navbar(props) {
               component="div"
               src="/logo.png"
               alt="logo"
-              width={147}
-              height={70}
+              width={130}
+              height={65}
               sx={{ flexGrow: 1 }}
               variant="h6"
             />
@@ -157,7 +157,7 @@ function Navbar(props) {
               <Image
                 src="/logo.png"
                 alt="logo"
-                width={132}
+                width={130}
                 height={65}
                 sx={{ flexGrow: 1 }}
                 variant="h6"

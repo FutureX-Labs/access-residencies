@@ -268,6 +268,8 @@ const Filter = ({
   const allOption = { title: "All", group: "All" };
   const transformedCitiesWithAll = [allOption, ...transformedCities];
 
+  const comAllComProperties = [{ value: "All", label: "All" }, ...comProperty];
+
   return (
     <>
       <Container>
@@ -420,7 +422,7 @@ const Filter = ({
                       }
                     }}
                   >
-                    {comProperty.map((type, index) => (
+                    {comAllComProperties.map((type, index) => (
                       <MenuItem key={index} value={type.value}>
                         {type.label}
                       </MenuItem>
@@ -741,7 +743,7 @@ const Filter = ({
               <Box sx={{ display: "flex", alignItems: "center", gap: "10px" }}>
                 <Typography color={"#8C1C40"}>{property}</Typography>
                 <IoIosArrowForward color={"#8C1C40"} sx={{ padding: "0px" }} />
-                <Typography color={"#8C1C40"}>{propertyType}</Typography>
+                <Typography color={"#8C1C40"}>{propertyType === "ForSale" ? "For Sale": "For Rent"}</Typography>
               </Box>
             )}
           </Breadcrumbs>
@@ -754,7 +756,7 @@ const Filter = ({
                 color: "white",
               }}
             >
-              {property} {propertyType} in Sri Lanka ({collectionData?.length}{" "}
+              {property} {propertyType === "ForSale" ? "For Sale": "For Rent"} in Sri Lanka ({collectionData?.length}{" "}
               properties)
             </Typography>
           )}

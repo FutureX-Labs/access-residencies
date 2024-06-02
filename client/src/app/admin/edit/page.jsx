@@ -28,7 +28,7 @@ import { Bedrooms } from "@/app/list/bedrooms";
 import { Perches } from "@/app/list/perches";
 import { Acres } from "@/app/list/acres";
 import { Cities } from "@/app/list/city";
-import { PropertyTypes } from "@/app/list/propertyTypes";
+import { comProperty } from "@/app/list/comProperty";
 import EditImage from "../../../../public/images/edit.png";
 import AuthContext from "@/app/context/AuthContext";
 import UseSessionStorage from "@/app/UseSessionStorage";
@@ -86,7 +86,7 @@ function Edit() {
   const [bathrooms, setBathrooms] = useState(null);
   const [perches, setPerches] = useState(null);
   const [acres, setAcres] = useState(null);
-  const [propertyTypes, setPropertyTypes] = useState(null);
+  const [comPropertyType, setComPropertyType] = useState(null);
   const [editFormData, setEditFormData] = useState(null);
   const router = useRouter();
   const { user } = useContext(AuthContext);
@@ -154,7 +154,7 @@ function Edit() {
       setBathrooms(editFormData?.bathrooms);
       setPerches(editFormData?.landExtent?.perches);
       setAcres(editFormData?.landExtent?.acres);
-      setPropertyTypes(editFormData?.propertyTypes);
+      setComPropertyType(editFormData?.propertyTypes);
       setThumbnail(editFormData?.thumbnailImage);
       setImages(editFormData?.images);
 
@@ -190,7 +190,7 @@ function Edit() {
         additionalData = {
           ...additionalData,
           size: parseInt(size),
-          propertyTypes: propertyTypes,
+          propertyTypes: comPropertyType,
         };
       } else if (property === "Land") {
         additionalData = {
@@ -629,12 +629,12 @@ function Edit() {
                       marginLeft: "10px",
                     }}
                   >
-                    Property Types
+                    Property Type
                   </Typography>
                   <Select
                     required
-                    value={propertyTypes || "All"}
-                    onChange={(e) => setPropertyTypes(e.target.value)}
+                    value={comPropertyType || ""}
+                    onChange={(e) => setComPropertyType(e.target.value)}
                     inputProps={{ style: { color: "white" } }}
                     size="small"
                     sx={{
@@ -645,7 +645,7 @@ function Edit() {
                     }}
                     fullWidth
                   >
-                    {PropertyTypes.map((type, index) => (
+                    {comProperty.map((type, index) => (
                       <MenuItem key={index} value={type.value}>
                         {type.label}
                       </MenuItem>
