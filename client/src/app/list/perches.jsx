@@ -1,5 +1,6 @@
 export const Perches = [
   { label: "All", value: "All" },
+  { label: "0 perch", value: 0 },
   { label: "1 perch", value: 1 },
   { label: "2 perches", value: 2 },
   { label: "3 perches", value: 3 },

@@ -25,7 +25,6 @@ import { Bedrooms } from "@/app/list/bedrooms";
 import { Perches } from "@/app/list/perches";
 import { Acres } from "@/app/list/acres";
 import { Cities } from "@/app/list/city";
-import { PropertyTypes } from "@/app/list/propertyTypes";
 import { comProperty } from "@/app/list/comProperty";
 import AddImage from "../../../../public/images/add.png";
 import AuthContext from "@/app/context/AuthContext";
@@ -77,16 +76,44 @@ function Add() {
   const [price, setPrice] = useState(null);
   const [rent, setRent] = useState(null);
   const [size, setSize] = useState(null);
-  const [city, setCity] = useState(null);
+  const [city, setCity] = useState({ title: "Maharagama", group: "Colombo" });
   const [bedrooms, setBedrooms] = useState(null);
   const [bathrooms, setBathrooms] = useState(null);
   const [perches, setPerches] = useState(null);
   const [acres, setAcres] = useState(null);
-  const [propertyTypes, setPropertyTypes] = useState(null);
+  const [comPropertyType, setComPropertyType] = useState(null);
   const [openCityDropDown, setOpenCityDropDown] = useState(false);
   const submitThumbnailRef = useRef(null);
   const submitMulImageRef = useRef(null);
   const router = useRouter();
+  const [selectStates, setSelectStates] = useState(Array(2).fill(false));
+
+  const handleOpen = (index) => {
+    setSelectStates(prevSelectStates => {
+      const newArray = [...prevSelectStates];
+      newArray[index] = true;
+      return newArray;
+    });
+  };
+
+  const handleClose = (index) => {
+    setSelectStates(prevSelectStates => {
+      const newArray = [...prevSelectStates];
+      newArray[index] = false;
+      return newArray;
+    });
+  };
+
+  const handleWindowScroll = () => {
+    setSelectStates(Array(2).fill(false));
+  };
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleWindowScroll);
+
+    return () => window.removeEventListener('scroll', handleWindowScroll);
+  }, []);
+
 
   useEffect(() => {
     const isUserLoggedIn = sessionStorage.getItem("contact_user");
@@ -134,7 +161,7 @@ function Add() {
           additionalData = {
             ...additionalData,
             size: parseInt(size),
-            propertyTypes: propertyTypes,
+            propertyTypes: comPropertyType,
           };
         } else if (property === "Land") {
           additionalData = {
@@ -282,6 +309,9 @@ function Add() {
             }}
           >
             <Select
+              open={selectStates[0]}
+              onClose={() => handleClose(0)}
+              onOpen={() => handleOpen(0)}
               value={property}
               onChange={(e) => setProperty(e.target.value)}
               sx={{
@@ -301,6 +331,9 @@ function Add() {
             </Select>
 
             <Select
+              open={selectStates[1]}
+              onClose={() => handleClose(1)}
+              onOpen={() => handleOpen(1)}
               value={propertyType}
               onChange={(e) => setPropertyType(e.target.value)}
               sx={{
@@ -592,8 +625,8 @@ function Add() {
                   </Typography>
                   <Select
                     required
-                    value={propertyTypes || ""}
-                    onChange={(e) => setPropertyTypes(e.target.value)}
+                    value={comPropertyType || ""}
+                    onChange={(e) => setComPropertyType(e.target.value)}
                     inputProps={{ style: { color: "white" } }}
                     size="small"
                     sx={{

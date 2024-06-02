@@ -127,7 +127,7 @@ function View() {
               <Box component="a" sx={{ display: "flex", alignItems: "center", gap: "10px" }}>
                 <Typography color={"#8C1C40"}>{property}</Typography>
                 <IoIosArrowForward color={"#8C1C40"} />
-                <Typography color={"#8C1C40"}>{propertyType}</Typography>
+                <Typography color={"#8C1C40"}>{propertyType === "ForSale" ? "For Sale": "For Rent"}</Typography>
               </Box>
             </Link>
           )}
