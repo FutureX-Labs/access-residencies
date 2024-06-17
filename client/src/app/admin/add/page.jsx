@@ -33,6 +33,7 @@ import axiosInstance from "@/app/utility/axiosInstance";
 import Autocomplete from "@mui/material/Autocomplete";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import BASE_URL from "../../config";
+import { CitySelectionDialog } from "@/app/components/citySelectionDialog/CitySelectionDialog";
 
 const theme = createTheme({
   components: {
@@ -87,9 +88,10 @@ function Add() {
   const submitMulImageRef = useRef(null);
   const router = useRouter();
   const [selectStates, setSelectStates] = useState(Array(2).fill(false));
+  const [showCitiesDialog, setShowCitiesDialog] = useState(false);
 
   const handleOpen = (index) => {
-    setSelectStates(prevSelectStates => {
+    setSelectStates((prevSelectStates) => {
       const newArray = [...prevSelectStates];
       newArray[index] = true;
       return newArray;
@@ -97,7 +99,7 @@ function Add() {
   };
 
   const handleClose = (index) => {
-    setSelectStates(prevSelectStates => {
+    setSelectStates((prevSelectStates) => {
       const newArray = [...prevSelectStates];
       newArray[index] = false;
       return newArray;
@@ -109,25 +111,26 @@ function Add() {
   };
 
   useEffect(() => {
-    window.addEventListener('scroll', handleWindowScroll);
+    window.addEventListener("scroll", handleWindowScroll);
 
-    return () => window.removeEventListener('scroll', handleWindowScroll);
+    return () => window.removeEventListener("scroll", handleWindowScroll);
   }, []);
-
 
   useEffect(() => {
     const isUserLoggedIn = sessionStorage.getItem("contact_user");
     if (!isUserLoggedIn) router.push("/");
   }, []);
-
   const createPost = async () => {
     try {
-
-      const response = await axiosInstance.post(`${BASE_URL}/api/customize/propertyid/check`, { propertyId: propertyId }, {
-        headers: {
-          'Content-Type': 'application/json'
+      const response = await axiosInstance.post(
+        `${BASE_URL}/api/customize/propertyid/check`,
+        { propertyId: propertyId },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
-      });
+      );
 
       if (response.status === 200 && response.data.available) {
         Swal.fire({
@@ -136,7 +139,6 @@ function Add() {
           timer: 1500,
         });
       } else {
-
         let additionalData = {
           propertyId: propertyId,
           title: title,
@@ -193,9 +195,7 @@ function Add() {
           window.location.reload();
         }, 1000);
       }
-
     } catch (error) {
-
       Swal.fire({
         title: "Unable to data",
         icon: "error",
@@ -253,14 +253,16 @@ function Add() {
     console.log("files", allFiles);
   };
 
-  const transformedCities = Cities.flatMap((city) =>
-    city.subheadings
-      ? city.subheadings.map((subheading) => ({
-        title: subheading.label,
-        group: city.label,
-      }))
-      : []
-  );
+  const handleCitySelect = (value) => {
+    setCity(value);
+  };
+  const handleCityDialogOpen = () => {
+    setShowCitiesDialog(true);
+  };
+
+  const handleCityDialogClose = () => {
+    setShowCitiesDialog(false);
+  };
 
   return (
     <>
@@ -572,8 +574,39 @@ function Add() {
                 onChange={(e) => setDescription(e.target.value)}
                 fullWidth
               />
-
               <Typography
+                variant="h6"
+                style={{
+                  color: "white",
+                  fontWeight: 500,
+                  fontSize: "22px",
+                  marginLeft: "10px",
+                }}
+              >
+                {propertyType === "ForSale" ? "Price" : "Rent"}
+              </Typography>
+
+              <TextField
+                required
+                value={propertyType === "ForSale" ? price || "" : rent || ""}
+                InputProps={{ style: { color: "white" } }}
+                size="small"
+                type="number"
+                sx={{
+                  border: "1px solid grey",
+                  color: "white",
+                  marginLeft: "20px",
+                  borderRadius: "5px",
+                }}
+                onChange={(e) =>
+                  propertyType === "ForSale"
+                    ? setPrice(e.target.value)
+                    : setRent(e.target.value)
+                }
+                fullWidth
+              />
+
+              {/* <Typography
                 variant="h6"
                 style={{
                   color: "white",
@@ -609,7 +642,7 @@ function Add() {
                     </MenuItem>
                   )
                 )}
-              </Select>
+              </Select> */}
               {property === "Commercial" && (
                 <>
                   <Typography
@@ -649,19 +682,19 @@ function Add() {
               {(property === "House" ||
                 property === "Commercial" ||
                 property === "Apartment") && (
-                  <>
-                    <Typography
-                      variant="h6"
-                      style={{
-                        color: "white",
-                        fontWeight: 500,
-                        fontSize: "22px",
-                        marginLeft: "10px",
-                      }}
-                    >
-                      Size
-                    </Typography>
-                    {/* <TextField
+                <>
+                  <Typography
+                    variant="h6"
+                    style={{
+                      color: "white",
+                      fontWeight: 500,
+                      fontSize: "22px",
+                      marginLeft: "10px",
+                    }}
+                  >
+                    Size
+                  </Typography>
+                  {/* <TextField
                     required
                     value={size}
                     InputProps={{ style: { color: "white" } }}
@@ -677,30 +710,30 @@ function Add() {
                     fullWidth
                   /> */}
 
-                    <Select
-                      required
-                      value={size || ""}
-                      onChange={(e) => setSize(e.target.value)}
-                      inputProps={{ style: { color: "white" } }}
-                      size="small"
-                      sx={{
-                        border: "1px solid grey",
-                        color: "white",
-                        marginLeft: "20px",
-                        borderRadius: "5px",
-                      }}
-                      fullWidth
-                    >
-                      {Sizes.map((sizeOption, index) =>
-                        sizeOption.value === "All" ? null : (
-                          <MenuItem key={index} value={sizeOption.value}>
-                            {sizeOption.label}
-                          </MenuItem>
-                        )
-                      )}
-                    </Select>
-                  </>
-                )}
+                  <Select
+                    required
+                    value={size || ""}
+                    onChange={(e) => setSize(e.target.value)}
+                    inputProps={{ style: { color: "white" } }}
+                    size="small"
+                    sx={{
+                      border: "1px solid grey",
+                      color: "white",
+                      marginLeft: "20px",
+                      borderRadius: "5px",
+                    }}
+                    fullWidth
+                  >
+                    {Sizes.map((sizeOption, index) =>
+                      sizeOption.value === "All" ? null : (
+                        <MenuItem key={index} value={sizeOption.value}>
+                          {sizeOption.label}
+                        </MenuItem>
+                      )
+                    )}
+                  </Select>
+                </>
+              )}
 
               {(property === "House" || property === "Apartment") && (
                 <>
@@ -864,36 +897,28 @@ function Add() {
                 >
                   City
                 </Typography>
-                <ThemeProvider theme={theme}>
-                  <Autocomplete
-                    value={city || transformedCities[0]}
-                    onChange={(event, value) => {
-                      setCity(value || transformedCities[0]);
-                    }}
-                    options={transformedCities}
-                    groupBy={(option) => option.group}
-                    getOptionLabel={(option) => option.title}
-                    isOptionEqualToValue={(option, value) =>
-                      option.title === value.title
-                    }
-                    size="small"
-                    sx={{
-                      height: "50px",
-                      backgroundColor: "black",
-                      marginLeft: "20px",
-                      marginRight: "0",
-                      border: "1px solid grey",
-                      borderRadius: "5px",
-                      "& .MuiAutocomplete-inputRoot": {
-                        color: "white",
-                        fontSize: "16px",
-                        border: 0,
-                        height: "50px",
-                      },
-                    }}
-                    renderInput={(params) => <TextField {...params} />}
-                  />
-                </ThemeProvider>
+                <Button
+                  sx={{
+                    border: "1px solid grey",
+                    width: "100%",
+                    color: "white",
+                    height: "43px",
+                    marginLeft: "20px",
+                    borderRadius: "5px",
+                    ".MuiSvgIcon-root ": {
+                      fill: "white !important",
+                    },
+                   
+                  }}
+                  onClick={handleCityDialogOpen}
+                >
+                 {city.title}
+                </Button>
+                <CitySelectionDialog
+                  open={showCitiesDialog}
+                  onClose={handleCityDialogClose}
+                  onSelect={handleCitySelect}
+                />
               </Box>
             </Grid>
 

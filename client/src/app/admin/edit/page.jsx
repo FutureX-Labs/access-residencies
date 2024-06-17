@@ -36,7 +36,7 @@ import axiosInstance from "@/app/utility/axiosInstance";
 import { CldImage } from "next-cloudinary";
 import Autocomplete from "@mui/material/Autocomplete";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-
+import { CitySelectionDialog } from "@/app/components/citySelectionDialog/CitySelectionDialog";
 import BASE_URL from "../../config";
 
 const theme = createTheme({
@@ -93,12 +93,13 @@ function Edit() {
   const [formUrl, setFormUrl] = useState(null);
   const [imageUploaded, setImageUploaded] = useState(false);
   const [thumbnailUploaded, setThumbnailUploaded] = useState(false);
+  const [showCitiesDialog, setShowCitiesDialog] = useState(false);
 
   useEffect(() => {
     const isUserLoggedIn = sessionStorage.getItem("contact_user");
     if (!isUserLoggedIn) router.push("/");
   }, []);
-
+  console.log("city", city);
   const submitThumbnailRef = useRef(null);
   const submitMulImageRef = useRef(null);
 
@@ -138,7 +139,6 @@ function Edit() {
   useEffect(() => {
     fetchData();
   }, []);
-
   useEffect(() => {
     if (editFormData) {
       setPropertyType(editFormData?.propertyType);
@@ -295,11 +295,22 @@ function Edit() {
   const transformedCities = Cities.flatMap((city) =>
     city.subheadings
       ? city.subheadings.map((subheading) => ({
-        title: subheading.label,
-        group: city.label,
-      }))
+          title: subheading.label,
+          group: city.label,
+        }))
       : []
   );
+
+  const handleCitySelect = (value) => {
+    setCity(value);
+  };
+  const handleCityDialogOpen = () => {
+    setShowCitiesDialog(true);
+  };
+
+  const handleCityDialogClose = () => {
+    setShowCitiesDialog(false);
+  };
 
   return (
     <>
@@ -592,18 +603,20 @@ function Edit() {
               >
                 {propertyType === "ForSale" ? "Max Price" : "Max Rent"}
               </Typography>
-              <Select
+
+              <TextField
                 required
                 value={
-                  propertyType === "ForSale" ? (price || "All") : (rent || "All")
+                  propertyType === "ForSale" ? price || "All" : rent || "All"
                 }
                 onChange={(e) =>
                   propertyType === "ForSale"
                     ? setPrice(e.target.value)
                     : setRent(e.target.value)
                 }
-                inputProps={{ style: { color: "white" } }}
+                InputProps={{ style: { color: "white" } }}
                 size="small"
+                type="number"
                 sx={{
                   border: "1px solid grey",
                   color: "white",
@@ -611,13 +624,8 @@ function Edit() {
                   borderRadius: "5px",
                 }}
                 fullWidth
-              >
-                {Prices.map((priceOption, index) => (
-                  <MenuItem key={index} value={priceOption.value}>
-                    {priceOption.label}
-                  </MenuItem>
-                ))}
-              </Select>
+              />
+
               {property === "Commercial" && (
                 <>
                   <Typography
@@ -657,19 +665,19 @@ function Edit() {
               {(property === "House" ||
                 property === "Commercial" ||
                 property === "Apartment") && (
-                  <>
-                    <Typography
-                      variant="h6"
-                      style={{
-                        color: "white",
-                        fontWeight: 500,
-                        fontSize: "22px",
-                        marginLeft: "10px",
-                      }}
-                    >
-                      Size
-                    </Typography>
-                    {/* <TextField
+                <>
+                  <Typography
+                    variant="h6"
+                    style={{
+                      color: "white",
+                      fontWeight: 500,
+                      fontSize: "22px",
+                      marginLeft: "10px",
+                    }}
+                  >
+                    Size
+                  </Typography>
+                  {/* <TextField
                     required
                     value={size}
                     InputProps={{ style: { color: "white" } }}
@@ -685,28 +693,28 @@ function Edit() {
                     fullWidth
                   /> */}
 
-                    <Select
-                      required
-                      value={size || "All"}
-                      onChange={(e) => setSize(e.target.value)}
-                      inputProps={{ style: { color: "white" } }}
-                      size="small"
-                      sx={{
-                        border: "1px solid grey",
-                        color: "white",
-                        marginLeft: "20px",
-                        borderRadius: "5px",
-                      }}
-                      fullWidth
-                    >
-                      {Sizes.map((sizeOption, index) => (
-                        <MenuItem key={index} value={sizeOption.value}>
-                          {sizeOption.label}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </>
-                )}
+                  <Select
+                    required
+                    value={size || "All"}
+                    onChange={(e) => setSize(e.target.value)}
+                    inputProps={{ style: { color: "white" } }}
+                    size="small"
+                    sx={{
+                      border: "1px solid grey",
+                      color: "white",
+                      marginLeft: "20px",
+                      borderRadius: "5px",
+                    }}
+                    fullWidth
+                  >
+                    {Sizes.map((sizeOption, index) => (
+                      <MenuItem key={index} value={sizeOption.value}>
+                        {sizeOption.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </>
+              )}
 
               {(property === "House" || property === "Apartment") && (
                 <>
@@ -862,36 +870,27 @@ function Edit() {
                 >
                   City
                 </Typography>
-                <ThemeProvider theme={theme}>
-                  <Autocomplete
-                    value={city || transformedCities[0]}
-                    onChange={(event, value) => {
-                      setCity(value || transformedCities[0]);
-                    }}
-                    options={transformedCities}
-                    groupBy={(option) => option.group}
-                    getOptionLabel={(option) => option.title}
-                    isOptionEqualToValue={(option, value) =>
-                      option.title === value.title
-                    }
-                    size="small"
-                    sx={{
-                      height: "50px",
-                      backgroundColor: "black",
-                      marginLeft: "20px",
-                      marginRight: "0",
-                      border: "1px solid grey",
-                      borderRadius: "5px",
-                      "& .MuiAutocomplete-inputRoot": {
-                        color: "white",
-                        fontSize: "16px",
-                        border: 0,
-                        height: "50px",
-                      },
-                    }}
-                    renderInput={(params) => <TextField {...params} />}
-                  />
-                </ThemeProvider>
+                <Button
+                  sx={{
+                    border: "1px solid grey",
+                    width: "100%",
+                    color: "white",
+                    height: "43px",
+                    marginLeft: "20px",
+                    borderRadius: "5px",
+                    ".MuiSvgIcon-root ": {
+                      fill: "white !important",
+                    },
+                  }}
+                  onClick={handleCityDialogOpen}
+                >
+                  {city?.title}
+                </Button>
+                <CitySelectionDialog
+                  open={showCitiesDialog}
+                  onClose={handleCityDialogClose}
+                  onSelect={handleCitySelect}
+                />
               </Box>
             </Grid>
 
