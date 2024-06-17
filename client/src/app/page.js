@@ -27,16 +27,15 @@ import Showcase from "./components/showcase/Showcase";
 import Subheader from "./components/subheader/subheader";
 import { GetAll } from "./utility/getAll";
 import { PropertyTypes } from "@/app/list/propertyTypes";
-import { Cities } from "@/app/list/city";
 import { Prices } from "@/app/list/price";
 import { Rents } from "@/app/list/priceRent";
 import { FilterUrl } from "./utility/filterUrls";
 import AuthContext from "./context/AuthContext";
 import { useRouter } from "next/navigation";
 import UseSessionStorage from "@/app/UseSessionStorage";
+import { CitySelectionDialog } from "./components/citySelectionDialog/CitySelectionDialog";
 
 import BASE_URL from "./config";
-import { CitySelectionDialog } from "./components/citySelectionDialog/CitySelectionDialog";
 const url = `${BASE_URL}/api/apartmentForRent/add`;
 
 function Home() {
@@ -244,17 +243,6 @@ function Home() {
     FetchPropertyIDs();
   }, []);
 
-  const transformedCities = Cities.flatMap((city) =>
-    city.subheadings
-      ? city.subheadings.map((subheading) => ({
-          title: subheading.label,
-          group: city.label,
-        }))
-      : []
-  );
-  const allOption = { title: "All", group: "All" };
-  const transformedCitiesWithAll = [allOption, ...transformedCities];
-
   const propertyTypeAll = { label: "All", value: "All" };
   const propertyTypesWithAll = [propertyTypeAll, ...PropertyTypes];
 
@@ -322,9 +310,8 @@ function Home() {
                           ? "transparent"
                           : "#8C1C40",
                       borderRadius: "10px",
-                      border: `3px solid ${
-                        selectedPropertyType === "ForRent" && "#8C1C40"
-                      }`,
+                      border: `3px solid ${selectedPropertyType === "ForRent" && "#8C1C40"
+                        }`,
                     }}
                     onClick={(e) => {
                       // e.preventDefault();
@@ -343,9 +330,8 @@ function Home() {
                           ? "transparent"
                           : "#8C1C40",
                       borderRadius: "10px",
-                      border: `3px solid ${
-                        selectedPropertyType === "ForSale" && "#8C1C40"
-                      }`,
+                      border: `3px solid ${selectedPropertyType === "ForSale" && "#8C1C40"
+                        }`,
                     }}
                     onClick={(e) => {
                       // e.preventDefault();
@@ -418,6 +404,7 @@ function Home() {
                       City
                     </Typography>
                     <Button
+                      style={{ justifyContent: "flex-start" }}
                       sx={{
                         border: "1px solid #8C1C40",
                         width: "100%",
@@ -482,15 +469,15 @@ function Home() {
                     >
                       {selectedPropertyType === "ForSale"
                         ? Prices.map((priceOption, index) => (
-                            <MenuItem key={index} value={priceOption.value}>
-                              {priceOption.label}
-                            </MenuItem>
-                          ))
+                          <MenuItem key={index} value={priceOption.value}>
+                            {priceOption.label}
+                          </MenuItem>
+                        ))
                         : Rents.map((priceOption, index) => (
-                            <MenuItem key={index} value={priceOption.value}>
-                              {priceOption.label}
-                            </MenuItem>
-                          ))}
+                          <MenuItem key={index} value={priceOption.value}>
+                            {priceOption.label}
+                          </MenuItem>
+                        ))}
                     </Select>
                   </Box>
                 </Box>
@@ -527,7 +514,7 @@ function Home() {
                       width: "100px",
                     }}
                     type="submit"
-                    // disabled={!propertyId}
+                  // disabled={!propertyId}
                   >
                     Search
                   </Button>
@@ -583,8 +570,8 @@ function Home() {
             <Showcase
               data={collectionData}
               user={"user"}
-              // property={property}
-              // propertyType={propertyType}
+            // property={property}
+            // propertyType={propertyType}
             />
           </Container>
         </Box>
