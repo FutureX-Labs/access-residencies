@@ -34,6 +34,7 @@ import { Padding } from "@mui/icons-material";
 import Link from "next/link";
 import UseSessionStorage from "@/app/UseSessionStorage";
 import axiosInstance from "@/app/utility/axiosInstance";
+import { CitySelectionDialog } from "../citySelectionDialog/CitySelectionDialog";
 
 const Filter = ({
   property,
@@ -45,7 +46,6 @@ const Filter = ({
   showHidden,
   hideProperties,
 }) => {
-
   const [propertyId, setPropertyId] = useState(null);
   const [price, setPrice] = useState("All");
   const [rent, setRent] = useState("All");
@@ -58,11 +58,13 @@ const Filter = ({
   const [comPropertyS, setComPropertyS] = useState("All");
   const [filteredBy, setFilteredBy] = useState([]);
   const [tempCollectionData, setTempCollectionData] = useState([]);
-
+  const [showCitiesDialog, setShowCitiesDialog] = useState(false);
   const [selectStates, setSelectStates] = useState(Array(8).fill(false));
 
+  console.log("city", city);
+
   const handleOpen = (index) => {
-    setSelectStates(prevSelectStates => {
+    setSelectStates((prevSelectStates) => {
       const newArray = [...prevSelectStates];
       newArray[index] = true;
       return newArray;
@@ -70,7 +72,7 @@ const Filter = ({
   };
 
   const handleClose = (index) => {
-    setSelectStates(prevSelectStates => {
+    setSelectStates((prevSelectStates) => {
       const newArray = [...prevSelectStates];
       newArray[index] = false;
       return newArray;
@@ -82,9 +84,9 @@ const Filter = ({
   };
 
   useEffect(() => {
-    window.addEventListener('scroll', handleWindowScroll);
+    window.addEventListener("scroll", handleWindowScroll);
 
-    return () => window.removeEventListener('scroll', handleWindowScroll);
+    return () => window.removeEventListener("scroll", handleWindowScroll);
   }, []);
 
   const theme = createTheme({
@@ -216,7 +218,6 @@ const Filter = ({
         const filteredArray = filteredWithoutAll.filter(Boolean);
 
         setFilteredBy(filteredArray);
-
       }
     } catch (error) {
       console.debug(error);
@@ -226,14 +227,16 @@ const Filter = ({
   const toggleHideProperties = (e) => {
     e.preventDefault();
     if (showHidden) {
-      const hiddenProperties = tempCollectionData.filter((data) => data.isVisibale === false);
+      const hiddenProperties = tempCollectionData.filter(
+        (data) => data.isVisibale === false
+      );
       setCollectionData(hiddenProperties);
       setShowHidden(false);
     } else {
       setCollectionData(tempCollectionData);
       setShowHidden(true);
     }
-  }
+  };
 
   const handleSubmitByID = async (e) => {
     e.preventDefault();
@@ -260,15 +263,25 @@ const Filter = ({
   const transformedCities = Cities.flatMap((city) =>
     city.subheadings
       ? city.subheadings.map((subheading) => ({
-        title: subheading.label,
-        group: city.label,
-      }))
+          title: subheading.label,
+          group: city.label,
+        }))
       : []
   );
   const allOption = { title: "All", group: "All" };
   const transformedCitiesWithAll = [allOption, ...transformedCities];
 
   const comAllComProperties = [{ value: "All", label: "All" }, ...comProperty];
+  const handleCitySelect = (value) => {
+    setCity(value);
+  };
+  const handleCityDialogOpen = () => {
+    setShowCitiesDialog(true);
+  };
+
+  const handleCityDialogClose = () => {
+    setShowCitiesDialog(false);
+  };
 
   return (
     <>
@@ -297,38 +310,28 @@ const Filter = ({
                 >
                   City
                 </Typography>
-                <ThemeProvider theme={theme}>
-                  <Autocomplete
-                    open={selectStates[0]}
-                    onClose={() => handleClose(0)}
-                    onOpen={() => handleOpen(0)}
-                    value={city || allOption}
-                    onChange={(event, value) => {
-                      setCity(value || '');
-                    }}
-                    options={transformedCitiesWithAll}
-                    groupBy={(option) => option.group}
-                    getOptionLabel={(option) => option.title}
-                    isOptionEqualToValue={(option, value) =>
-                      option.title === value.title
-                    }
-                    size="small"
-                    sx={{
-                      height: "50px",
-                      width: "100%",
-                      backgroundColor: "black",
-                      border: "1px solid grey",
-                      borderRadius: { xs: "10px", md: "10px 0px 0px 10px" },
-                      "& .MuiAutocomplete-inputRoot": {
-                        color: "white",
-                        fontSize: "16px",
-                        border: 0,
-                        height: "50px",
-                      },
-                    }}
-                    renderInput={(params) => <TextField {...params} />}
-                  />
-                </ThemeProvider>
+                <Button
+                  size="small"
+                  sx={{
+                    height: "50px",
+                    width: "100%",
+                    border: "1px solid grey",
+                    borderRadius: { xs: "20px", md: "10px 0px 0px 10px" },
+                    backgroundColor: "black",
+                    color: "white",
+                    ".MuiSvgIcon-root ": {
+                      fill: "white !important",
+                    },
+                  }}
+                  onClick={handleCityDialogOpen}
+                >
+                {city.title}
+                </Button>
+                <CitySelectionDialog
+                  open={showCitiesDialog}
+                  onClose={handleCityDialogClose}
+                  onSelect={handleCitySelect}
+                />
               </Box>
               <Box sx={{ width: "100%" }}>
                 <Typography
@@ -366,24 +369,22 @@ const Filter = ({
                     borderRadius: { xs: "10px", md: "0px" },
                     backgroundColor: "black",
                     color: "white",
-                    '.MuiSvgIcon-root ': {
+                    ".MuiSvgIcon-root ": {
                       fill: "white !important",
-                    }
+                    },
                   }}
                 >
-                  {propertyType === "ForSale" ? (
-                    Prices.map((priceOption, index) => (
-                      <MenuItem key={index} value={priceOption.value}>
-                        {priceOption.label}
-                      </MenuItem>
-                    ))
-                  ) : (
-                    Rents.map((priceOption, index) => (
-                      <MenuItem key={index} value={priceOption.value}>
-                        {priceOption.label}
-                      </MenuItem>
-                    ))
-                  )}
+                  {propertyType === "ForSale"
+                    ? Prices.map((priceOption, index) => (
+                        <MenuItem key={index} value={priceOption.value}>
+                          {priceOption.label}
+                        </MenuItem>
+                      ))
+                    : Rents.map((priceOption, index) => (
+                        <MenuItem key={index} value={priceOption.value}>
+                          {priceOption.label}
+                        </MenuItem>
+                      ))}
                 </Select>
               </Box>
               {property === "Commercial" && (
@@ -417,9 +418,9 @@ const Filter = ({
                       borderRadius: { xs: "10px", md: "0px" },
                       backgroundColor: "black",
                       color: "white",
-                      '.MuiSvgIcon-root ': {
+                      ".MuiSvgIcon-root ": {
                         fill: "white !important",
-                      }
+                      },
                     }}
                   >
                     {comAllComProperties.map((type, index) => (
@@ -433,49 +434,49 @@ const Filter = ({
               {(property === "House" ||
                 property === "Commercial" ||
                 property === "Apartment") && (
-                  <Box sx={{ width: "100%" }}>
-                    <Typography
-                      variant="h6"
-                      style={{
-                        color: "white",
-                        fontWeight: 500,
-                        fontSize: "16px",
-                        marginLeft: "10px",
-                      }}
-                    >
-                      Size
-                    </Typography>
-                    <Select
-                      open={selectStates[3]}
-                      onClose={() => handleClose(3)}
-                      onOpen={() => handleOpen(3)}
-                      MenuProps={{
-                        disableScrollLock: true,
-                      }}
-                      value={size || "All"}
-                      onChange={(e) => setSize(e.target.value)}
-                      inputProps={{ style: { color: "white" } }}
-                      size="small"
-                      sx={{
-                        height: "50px",
-                        width: "100%",
-                        border: "1px solid grey",
-                        borderRadius: { xs: "10px", md: "0px" },
-                        backgroundColor: "black",
-                        color: "white",
-                        '.MuiSvgIcon-root ': {
-                          fill: "white !important",
-                        }
-                      }}
-                    >
-                      {Sizes.map((sizeOption, index) => (
-                        <MenuItem key={index} value={sizeOption.value}>
-                          {sizeOption.label}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </Box>
-                )}
+                <Box sx={{ width: "100%" }}>
+                  <Typography
+                    variant="h6"
+                    style={{
+                      color: "white",
+                      fontWeight: 500,
+                      fontSize: "16px",
+                      marginLeft: "10px",
+                    }}
+                  >
+                    Size
+                  </Typography>
+                  <Select
+                    open={selectStates[3]}
+                    onClose={() => handleClose(3)}
+                    onOpen={() => handleOpen(3)}
+                    MenuProps={{
+                      disableScrollLock: true,
+                    }}
+                    value={size || "All"}
+                    onChange={(e) => setSize(e.target.value)}
+                    inputProps={{ style: { color: "white" } }}
+                    size="small"
+                    sx={{
+                      height: "50px",
+                      width: "100%",
+                      border: "1px solid grey",
+                      borderRadius: { xs: "10px", md: "0px" },
+                      backgroundColor: "black",
+                      color: "white",
+                      ".MuiSvgIcon-root ": {
+                        fill: "white !important",
+                      },
+                    }}
+                  >
+                    {Sizes.map((sizeOption, index) => (
+                      <MenuItem key={index} value={sizeOption.value}>
+                        {sizeOption.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </Box>
+              )}
               {(property === "House" || property === "Apartment") && (
                 <Box sx={{ width: "100%" }}>
                   <Typography
@@ -507,9 +508,9 @@ const Filter = ({
                       borderRadius: { xs: "10px", md: "0px" },
                       backgroundColor: "black",
                       color: "white",
-                      '.MuiSvgIcon-root ': {
+                      ".MuiSvgIcon-root ": {
                         fill: "white !important",
-                      }
+                      },
                     }}
                   >
                     {Bedrooms.map((option, index) => (
@@ -551,9 +552,9 @@ const Filter = ({
                       borderRadius: { xs: "10px", md: "0px" },
                       backgroundColor: "black",
                       color: "white",
-                      '.MuiSvgIcon-root ': {
+                      ".MuiSvgIcon-root ": {
                         fill: "white !important",
-                      }
+                      },
                     }}
                   >
                     {Bedrooms.map((option, index) => (
@@ -596,9 +597,9 @@ const Filter = ({
                         borderRadius: { xs: "10px", md: "0px" },
                         backgroundColor: "black",
                         color: "white",
-                        '.MuiSvgIcon-root ': {
+                        ".MuiSvgIcon-root ": {
                           fill: "white !important",
-                        }
+                        },
                       }}
                     >
                       {Perches.map((option, index) => (
@@ -642,9 +643,9 @@ const Filter = ({
                         borderRadius: { xs: "10px", md: "0px" },
                         backgroundColor: "black",
                         color: "white",
-                        '.MuiSvgIcon-root ': {
+                        ".MuiSvgIcon-root ": {
                           fill: "white !important",
-                        }
+                        },
                       }}
                     >
                       {Acres.map((option, index) => (
@@ -686,12 +687,14 @@ const Filter = ({
               sx={{
                 borderRadius: "10px",
                 border: "1px solid grey",
-                backgroundColor: (showHidden ? 'transparent' : '#8C1C40'),
+                backgroundColor: showHidden ? "transparent" : "#8C1C40",
                 color: "white",
                 height: "42px",
                 width: "40%",
               }}
-              onClick={(e) => { toggleHideProperties(e); }}
+              onClick={(e) => {
+                toggleHideProperties(e);
+              }}
             >
               Show Only Hidden Properties
             </Button>
@@ -743,7 +746,9 @@ const Filter = ({
               <Box sx={{ display: "flex", alignItems: "center", gap: "10px" }}>
                 <Typography color={"#8C1C40"}>{property}</Typography>
                 <IoIosArrowForward color={"#8C1C40"} sx={{ padding: "0px" }} />
-                <Typography color={"#8C1C40"}>{propertyType === "ForSale" ? "For Sale": "For Rent"}</Typography>
+                <Typography color={"#8C1C40"}>
+                  {propertyType === "ForSale" ? "For Sale" : "For Rent"}
+                </Typography>
               </Box>
             )}
           </Breadcrumbs>
@@ -756,8 +761,8 @@ const Filter = ({
                 color: "white",
               }}
             >
-              {property} {propertyType === "ForSale" ? "For Sale": "For Rent"} in Sri Lanka ({collectionData?.length}{" "}
-              properties)
+              {property} {propertyType === "ForSale" ? "For Sale" : "For Rent"}{" "}
+              in Sri Lanka ({collectionData?.length} properties)
             </Typography>
           )}
 

@@ -1,6 +1,6 @@
 import React from "react";
 import Slider from "react-slick";
-import { CldImage } from 'next-cloudinary';
+import { CldImage } from "next-cloudinary";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
@@ -43,7 +43,7 @@ export default function BannerSlider({ imageData }) {
               quality="auto"
               alt="Image"
               style={{
-                objectFit: 'cover',
+                objectFit: "cover",
               }}
             />
           </div>

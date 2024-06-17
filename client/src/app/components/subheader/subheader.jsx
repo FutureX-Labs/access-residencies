@@ -1,34 +1,28 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Box, Menu, MenuItem, Button } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import Link from "next/link";
+import { ArrowForwardIos } from "@mui/icons-material";
 
 const Subheader = ({ propertyType, user }) => {
+  const [openForSale, setOpenForSale] = useState(false);
+  const [openForRent, setOpenForRent] = useState(false);
+
   const buttonRefForSale = useRef(null);
   const buttonRefForRent = useRef(null);
 
-  const [anchorElForSale, setAnchorElForSale] = useState(null);
-  const [anchorElForRent, setAnchorElForRent] = useState(null);
-
-  const handleOpenMenuForSale = (event) => {
-    setAnchorElForSale(event.currentTarget);
+  const handleMenuForSale = () => {
+    setOpenForRent(false);
+    setOpenForSale(!openForSale);
   };
-
-  const handleCloseMenuForSale = () => {
-    setAnchorElForSale(null);
-  };
-
-  const handleOpenMenuForRent = (event) => {
-    setAnchorElForRent(event.currentTarget);
-  };
-
-  const handleCloseMenuForRent = () => {
-    setAnchorElForRent(null);
+  const handleMenuForRent = () => {
+    setOpenForSale(false);
+    setOpenForRent(!openForRent);
   };
 
   const handleAutoHideMenu = (setStateFn) => {
     const handleScroll = () => {
       const isScrolledDown = window.scrollY > 0;
-      setStateFn(isScrolledDown ? null : undefined);
+      setStateFn(isScrolledDown ? false : undefined);
     };
 
     useEffect(() => {
@@ -38,19 +32,17 @@ const Subheader = ({ propertyType, user }) => {
     }, []);
   };
 
-  handleAutoHideMenu(setAnchorElForSale);
-  handleAutoHideMenu(setAnchorElForRent);
+  handleAutoHideMenu(setOpenForSale);
+  handleAutoHideMenu(setOpenForRent);
 
   return (
-    <Box sx={{ backgroundColor: "#8c1c40", width: "100vw" }}>
+    <Box
+      sx={{ backgroundColor: "#8c1c40", width: "100vw", position: "relative" }}
+    >
       <Box
-        sx={{
-          display: "flex",
-          gap: "0px",
-          width: { md: "25%", xs: "100%" },
-        }}
+        sx={{ display: "flex", gap: "0px", width: { md: "25%", xs: "100%" } }}
       >
-        <div onClick={handleOpenMenuForSale} style={{ width: "50%" }}>
+        <div onClick={handleMenuForSale} style={{ width: "50%" }}>
           <Button
             ref={buttonRefForSale}
             sx={{
@@ -68,9 +60,10 @@ const Subheader = ({ propertyType, user }) => {
             }}
           >
             For Sale
+           
           </Button>
         </div>
-        <div onClick={handleOpenMenuForRent} style={{ width: "50%" }}>
+        <div onClick={handleMenuForRent} style={{ width: "50%" }}>
           <Button
             ref={buttonRefForRent}
             sx={{
@@ -87,152 +80,210 @@ const Subheader = ({ propertyType, user }) => {
             }}
           >
             For Rent
+            
           </Button>
         </div>
       </Box>
-      <Menu
-        anchorEl={anchorElForSale}
-        open={Boolean(anchorElForSale)}
-        onClose={handleCloseMenuForSale}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "left",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "left",
-        }}
-        PaperProps={{
-          style: {
+      {openForSale && (
+        <Box
+          sx={{
+            position: "absolute",
+            backgroundColor: "white",
+            boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+            zIndex: 20,
+            borderRadius: "5px",
             width: buttonRefForSale.current
-              ? `${buttonRefForSale.current.offsetWidth}px`
-              : undefined,
-            maxWidth: "100vw", // Ensure the maximum width of the dropdown menu does not exceed the viewport width
-          },
-        }}
-      >
-        <MenuItem onClick={handleCloseMenuForSale}>
-          <Link
-            style={{ textDecoration: "none", color: "black", width: '100%' }}
-            href={
-              user === "admin"
-                ? "/admin/view/House/ForSale"
-                : "/user/filter/House/ForSale"
-            }
-          >
-            House
-          </Link>
-        </MenuItem>
-        <MenuItem onClick={handleCloseMenuForSale}>
-          <Link
-            style={{ textDecoration: "none", color: "black", width: '100%' }}
-            href={
-              user === "admin"
-                ? "/admin/view/Land/ForSale"
-                : "/user/filter/Land/ForSale"
-            }
-          >
-            Land
-          </Link>
-        </MenuItem>
-        <MenuItem onClick={handleCloseMenuForSale}>
-          <Link
-            style={{ textDecoration: "none", color: "black", width: '100%' }}
-            href={
-              user === "admin"
-                ? "/admin/view/Apartment/ForSale"
-                : "/user/filter/Apartment/ForSale"
-            }
-          >
-            Apartment
-          </Link>
-        </MenuItem>
-        <MenuItem onClick={handleCloseMenuForSale}>
-          <Link
-            style={{ textDecoration: "none", color: "black", width: '100%' }}
-            href={
-              user === "admin"
-                ? "/admin/view/Commercial/ForSale"
-                : "/user/filter/Commercial/ForSale"
-            }
-          >
-            Commercial
-          </Link>
-        </MenuItem>
-      </Menu>
-      <Menu
-        anchorEl={anchorElForRent}
-        open={Boolean(anchorElForRent)}
-        onClose={handleCloseMenuForRent}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "left",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "left",
-        }}
-        PaperProps={{
-          style: {
+              ? buttonRefForSale.current.offsetWidth
+              : "100%",
+            left: 0,
+          }}
+        >
+          <ul style={{ listStyleType: "none", padding: 0, margin: 0 }}>
+            <li
+              style={{ padding: "8px 16px" }}
+              // onClick={handleCloseMenuForSale}
+            >
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  width: "100%",
+                  display: "block",
+                }}
+                href={
+                  user === "admin"
+                    ? "/admin/view/House/ForSale"
+                    : "/user/filter/House/ForSale"
+                }
+              >
+                House
+              </Link>
+            </li>
+            <li
+              style={{ padding: "8px 16px" }}
+              // onClick={handleCloseMenuForSale}
+            >
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  width: "100%",
+                  display: "block",
+                }}
+                href={
+                  user === "admin"
+                    ? "/admin/view/Land/ForSale"
+                    : "/user/filter/Land/ForSale"
+                }
+              >
+                Land
+              </Link>
+            </li>
+            <li
+              style={{ padding: "8px 16px" }}
+              // onClick={handleCloseMenuForSale}
+            >
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  width: "100%",
+                  display: "block",
+                }}
+                href={
+                  user === "admin"
+                    ? "/admin/view/Apartment/ForSale"
+                    : "/user/filter/Apartment/ForSale"
+                }
+              >
+                Apartment
+              </Link>
+            </li>
+            <li
+              style={{ padding: "8px 16px" }}
+              // onClick={handleCloseMenuForSale}
+            >
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  width: "100%",
+                  display: "block",
+                }}
+                href={
+                  user === "admin"
+                    ? "/admin/view/Commercial/ForSale"
+                    : "/user/filter/Commercial/ForSale"
+                }
+              >
+                Commercial
+              </Link>
+            </li>
+          </ul>
+        </Box>
+      )}
+      {openForRent && (
+        <Box
+          sx={{
+            position: "absolute",
+            backgroundColor: "white",
+            boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+            zIndex: 20,
+            borderRadius: "5px",
             width: buttonRefForRent.current
-              ? `${buttonRefForRent.current.offsetWidth}px`
-              : undefined,
-            maxWidth: "100vw", // Ensure the maximum width of the dropdown menu does not exceed the viewport width
-          },
-        }}
-      >
-        <MenuItem onClick={handleCloseMenuForRent}>
-          <Link
-            style={{ textDecoration: "none", color: "black", width: '100%' }}
-            href={
-              user === "admin"
-                ? "/admin/view/House/ForRent"
-                : "/user/filter/House/ForRent"
-            }
-          >
-            House
-          </Link>
-        </MenuItem>
-        <MenuItem onClick={handleCloseMenuForRent}>
-          <Link
-            style={{ textDecoration: "none", color: "black", width: '100%' }}
-            href={
-              user === "admin"
-                ? "/admin/view/Land/ForRent"
-                : "/user/filter/Land/ForRent"
-            }
-          >
-            Land
-          </Link>
-        </MenuItem>
-        <MenuItem onClick={handleCloseMenuForRent}>
-          <Link
-            style={{ textDecoration: "none", color: "black", width: '100%' }}
-            href={
-              user === "admin"
-                ? "/admin/view/Apartment/ForRent"
-                : "/user/filter/Apartment/ForRent"
-            }
-          >
-            Apartment
-          </Link>
-        </MenuItem>
-        <MenuItem onClick={handleCloseMenuForRent}>
-          <Link
-            style={{ textDecoration: "none", color: "black", width: '100%' }}
-            href={user === "admin"
-              ? "/admin/view/Commercial/ForRent"
-              : "/user/filter/Commercial/ForRent"
-            }
-          >
-            Commercial
-          </Link>
-        </MenuItem>
-      </Menu>
+              ? buttonRefForRent.current.offsetWidth
+              : "100%",
+            left: buttonRefForRent.current
+              ? buttonRefForRent.current.offsetLeft
+              : 0,
+          }}
+        >
+          <ul style={{ listStyleType: "none", padding: 0, margin: 0 }}>
+            <li
+              style={{ padding: "8px 16px" }}
+              // onClick={handleCloseMenuForRent}
+            >
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  width: "100%",
+                  display: "block",
+                }}
+                href={
+                  user === "admin"
+                    ? "/admin/view/House/ForRent"
+                    : "/user/filter/House/ForRent"
+                }
+              >
+                House
+              </Link>
+            </li>
+            <li
+              style={{ padding: "8px 16px" }}
+              // onClick={handleCloseMenuForRent}
+            >
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  width: "100%",
+                  display: "block",
+                }}
+                href={
+                  user === "admin"
+                    ? "/admin/view/Land/ForRent"
+                    : "/user/filter/Land/ForRent"
+                }
+              >
+                Land
+              </Link>
+            </li>
+            <li
+              style={{ padding: "8px 16px" }}
+              // onClick={handleCloseMenuForRent}
+            >
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  width: "100%",
+                  display: "block",
+                }}
+                href={
+                  user === "admin"
+                    ? "/admin/view/Apartment/ForRent"
+                    : "/user/filter/Apartment/ForRent"
+                }
+              >
+                Apartment
+              </Link>
+            </li>
+            <li
+              style={{ padding: "8px 16px" }}
+              // onClick={handleCloseMenuForRent}
+            >
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  width: "100%",
+                  display: "block",
+                }}
+                href={
+                  user === "admin"
+                    ? "/admin/view/Commercial/ForRent"
+                    : "/user/filter/Commercial/ForRent"
+                }
+              >
+                Commercial
+              </Link>
+            </li>
+          </ul>
+        </Box>
+      )}
     </Box>
   );
 };
 
 export default Subheader;
-
-
