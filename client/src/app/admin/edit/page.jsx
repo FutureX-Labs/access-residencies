@@ -259,9 +259,9 @@ function Edit() {
     const files = e.target.files;
     imageFormData.delete("image");
 
-    if (files.length > 3) {
+    if (files.length > 15) {
       Swal.fire({
-        title: "You can only select up to 3 files.",
+        title: "You can only select up to 15 files.",
         icon: "error",
         confirmButtonText: "Cancel",
       });

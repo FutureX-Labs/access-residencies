@@ -234,9 +234,9 @@ function Add() {
     console.log("before Files", files);
     formData.delete("myFiles");
 
-    if (files.length > 3) {
+    if (files.length > 15) {
       Swal.fire({
-        title: "You can only select up to 3 files.",
+        title: "You can only select up to 15 files.",
         icon: "error",
         confirmButtonText: "Cancel",
       });
@@ -900,7 +900,7 @@ function Add() {
                 <Button
                   sx={{
                     border: "1px solid grey",
-                    width: "100%",
+                    width: "98%",
                     color: "white",
                     height: "43px",
                     marginLeft: "20px",
@@ -908,7 +908,6 @@ function Add() {
                     ".MuiSvgIcon-root ": {
                       fill: "white !important",
                     },
-                   
                   }}
                   onClick={handleCityDialogOpen}
                 >
