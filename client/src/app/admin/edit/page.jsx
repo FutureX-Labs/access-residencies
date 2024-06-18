@@ -295,9 +295,9 @@ function Edit() {
   const transformedCities = Cities.flatMap((city) =>
     city.subheadings
       ? city.subheadings.map((subheading) => ({
-          title: subheading.label,
-          group: city.label,
-        }))
+        title: subheading.label,
+        group: city.label,
+      }))
       : []
   );
 
@@ -510,7 +510,14 @@ function Edit() {
                       justifyContent: "center",
                     }}
                   >
-                    <Box sx={{ display: "flex" }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexWrap: "wrap",
+                        justifyContent: "flex-start",
+                        width: "100%",
+                      }}
+                    >
                       {images &&
                         Array.from(images).map((img, index) => {
                           return imageUploaded ? (
@@ -521,9 +528,11 @@ function Edit() {
                               width={150}
                               height={150}
                               style={{
-                                margin: "20px 10px",
+                                margin: "10px",
                                 borderRadius: "5px",
                                 objectFit: "cover",
+                                flex: "1 1 calc(20% - 20px)",
+                                maxWidth: "150px",
                               }}
                             />
                           ) : (
@@ -536,9 +545,11 @@ function Edit() {
                               height={150}
                               alt="Image"
                               style={{
-                                margin: "20px 10px",
+                                margin: "10px",
                                 borderRadius: "5px",
                                 objectFit: "cover",
+                                flex: "1 1 calc(20% - 20px)",
+                                maxWidth: "150px",
                               }}
                             />
                           );
@@ -665,19 +676,19 @@ function Edit() {
               {(property === "House" ||
                 property === "Commercial" ||
                 property === "Apartment") && (
-                <>
-                  <Typography
-                    variant="h6"
-                    style={{
-                      color: "white",
-                      fontWeight: 500,
-                      fontSize: "22px",
-                      marginLeft: "10px",
-                    }}
-                  >
-                    Size
-                  </Typography>
-                  {/* <TextField
+                  <>
+                    <Typography
+                      variant="h6"
+                      style={{
+                        color: "white",
+                        fontWeight: 500,
+                        fontSize: "22px",
+                        marginLeft: "10px",
+                      }}
+                    >
+                      Size
+                    </Typography>
+                    {/* <TextField
                     required
                     value={size}
                     InputProps={{ style: { color: "white" } }}
@@ -693,28 +704,28 @@ function Edit() {
                     fullWidth
                   /> */}
 
-                  <Select
-                    required
-                    value={size || "All"}
-                    onChange={(e) => setSize(e.target.value)}
-                    inputProps={{ style: { color: "white" } }}
-                    size="small"
-                    sx={{
-                      border: "1px solid grey",
-                      color: "white",
-                      marginLeft: "20px",
-                      borderRadius: "5px",
-                    }}
-                    fullWidth
-                  >
-                    {Sizes.map((sizeOption, index) => (
-                      <MenuItem key={index} value={sizeOption.value}>
-                        {sizeOption.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </>
-              )}
+                    <Select
+                      required
+                      value={size || "All"}
+                      onChange={(e) => setSize(e.target.value)}
+                      inputProps={{ style: { color: "white" } }}
+                      size="small"
+                      sx={{
+                        border: "1px solid grey",
+                        color: "white",
+                        marginLeft: "20px",
+                        borderRadius: "5px",
+                      }}
+                      fullWidth
+                    >
+                      {Sizes.map((sizeOption, index) => (
+                        <MenuItem key={index} value={sizeOption.value}>
+                          {sizeOption.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </>
+                )}
 
               {(property === "House" || property === "Apartment") && (
                 <>
@@ -871,9 +882,10 @@ function Edit() {
                   City
                 </Typography>
                 <Button
+                  style={{ justifyContent: "flex-start", paddingLeft: "15px", textTransform: "none", fontSize: "16px" }}
                   sx={{
                     border: "1px solid grey",
-                    width: "100%",
+                    width: "98%",
                     color: "white",
                     height: "43px",
                     marginLeft: "20px",

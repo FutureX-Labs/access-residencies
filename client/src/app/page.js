@@ -404,7 +404,7 @@ function Home() {
                       City
                     </Typography>
                     <Button
-                      style={{ justifyContent: "flex-start" }}
+                      style={{ justifyContent: "flex-start", paddingLeft:"15px", textTransform: "none", fontSize: "16px" }}
                       sx={{
                         border: "1px solid #8C1C40",
                         width: "100%",
