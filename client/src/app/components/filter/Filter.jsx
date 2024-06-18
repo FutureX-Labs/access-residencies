@@ -263,9 +263,9 @@ const Filter = ({
   const transformedCities = Cities.flatMap((city) =>
     city.subheadings
       ? city.subheadings.map((subheading) => ({
-          title: subheading.label,
-          group: city.label,
-        }))
+        title: subheading.label,
+        group: city.label,
+      }))
       : []
   );
   const allOption = { title: "All", group: "All" };
@@ -311,12 +311,13 @@ const Filter = ({
                   City
                 </Typography>
                 <Button
+                  style={{ justifyContent: "flex-start", paddingLeft: "15px", textTransform: "none", fontSize: "16px" }}
                   size="small"
                   sx={{
                     height: "50px",
                     width: "100%",
                     border: "1px solid grey",
-                    borderRadius: { xs: "20px", md: "10px 0px 0px 10px" },
+                    borderRadius: { xs: "10px", md: "10px 0px 0px 10px" },
                     backgroundColor: "black",
                     color: "white",
                     ".MuiSvgIcon-root ": {
@@ -325,7 +326,7 @@ const Filter = ({
                   }}
                   onClick={handleCityDialogOpen}
                 >
-                {city.title}
+                  {city.title}
                 </Button>
                 <CitySelectionDialog
                   open={showCitiesDialog}
@@ -376,15 +377,15 @@ const Filter = ({
                 >
                   {propertyType === "ForSale"
                     ? Prices.map((priceOption, index) => (
-                        <MenuItem key={index} value={priceOption.value}>
-                          {priceOption.label}
-                        </MenuItem>
-                      ))
+                      <MenuItem key={index} value={priceOption.value}>
+                        {priceOption.label}
+                      </MenuItem>
+                    ))
                     : Rents.map((priceOption, index) => (
-                        <MenuItem key={index} value={priceOption.value}>
-                          {priceOption.label}
-                        </MenuItem>
-                      ))}
+                      <MenuItem key={index} value={priceOption.value}>
+                        {priceOption.label}
+                      </MenuItem>
+                    ))}
                 </Select>
               </Box>
               {property === "Commercial" && (
@@ -434,49 +435,49 @@ const Filter = ({
               {(property === "House" ||
                 property === "Commercial" ||
                 property === "Apartment") && (
-                <Box sx={{ width: "100%" }}>
-                  <Typography
-                    variant="h6"
-                    style={{
-                      color: "white",
-                      fontWeight: 500,
-                      fontSize: "16px",
-                      marginLeft: "10px",
-                    }}
-                  >
-                    Size
-                  </Typography>
-                  <Select
-                    open={selectStates[3]}
-                    onClose={() => handleClose(3)}
-                    onOpen={() => handleOpen(3)}
-                    MenuProps={{
-                      disableScrollLock: true,
-                    }}
-                    value={size || "All"}
-                    onChange={(e) => setSize(e.target.value)}
-                    inputProps={{ style: { color: "white" } }}
-                    size="small"
-                    sx={{
-                      height: "50px",
-                      width: "100%",
-                      border: "1px solid grey",
-                      borderRadius: { xs: "10px", md: "0px" },
-                      backgroundColor: "black",
-                      color: "white",
-                      ".MuiSvgIcon-root ": {
-                        fill: "white !important",
-                      },
-                    }}
-                  >
-                    {Sizes.map((sizeOption, index) => (
-                      <MenuItem key={index} value={sizeOption.value}>
-                        {sizeOption.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </Box>
-              )}
+                  <Box sx={{ width: "100%" }}>
+                    <Typography
+                      variant="h6"
+                      style={{
+                        color: "white",
+                        fontWeight: 500,
+                        fontSize: "16px",
+                        marginLeft: "10px",
+                      }}
+                    >
+                      Size
+                    </Typography>
+                    <Select
+                      open={selectStates[3]}
+                      onClose={() => handleClose(3)}
+                      onOpen={() => handleOpen(3)}
+                      MenuProps={{
+                        disableScrollLock: true,
+                      }}
+                      value={size || "All"}
+                      onChange={(e) => setSize(e.target.value)}
+                      inputProps={{ style: { color: "white" } }}
+                      size="small"
+                      sx={{
+                        height: "50px",
+                        width: "100%",
+                        border: "1px solid grey",
+                        borderRadius: { xs: "10px", md: "0px" },
+                        backgroundColor: "black",
+                        color: "white",
+                        ".MuiSvgIcon-root ": {
+                          fill: "white !important",
+                        },
+                      }}
+                    >
+                      {Sizes.map((sizeOption, index) => (
+                        <MenuItem key={index} value={sizeOption.value}>
+                          {sizeOption.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </Box>
+                )}
               {(property === "House" || property === "Apartment") && (
                 <Box sx={{ width: "100%" }}>
                   <Typography

@@ -505,10 +505,17 @@ function Add() {
                       display: "flex",
                       flexDirection: "column",
                       alignItems: "center",
-                      justifyContent: "center",
+                      justifyContent: "center"
                     }}
                   >
-                    <Box sx={{ display: "flex" }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexWrap: "wrap",
+                        justifyContent: "flex-start",
+                        width: "100%",
+                      }}
+                    >
                       {images &&
                         Array.from(images).map((img, index) => {
                           return (
@@ -519,9 +526,11 @@ function Add() {
                               width={150}
                               height={150}
                               style={{
-                                margin: "20px 10px",
+                                margin: "10px",
                                 borderRadius: "5px",
                                 objectFit: "cover",
+                                flex: "1 1 calc(20% - 20px)",
+                                maxWidth: "150px",
                               }}
                             />
                           );
@@ -682,19 +691,19 @@ function Add() {
               {(property === "House" ||
                 property === "Commercial" ||
                 property === "Apartment") && (
-                <>
-                  <Typography
-                    variant="h6"
-                    style={{
-                      color: "white",
-                      fontWeight: 500,
-                      fontSize: "22px",
-                      marginLeft: "10px",
-                    }}
-                  >
-                    Size
-                  </Typography>
-                  {/* <TextField
+                  <>
+                    <Typography
+                      variant="h6"
+                      style={{
+                        color: "white",
+                        fontWeight: 500,
+                        fontSize: "22px",
+                        marginLeft: "10px",
+                      }}
+                    >
+                      Size
+                    </Typography>
+                    {/* <TextField
                     required
                     value={size}
                     InputProps={{ style: { color: "white" } }}
@@ -710,30 +719,30 @@ function Add() {
                     fullWidth
                   /> */}
 
-                  <Select
-                    required
-                    value={size || ""}
-                    onChange={(e) => setSize(e.target.value)}
-                    inputProps={{ style: { color: "white" } }}
-                    size="small"
-                    sx={{
-                      border: "1px solid grey",
-                      color: "white",
-                      marginLeft: "20px",
-                      borderRadius: "5px",
-                    }}
-                    fullWidth
-                  >
-                    {Sizes.map((sizeOption, index) =>
-                      sizeOption.value === "All" ? null : (
-                        <MenuItem key={index} value={sizeOption.value}>
-                          {sizeOption.label}
-                        </MenuItem>
-                      )
-                    )}
-                  </Select>
-                </>
-              )}
+                    <Select
+                      required
+                      value={size || ""}
+                      onChange={(e) => setSize(e.target.value)}
+                      inputProps={{ style: { color: "white" } }}
+                      size="small"
+                      sx={{
+                        border: "1px solid grey",
+                        color: "white",
+                        marginLeft: "20px",
+                        borderRadius: "5px",
+                      }}
+                      fullWidth
+                    >
+                      {Sizes.map((sizeOption, index) =>
+                        sizeOption.value === "All" ? null : (
+                          <MenuItem key={index} value={sizeOption.value}>
+                            {sizeOption.label}
+                          </MenuItem>
+                        )
+                      )}
+                    </Select>
+                  </>
+                )}
 
               {(property === "House" || property === "Apartment") && (
                 <>
@@ -898,6 +907,7 @@ function Add() {
                   City
                 </Typography>
                 <Button
+                  style={{ justifyContent: "flex-start", paddingLeft: "15px", textTransform: "none", fontSize: "16px" }}
                   sx={{
                     border: "1px solid grey",
                     width: "98%",
@@ -911,7 +921,7 @@ function Add() {
                   }}
                   onClick={handleCityDialogOpen}
                 >
-                 {city.title}
+                  {city.title}
                 </Button>
                 <CitySelectionDialog
                   open={showCitiesDialog}

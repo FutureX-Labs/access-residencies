@@ -24,17 +24,22 @@ export function CitySelectionDialog({ open, onClose, onSelect }) {
     onSelect({
       group: selectedCity,
       title: subheading.value,
-    }); 
-    onClose(); 
+    });
+    onClose();
   };
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
-      <DialogTitle>Select City or District</DialogTitle>
+      <DialogTitle>Select a Area</DialogTitle>
       <DialogContent>
         <Grid container spacing={2}>
           <Grid item xs={6}>
-            <Typography variant="subtitle1">Districts</Typography>
+            <Typography
+              variant="subtitle1"
+              sx={{ color: "grey", fontSize: "medium" }}
+            >
+              Select a District
+            </Typography>
             <ul style={{ listStyleType: "none", padding: 0 }}>
               {Cities.map((city, i) => (
                 <li
@@ -66,14 +71,11 @@ export function CitySelectionDialog({ open, onClose, onSelect }) {
           </Grid>
           {selectedCity && (
             <Grid item xs={6}>
-              <Typography variant="subtitle1">
-                Select a local area within {selectedCity}
-              </Typography>
               <Typography
                 variant="subtitle1"
                 sx={{ color: "grey", fontSize: "medium" }}
               >
-                Popular Cities
+                Select a Area within {selectedCity}
               </Typography>
               <ul style={{ listStyleType: "none", padding: 0 }}>
                 {Cities.find(
