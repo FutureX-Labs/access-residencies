@@ -16,6 +16,7 @@ export default function FeatureSlider({ imageData }) {
     slidesToScroll: 1,
     fade: true,
     arrows: false,
+    pauseOnHover: true,
   };
 
   return (

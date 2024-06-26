@@ -24,7 +24,7 @@ import { SlCallEnd } from "react-icons/sl";
 import { Roboto } from "next/font/google";
 import { useRouter } from "next/navigation";
 import { GetOneUrl } from "@/app/utility/getOneUrl";
-import BannerSlider from "@/app/components/bannerslider/BannerSlider";
+import BannerSlider from "@/app/components/bannersliderSinglePage/BannerSlider";
 
 function View() {
   const [selectedData, setSelectedData] = useState("");
