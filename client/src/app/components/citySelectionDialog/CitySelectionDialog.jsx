@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -16,7 +16,16 @@ export function CitySelectionDialog({ open, onClose, onSelect }) {
   const handleCitySelect = (city) => {
     setSelectedCity(city.label);
 
-    setSelectedSubheading(""); // Reset subheading selection when a new city is selected
+    if (city.label === "All") {
+      onSelect({
+        group: "All",
+        title: "All",
+      });
+      onClose();
+      return;
+    }
+
+    setSelectedSubheading("");
   };
 
   const handleSubheadingSelect = (subheading) => {
@@ -28,9 +37,25 @@ export function CitySelectionDialog({ open, onClose, onSelect }) {
     onClose();
   };
 
+  const allItem = {
+    label: "All",
+    value: "All",
+    subheadings: [],
+  };
+
+  const transformedCities = Cities.map(city => ({
+    ...city,
+    subheadings: [{
+      label: `All of ${city.value}`,
+      value: `All of ${city.value}`
+    }, ...city.subheadings]
+  }));
+
+  transformedCities.unshift(allItem);
+
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
-      <DialogTitle>Select a Area</DialogTitle>
+      <DialogTitle>Select a Location</DialogTitle>
       <DialogContent>
         <Grid container spacing={2}>
           <Grid item xs={6}>
@@ -41,7 +66,7 @@ export function CitySelectionDialog({ open, onClose, onSelect }) {
               Select a District
             </Typography>
             <ul style={{ listStyleType: "none", padding: 0 }}>
-              {Cities.map((city, i) => (
+              {transformedCities.map((city, i) => (
                 <li
                   key={i}
                   onClick={() => handleCitySelect(city)}
@@ -75,10 +100,10 @@ export function CitySelectionDialog({ open, onClose, onSelect }) {
                 variant="subtitle1"
                 sx={{ color: "grey", fontSize: "medium" }}
               >
-                Select a Area within {selectedCity}
+                Select a Location within {selectedCity}
               </Typography>
               <ul style={{ listStyleType: "none", padding: 0 }}>
-                {Cities.find(
+                {transformedCities.find(
                   (city) => city.label === selectedCity
                 )?.subheadings.map((subheading, i) => (
                   <li

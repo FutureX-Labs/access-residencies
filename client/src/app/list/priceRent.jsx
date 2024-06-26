@@ -27,5 +27,5 @@ export const Rents = [
   { label: "7 mn (70 lakhs)", value: 7000000 },
   { label: "8 mn (80 lakhs)", value: 8000000 },
   { label: "9 mn (90 lakhs)", value: 9000000 },
-  { label: "10 mn (1 crore)", value: 10000000 },
+  { label: "10 mn (100 lakhs)", value: 10000000 },
 ];

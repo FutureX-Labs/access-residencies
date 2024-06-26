@@ -234,9 +234,9 @@ function Add() {
     console.log("before Files", files);
     formData.delete("myFiles");
 
-    if (files.length > 15) {
+    if (files.length > 20) {
       Swal.fire({
-        title: "You can only select up to 15 files.",
+        title: "You can only select up to 20 files.",
         icon: "error",
         confirmButtonText: "Cancel",
       });
@@ -719,28 +719,21 @@ function Add() {
                     fullWidth
                   /> */}
 
-                    <Select
+                    <TextField
                       required
                       value={size || ""}
-                      onChange={(e) => setSize(e.target.value)}
-                      inputProps={{ style: { color: "white" } }}
+                      InputProps={{ style: { color: "white" } }}
                       size="small"
+                      type="number"
                       sx={{
                         border: "1px solid grey",
                         color: "white",
                         marginLeft: "20px",
                         borderRadius: "5px",
                       }}
+                      onChange={(e) => setSize(e.target.value)}
                       fullWidth
-                    >
-                      {Sizes.map((sizeOption, index) =>
-                        sizeOption.value === "All" ? null : (
-                          <MenuItem key={index} value={sizeOption.value}>
-                            {sizeOption.label}
-                          </MenuItem>
-                        )
-                      )}
-                    </Select>
+                    />
                   </>
                 )}
 
@@ -757,28 +750,21 @@ function Add() {
                   >
                     Bedrooms
                   </Typography>
-                  <Select
+                  <TextField
                     required
                     value={bedrooms || ""}
-                    onChange={(e) => setBedrooms(e.target.value)}
-                    inputProps={{ style: { color: "white" } }}
+                    InputProps={{ style: { color: "white" } }}
                     size="small"
+                    type="number"
                     sx={{
                       border: "1px solid grey",
                       color: "white",
                       marginLeft: "20px",
                       borderRadius: "5px",
                     }}
+                    onChange={(e) => setBedrooms(e.target.value)}
                     fullWidth
-                  >
-                    {Bedrooms.map((option, index) =>
-                      option.value === "All" ? null : (
-                        <MenuItem key={index} value={option.value}>
-                          {option.label}
-                        </MenuItem>
-                      )
-                    )}
-                  </Select>
+                  />
                 </>
               )}
 
@@ -795,28 +781,21 @@ function Add() {
                   >
                     Bathrooms
                   </Typography>
-                  <Select
+                  <TextField
                     required
                     value={bathrooms || ""}
-                    onChange={(e) => setBathrooms(e.target.value)}
-                    inputProps={{ style: { color: "white" } }}
+                    InputProps={{ style: { color: "white" } }}
                     size="small"
+                    type="number"
                     sx={{
                       border: "1px solid grey",
                       color: "white",
                       marginLeft: "20px",
                       borderRadius: "5px",
                     }}
+                    onChange={(e) => setBathrooms(e.target.value)}
                     fullWidth
-                  >
-                    {Bedrooms.map((option, index) =>
-                      option.value === "All" ? null : (
-                        <MenuItem key={index} value={option.value}>
-                          {option.label}
-                        </MenuItem>
-                      )
-                    )}
-                  </Select>
+                  />
                 </>
               )}
 
@@ -833,28 +812,21 @@ function Add() {
                   >
                     Perches
                   </Typography>
-                  <Select
+                  <TextField
                     required
                     value={perches || ""}
-                    onChange={(e) => setPerches(e.target.value)}
-                    inputProps={{ style: { color: "white" } }}
+                    InputProps={{ style: { color: "white" } }}
                     size="small"
+                    type="number"
                     sx={{
                       border: "1px solid grey",
                       color: "white",
                       marginLeft: "20px",
                       borderRadius: "5px",
                     }}
+                    onChange={(e) => setPerches(e.target.value)}
                     fullWidth
-                  >
-                    {Perches.map((option, index) =>
-                      option.value === "All" ? null : (
-                        <MenuItem key={index} value={option.value}>
-                          {option.label}
-                        </MenuItem>
-                      )
-                    )}
-                  </Select>
+                  />
                 </>
               )}
               {property === "Land" && (
@@ -870,28 +842,21 @@ function Add() {
                   >
                     Acres
                   </Typography>
-                  <Select
+                  <TextField
                     required
                     value={acres || ""}
-                    onChange={(e) => setAcres(e.target.value)}
-                    inputProps={{ style: { color: "white" } }}
+                    InputProps={{ style: { color: "white" } }}
                     size="small"
+                    type="number"
                     sx={{
                       border: "1px solid grey",
                       color: "white",
                       marginLeft: "20px",
                       borderRadius: "5px",
                     }}
+                    onChange={(e) => setAcres(e.target.value)}
                     fullWidth
-                  >
-                    {Acres.map((option, index) =>
-                      option.value === "All" ? null : (
-                        <MenuItem key={index} value={option.value}>
-                          {option.label}
-                        </MenuItem>
-                      )
-                    )}
-                  </Select>
+                  />
                 </>
               )}
               <Box sx={{ width: "100%" }}>

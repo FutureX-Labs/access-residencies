@@ -290,7 +290,8 @@ router.post("/filter/admin", AuthM, async (req, res) => {
     }
 
     if (city !== "" && city !== null && city !== "All") {
-      filter.city = { $regex: new RegExp(city, "i") };
+      const cityList = city.split(",").map(cityName => cityName.trim());
+      filter.city = { $in: cityList };
     }
 
     if (size !== NaN && size !== null && size !== "All") {
@@ -329,7 +330,8 @@ router.post("/filter", async (req, res) => {
     }
 
     if (city !== "" && city !== null && city !== "All") {
-      filter.city = { $regex: new RegExp(city, "i") };
+      const cityList = city.split(",").map(cityName => cityName.trim());
+      filter.city = { $in: cityList };
     }
 
     if (size !== NaN && size !== null && size !== "All") {
@@ -368,7 +370,8 @@ router.post("/filter/main", async (req, res) => {
     }
 
     if (city !== "" && city !== null && city !== "All") {
-      filter.city = { $regex: new RegExp(city, "i") };
+      const cityList = city.split(",").map(cityName => cityName.trim());
+      filter.city = { $in: cityList };
     }
 
     if (title !== "" && title !== null) {
