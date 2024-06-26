@@ -1,22 +1,22 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import Slider from "react-slick";
 import { CldImage } from "next-cloudinary";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
 export default function BannerSlider({ imageData }) {
+  let sliderRef = useRef(null);
   console.log("imageData", imageData);
 
   const settings = {
     dots: false,
+    arrows: false,
     infinite: true,
-    speed: 2000,
     adaptiveHeight: true,
     slidesToShow: 1,
     slidesToScroll: 1,
-    fade: true,
-    arrows: false,
     autoplay: true,
+    speed: 1500,
     autoplaySpeed: 5000,
     pauseOnHover: false,
   };
@@ -28,8 +28,15 @@ export default function BannerSlider({ imageData }) {
     position: "relative",
   };
 
+  useEffect(() => {
+    if (sliderRef) {
+      sliderRef.slickPlay();
+    }
+  }, []);
+
   return (
     <Slider
+      ref={slider => (sliderRef = slider)}
       {...settings}
       className="slick-slider-custom"
       style={{ zIndex: "10", position: "relative" }}

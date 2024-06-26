@@ -298,7 +298,7 @@ const Showcase = ({ data, user, property, propertyType, showHidden }) => {
                 height: "37px",
               }}
             >
-              RS.{formatPrice(item.price)}
+              RS.{user === "admin" ? item.price : formatPrice(item.price)}
             </Typography>
           )}
           {item.rent && (
@@ -312,7 +312,7 @@ const Showcase = ({ data, user, property, propertyType, showHidden }) => {
                 height: "37px",
               }}
             >
-              RS.{formatPrice(item.rent)}
+              RS.{user === "admin" ? item.rent : formatPrice(item.rent)}
             </Typography>
           )}
         </Box>
