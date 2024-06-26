@@ -1,5 +1,5 @@
 export const comProperty = [
-  { label: "Building", value: "Building" },
+  { label: "Commercial Building", value: "Building" },
   { label: "Hotel", value: "Hotel" },
   { label: "Shop", value: "Shop" },
   { label: "Warehouse", value: "Warehouse" },

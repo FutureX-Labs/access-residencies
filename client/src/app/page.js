@@ -29,6 +29,7 @@ import { GetAll } from "./utility/getAll";
 import { PropertyTypes } from "@/app/list/propertyTypes";
 import { Prices } from "@/app/list/price";
 import { Rents } from "@/app/list/priceRent";
+import { Cities } from "@/app/list/city";
 import { FilterUrl } from "./utility/filterUrls";
 import AuthContext from "./context/AuthContext";
 import { useRouter } from "next/navigation";
@@ -105,10 +106,17 @@ function Home() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const additionalData = {
-      title: title,
-      city: city.title,
-    };
+    let additionalData;
+
+    if (city.title.startsWith("All of ")) {
+      const cityName = city.title.replace("All of ", "");
+      const cityItem = Cities.find(city => city.value === cityName);
+      if (cityItem) {
+        additionalData = { title: title, city: cityItem.subheadings.map(subheading => subheading.value).join(",") };
+      }
+    } else {
+      additionalData = { title: title, city: city.title, };
+    }
 
     if (selectedPropertyType === "ForSale") {
       additionalData.price = parseInt(price);
@@ -401,10 +409,10 @@ function Home() {
                         marginLeft: "10px",
                       }}
                     >
-                      City
+                      Location
                     </Typography>
                     <Button
-                      style={{ justifyContent: "flex-start", paddingLeft:"15px", textTransform: "none", fontSize: "16px" }}
+                      style={{ justifyContent: "flex-start", paddingLeft: "15px", textTransform: "none", fontSize: "16px" }}
                       sx={{
                         border: "1px solid #8C1C40",
                         width: "100%",

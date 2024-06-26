@@ -259,9 +259,9 @@ function Edit() {
     const files = e.target.files;
     imageFormData.delete("image");
 
-    if (files.length > 15) {
+    if (files.length > 20) {
       Swal.fire({
-        title: "You can only select up to 15 files.",
+        title: "You can only select up to 20 files.",
         icon: "error",
         confirmButtonText: "Cancel",
       });
@@ -704,26 +704,21 @@ function Edit() {
                     fullWidth
                   /> */}
 
-                    <Select
+                    <TextField
                       required
-                      value={size || "All"}
-                      onChange={(e) => setSize(e.target.value)}
-                      inputProps={{ style: { color: "white" } }}
+                      value={size || ""}
+                      InputProps={{ style: { color: "white" } }}
                       size="small"
+                      type="number"
                       sx={{
                         border: "1px solid grey",
                         color: "white",
                         marginLeft: "20px",
                         borderRadius: "5px",
                       }}
+                      onChange={(e) => setSize(e.target.value)}
                       fullWidth
-                    >
-                      {Sizes.map((sizeOption, index) => (
-                        <MenuItem key={index} value={sizeOption.value}>
-                          {sizeOption.label}
-                        </MenuItem>
-                      ))}
-                    </Select>
+                    />
                   </>
                 )}
 
@@ -740,26 +735,21 @@ function Edit() {
                   >
                     Bedrooms
                   </Typography>
-                  <Select
+                  <TextField
                     required
-                    value={bedrooms || "All"}
-                    onChange={(e) => setBedrooms(e.target.value)}
-                    inputProps={{ style: { color: "white" } }}
+                    value={bedrooms || ""}
+                    InputProps={{ style: { color: "white" } }}
                     size="small"
+                    type="number"
                     sx={{
                       border: "1px solid grey",
                       color: "white",
                       marginLeft: "20px",
                       borderRadius: "5px",
                     }}
+                    onChange={(e) => setBedrooms(e.target.value)}
                     fullWidth
-                  >
-                    {Bedrooms.map((option, index) => (
-                      <MenuItem key={index} value={option.value}>
-                        {option.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
+                  />
                 </>
               )}
 
@@ -776,26 +766,21 @@ function Edit() {
                   >
                     Bathrooms
                   </Typography>
-                  <Select
+                  <TextField
                     required
-                    value={bathrooms || "All"}
-                    onChange={(e) => setBathrooms(e.target.value)}
-                    inputProps={{ style: { color: "white" } }}
+                    value={bathrooms || ""}
+                    InputProps={{ style: { color: "white" } }}
                     size="small"
+                    type="number"
                     sx={{
                       border: "1px solid grey",
                       color: "white",
                       marginLeft: "20px",
                       borderRadius: "5px",
                     }}
+                    onChange={(e) => setBathrooms(e.target.value)}
                     fullWidth
-                  >
-                    {Bedrooms.map((option, index) => (
-                      <MenuItem key={index} value={option.value}>
-                        {option.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
+                  />
                 </>
               )}
 
@@ -812,26 +797,21 @@ function Edit() {
                   >
                     Perches
                   </Typography>
-                  <Select
+                  <TextField
                     required
-                    value={perches || "All"}
-                    onChange={(e) => setPerches(e.target.value)}
-                    inputProps={{ style: { color: "white" } }}
+                    value={perches || ""}
+                    InputProps={{ style: { color: "white" } }}
                     size="small"
+                    type="number"
                     sx={{
                       border: "1px solid grey",
                       color: "white",
                       marginLeft: "20px",
                       borderRadius: "5px",
                     }}
+                    onChange={(e) => setPerches(e.target.value)}
                     fullWidth
-                  >
-                    {Perches.map((option, index) => (
-                      <MenuItem key={index} value={option.value}>
-                        {option.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
+                  />
                 </>
               )}
               {property === "Land" && (
@@ -847,26 +827,21 @@ function Edit() {
                   >
                     Acres
                   </Typography>
-                  <Select
+                  <TextField
                     required
-                    value={acres || "All"}
-                    onChange={(e) => setAcres(e.target.value)}
-                    inputProps={{ style: { color: "white" } }}
+                    value={acres || ""}
+                    InputProps={{ style: { color: "white" } }}
                     size="small"
+                    type="number"
                     sx={{
                       border: "1px solid grey",
                       color: "white",
                       marginLeft: "20px",
                       borderRadius: "5px",
                     }}
+                    onChange={(e) => setAcres(e.target.value)}
                     fullWidth
-                  >
-                    {Acres.map((option, index) => (
-                      <MenuItem key={index} value={option.value}>
-                        {option.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
+                  />
                 </>
               )}
               <Box sx={{ width: "100%" }}>

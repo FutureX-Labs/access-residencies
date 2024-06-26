@@ -259,7 +259,8 @@ router.post("/filter/admin", AuthM, async (req, res) => {
     }
 
     if (city !== "" && city !== null && city !== "All") {
-      filter.city = { $regex: new RegExp(city, "i") };
+      const cityList = city.split(",").map(cityName => cityName.trim());
+      filter.city = { $in: cityList };
     }
 
     const aggregationPipeline = [
@@ -314,7 +315,8 @@ router.post("/filter", async (req, res) => {
     }
 
     if (city !== "" && city !== null && city !== "All") {
-      filter.city = { $regex: new RegExp(city, "i") };
+      const cityList = city.split(",").map(cityName => cityName.trim());
+      filter.city = { $in: cityList };
     }
 
     const aggregationPipeline = [
@@ -371,7 +373,8 @@ router.post("/filter/main", async (req, res) => {
 
     // Filtering by city using a case-insensitive regex for flexible matching
     if (city !== "" && city !== null && city !== "All") {
-      filter.city = { $regex: new RegExp(city, "i") };
+      const cityList = city.split(",").map(cityName => cityName.trim());
+      filter.city = { $in: cityList };
     }
 
     // Filtering by title using a case-insensitive regex for partial matches

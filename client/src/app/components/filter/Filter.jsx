@@ -119,9 +119,17 @@ const Filter = ({
       }
     }
     try {
-      let additionalData = {
-        city: city.title,
-      };
+      let additionalData;
+
+      if (city.title.startsWith("All of ")) {
+        const cityName = city.title.replace("All of ", "");
+        const cityItem = Cities.find(city => city.value === cityName);
+        if (cityItem) {
+          additionalData = { city: cityItem.subheadings.map(subheading => subheading.value).join(",") };
+        }
+      } else {
+        additionalData = { city: city.title, };
+      }
 
       if (propertyType === "ForSale") {
         additionalData.price = parseInt(price);
@@ -188,7 +196,7 @@ const Filter = ({
 
             switch (key) {
               case "city":
-                return value;
+                return city.title;
               case "bedrooms":
                 return `${value} Bedrooms`;
               case "bathrooms":
@@ -308,7 +316,7 @@ const Filter = ({
                     marginLeft: "10px",
                   }}
                 >
-                  City
+                  Location
                 </Typography>
                 <Button
                   style={{ justifyContent: "flex-start", paddingLeft: "15px", textTransform: "none", fontSize: "16px" }}
@@ -445,7 +453,7 @@ const Filter = ({
                         marginLeft: "10px",
                       }}
                     >
-                      Size
+                      Min Size
                     </Typography>
                     <Select
                       open={selectStates[3]}

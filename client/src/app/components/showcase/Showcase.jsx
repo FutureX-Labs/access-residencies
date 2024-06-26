@@ -132,7 +132,20 @@ const Showcase = ({ data, user, property, propertyType, showHidden }) => {
     }
   };
 
-  console.log("showHidden", showHidden);
+  function formatPrice(price) {
+    const lakhs = price / 100000;
+    let lakhsString;
+
+    if (lakhs >= 1) {
+      lakhsString = lakhs.toFixed(1).replace(/\.0$/, "");
+    } else {
+      lakhsString = lakhs.toString();
+    }
+
+    return `${price} (${lakhsString} lakhs)`;
+  }
+
+  // console.log("showHidden", showHidden);
 
   const childrenContent = (item) => (
     <>
@@ -143,7 +156,7 @@ const Showcase = ({ data, user, property, propertyType, showHidden }) => {
         style={{ objectFit: "cover" }}
         blur={200}
         sizes="20vw"
-        opacity="65"
+        opacity="60"
         alt="Banner Image"
       />
       <Box sx={{ ml: "20px", mt: "16px", textAlign: "start", zIndex: 1, position: "absolute" }}>
@@ -285,7 +298,7 @@ const Showcase = ({ data, user, property, propertyType, showHidden }) => {
                 height: "37px",
               }}
             >
-              RS.{item.price}
+              RS.{formatPrice(item.price)}
             </Typography>
           )}
           {item.rent && (
@@ -299,7 +312,7 @@ const Showcase = ({ data, user, property, propertyType, showHidden }) => {
                 height: "37px",
               }}
             >
-              RS.{item.rent}
+              RS.{formatPrice(item.rent)}
             </Typography>
           )}
         </Box>
